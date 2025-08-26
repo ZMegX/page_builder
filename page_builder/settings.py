@@ -25,13 +25,13 @@ SECRET_KEY = 'django-insecure-p(zi^f2^ue!+@t8wf4$4gr=j+12wt2$ej4)@!zg2d61-213t#4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost:8000']
+ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'forms.apps.FormsConfig',
+    'page_builder_app_create_page.apps.PageBuilderAppCreatePageConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,7 +115,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
