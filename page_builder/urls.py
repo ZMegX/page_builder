@@ -15,4 +15,6 @@ urlpatterns = [
 
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('users.urls')),
+
 ]
