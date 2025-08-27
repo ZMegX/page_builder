@@ -1,16 +1,18 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
-from .models import Profile, Address
+from .models import Profile, Address, RestaurantDetails
 
 # Profile Create/Edit Form
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'company_name', 'image', 'email', 'phone_number', 'description',
-            'cuisine_type', 'established_year', 'registration_number',
-            'tax_id', 'website', 'capacity',
+            'company_name',
+            'image',
+            'email',
+            'phone_number',
+            'description',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
@@ -30,10 +32,27 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
         fields = [
-            'street', 'city', 'state', 'country', 'zipcode',
-            'latitude', 'longitude',
+            'street',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'latitude',
+            'longitude',
         ]
 
+class RestaurantDetailsForm(forms.ModelForm):
+    class Meta:
+        model = RestaurantDetails
+        fields = [
+            'cuisine_type',
+            'established_year',
+            'registration_number',
+            'tax_id',
+            'website',
+            'capacity',
+            'is_verified',
+        ]
 # User Registration Form (extend as needed)
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
