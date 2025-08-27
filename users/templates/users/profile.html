@@ -1,40 +1,79 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
-<div class="container" style="min-height: 80vh;">
-    <div class="row align-items-center h-100">
-        <!-- Left: Profile Info & Form -->
-        <div class="col-md-6 d-flex justify-content-center">
-            <div class="card shadow-sm w-100" style="max-width: 500px;">
-                <div class="card-body text-center">
+<div class="container py-5" style="min-height: 80vh;">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-lg-7 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
                     <!-- Profile image -->
-                    <img class="rounded-circle mb-3" 
-                         src="{{ user.profile.image.url }}" 
-                         alt="Profile picture" 
-                         style="width: 120px; height: 120px; object-fit: cover;">
+                    <div class="d-flex flex-column align-items-center mb-4">
+                        {% if user.profile.image %}
+                            <img class="rounded-circle border border-3 border-primary mb-3 shadow" 
+                                 src="{{ user.profile.image.url }}" 
+                                 alt="Profile picture" 
+                                 style="width: 128px; height: 128px; object-fit: cover;">
+                        {% else %}
+                            <img class="rounded-circle border border-3 border-secondary mb-3 shadow"
+                                 src="{% static 'default_profile_pic.png' %}"
+                                 alt="Profile picture"
+                                 style="width: 128px; height: 128px; object-fit: cover;">
+                        {% endif %}
 
-                    <h2 class="account-heading">{{ user.username }}</h2>
-                    <p class="text-secondary">{{ user.email }}</p>
+                        <h3 class="fw-bold mb-1">{{ user.username }}</h3>
+                        <p class="text-muted mb-0">{{ user.email }}</p>
+                    </div>
 
                     <!-- Profile update form -->
-                    <form method="POST" enctype="multipart/form-data" class="text-start">
+                    <form method="POST" enctype="multipart/form-data" autocomplete="off">
                         {% csrf_token %}
-                        <fieldset class="form-group">
-                            <legend class="border-bottom mb-4">Your Info</legend>
-                            {{ u_form|crispy }}
-                            {{ p_form.image|as_crispy_field }}
+                        <fieldset class="form-group mb-4">
+                            <legend class="fs-5 fw-semibold border-bottom pb-2 mb-3 text-primary-emphasis">
+                                Your Info
+                            </legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% for field in u_form %}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                                            {{ field|as_crispy_field }}
+                                            {% if field.help_text %}
+                                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% for field in p_form %}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                                            {{ field|as_crispy_field }}
+                                            {% if field.help_text %}
+                                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </fieldset>
 
-                        <div class="row g-2 mt-3">
+                        <div class="row g-2 mt-4">
                             <div class="col-12 col-sm-6">
-                                <a href="{% url 'password_change' %}" class="btn btn-outline-warning w-100">
-                                    Change Password
+                                <a href="{% url 'password_change' %}" class="btn btn-outline-warning w-100 py-2">
+                                    <i class="bi bi-key me-1"></i> Change Password
                                 </a>
                             </div>
                             <div class="col-12 col-sm-6">
-                                <button class="btn btn-primary w-100" type="submit">
-                                    Update Profile
+                                <button class="btn btn-primary w-100 py-2" type="submit">
+                                    <i class="bi bi-save me-1"></i> Update Profile
                                 </button>
                             </div>
                         </div>
@@ -42,15 +81,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Right: Placeholder or Image -->
-        <div class="col-md-6 d-flex justify-content-center align-items-center">
-            <!-- Replace with your own image -->
-            <img src="..." 
-                 alt="Profile side image" 
-                 class="img-fluid rounded shadow-sm"
-                 style="max-height: 400px;">
-        </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}
