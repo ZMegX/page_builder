@@ -15,6 +15,18 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # This will load variables from .env into environment
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,6 +44,7 @@ ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'users',
     'page_builder_app_create_page.apps.PageBuilderAppCreatePageConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +52,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "crispy_forms",
+    "crispy_bootstrap5",
+    'cloudinary',
+    'cloudinary_storage',
+    
 ]
 
 MIDDLEWARE = [
@@ -125,3 +143,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
