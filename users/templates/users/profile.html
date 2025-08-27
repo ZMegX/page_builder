@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container" style="min-height: 80vh;">
+    <div class="row align-items-center h-100">
+        <!-- Left: Profile Info & Form -->
+        <div class="col-md-6 d-flex justify-content-center">
+            <div class="card shadow-sm w-100" style="max-width: 500px;">
+                <div class="card-body text-center">
+                    <!-- Profile image -->
+                    <img class="rounded-circle mb-3" 
+                         src="{{ user.profile.image.url }}" 
+                         alt="Profile picture" 
+                         style="width: 120px; height: 120px; object-fit: cover;">
+
+                    <h2 class="account-heading">{{ user.username }}</h2>
+                    <p class="text-secondary">{{ user.email }}</p>
+
+                    <!-- Profile update form -->
+                    <form method="POST" enctype="multipart/form-data" class="text-start">
+                        {% csrf_token %}
+                        <fieldset class="form-group">
+                            <legend class="border-bottom mb-4">Your Info</legend>
+                            {{ u_form|crispy }}
+                            {{ p_form.image|as_crispy_field }}
+                        </fieldset>
+
+                        <div class="row g-2 mt-3">
+                            <div class="col-12 col-sm-6">
+                                <a href="{% url 'password_change' %}" class="btn btn-outline-warning w-100">
+                                    Change Password
+                                </a>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <button class="btn btn-primary w-100" type="submit">
+                                    Update Profile
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Placeholder or Image -->
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <!-- Replace with your own image -->
+            <img src="..." 
+                 alt="Profile side image" 
+                 class="img-fluid rounded shadow-sm"
+                 style="max-height: 400px;">
+        </div>
+    </div>
+</div>
+{% endblock content %}

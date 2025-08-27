@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Restaurant Profile</h2>
+    {{ profile_form|crispy }}
+    <h2>Address</h2>
+    {{ address_form|crispy }}
+    <button type="submit">Save</button>
+</form>
+
