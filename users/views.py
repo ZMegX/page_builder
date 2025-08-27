@@ -1,5 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import ProfileForm, AddressForm
+from .forms import (ProfileForm, 
+                    AddressForm, 
+                    UserCreationForm,
+                    UserRegisterForm, 
+                    CustomUserCreationForm,
+                    UserUpdateForm,
+                    ProfileUpdateForm,
+                    )
 from .models import Profile
 from django.contrib.auth.decorators import login_required
 
@@ -74,3 +81,8 @@ def profile(request):
   }
 
   return render(request, 'users/profile.html', context)
+
+
+@login_required
+def profile_view(request):
+    return render(request, 'users/profile.html')
