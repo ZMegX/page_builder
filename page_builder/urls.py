@@ -10,9 +10,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 
     # Registration flow
-    path('register/', user_views.create_profile, name='register'),
-    path('register/registration/complete_profile/', user_views.complete_profile, name='complete_profile'),
-
+    path('register/', user_views.register, name='register'),
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
