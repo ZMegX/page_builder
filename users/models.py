@@ -32,12 +32,21 @@ class OpeningHour(models.Model):
         return f"{self.day_of_week}: {self.open_time} - {self.close_time}"
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=200)
     image = CloudinaryField('image', blank=True, null=True)
     email = models.EmailField(max_length=254)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    addresses = models.ManyToManyField(Address, blank=True, related_name='profiles')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username
+    
+class RestaurantDetails(models.Model):
+    profile = models.OneToOneField('Profile', on_delete=models.CASCADE, related_name='restaurant_details')
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     established_year = models.PositiveIntegerField(blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
@@ -45,10 +54,6 @@ class Profile(models.Model):
     website = models.URLField(blank=True, null=True)
     capacity = models.PositiveIntegerField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    # Address relation: OneToMany (profile can have multiple addresses)
-    addresses = models.ManyToManyField(Address, blank=True, related_name='profiles')
 
     def __str__(self):
-        return f'{self.user.username}'
+        return f"{self.profile.company_name} Restaurant Details"
