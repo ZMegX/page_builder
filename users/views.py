@@ -1,88 +1,50 @@
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .forms import (ProfileForm, 
+from .forms import (
                     AddressForm, 
-                    UserCreationForm,
-                    UserRegisterForm, 
-                    CustomUserCreationForm,
-                    UserUpdateForm,
-                    ProfileUpdateForm,
+                    CustomUserCreationForm, 
+                    UserUpdateForm, 
+                    ProfileUpdateForm
                     )
 from .models import Profile
-from django.contrib.auth.decorators import login_required
 
-@login_required
-def create_profile(request):
+def register(request):
     if request.method == 'POST':
-        try:
-            profile = Profile.objects.get(user=request.user)
-            profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-        except Profile.DoesNotExist:
-            profile_form = ProfileForm(request.POST, request.FILES)
-        
-        address_form = AddressForm(request.POST)
-        
-        if profile_form.is_valid() and address_form.is_valid():
-            profile = profile_form.save(commit=False)
-            profile.user = request.user
-            profile.save()
-            address = address_form.save()
-            profile.addresses.add(address)
-            return redirect('registration/complete_profile')
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            Profile.objects.get_or_create(user=user)
+            return redirect('login')  
     else:
-        try:
-            profile = Profile.objects.get(user=request.user)
-            profile_form = ProfileForm(instance=profile)
-        except Profile.DoesNotExist:
-            profile_form = ProfileForm()
+        form = CustomUserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+# Profile creation/editing view (NO password here)
+@login_required
+def profile_manage(request):
+    user = request.user
+    profile, created = Profile.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=user)
+        address_form = AddressForm(request.POST)
+        if u_form.is_valid() and p_form.is_valid() and address_form.is_valid():
+            u_form.save()
+            p_form.save()
+            address = AddressForm.save()
+            profile.addresses.add(address)
+            return redirect('profile')  # Redirect to profile page after completion
+    else:
+        u_form= UserUpdateForm(instance=user)
+        p_form = ProfileUpdateForm(instance=profile)
         address_form = AddressForm()
-    return render(request, 'registration/registration.html', {
-        'profile_form': profile_form,
-        'address_form': address_form
+
+    return render(request, 'users/profile.html', {
+        'u_form': u_form,
+        'p_form': p_form,
+        'address_form': address_form,
+        'profile': profile,
     })
 
-@login_required
-def complete_profile(request):
-    profile = request.user.profile
-    if request.method == 'POST':
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-        address_form = AddressForm(request.POST)
-        if profile_form.is_valid() and address_form.is_valid():
-            profile_form.save()
-            address = address_form.save()
-            profile.addresses.add(address)
-            return redirect('dashboard')
-    else:
-        profile_form = ProfileForm(instance=profile)
-        address_form = AddressForm()
-    return render(request, 'registration/complete_profile.html', {
-        'profile_form': profile_form,
-        'address_form': address_form
-    })
-
-@login_required
-def profile(request):
-  if request.method == 'POST':
-    u_form = UserUpdateForm(request.POST, instance=request.user)
-    p_form = ProfileUpdateForm(request.POST, 
-                request.FILES, 
-                instance=request.user.profile)
-    if u_form.is_valid() and p_form.is_valid():
-      u_form.save()
-      p_form.save()
-      messages.success(request, f'Your account has been updated') #Changes here
-      return redirect('profile') #Changes here
-  else:
-    u_form = UserUpdateForm(instance=request.user)
-    p_form = ProfileUpdateForm(instance=request.user.profile)
-
-  context = {
-    'u_form': u_form,
-    'p_form': p_form
-  }
-
-  return render(request, 'users/profile.html', context)
-
-
-@login_required
-def profile_view(request):
-    return render(request, 'users/profile.html')
