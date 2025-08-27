@@ -21,7 +21,6 @@
                                  alt="Profile picture"
                                  style="width: 128px; height: 128px; object-fit: cover;">
                         {% endif %}
-
                         <h3 class="fw-bold mb-1">{{ user.username }}</h3>
                         <p class="text-muted mb-0">{{ user.email }}</p>
                     </div>
@@ -65,6 +64,50 @@
                             </div>
                         </fieldset>
 
+                        <!-- Address form section -->
+                        <fieldset class="form-group mb-4">
+                            <legend class="fs-5 fw-semibold border-bottom pb-2 mb-3 text-primary-emphasis">
+                                Address
+                                <span class="fs-6 fw-normal text-muted ms-2">(Add or update your address)</span>
+                            </legend>
+                            <div class="row">
+                                {% for field in address_form %}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                                        {{ field|as_crispy_field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+
+                        <!-- Restaurant Details form section -->
+                        <fieldset class="form-group mb-4">
+                            <legend class="fs-5 fw-semibold border-bottom pb-2 mb-3 text-primary-emphasis">
+                                Restaurant Details
+                                <span class="fs-6 fw-normal text-muted ms-2">(Fill in if you are a restaurant)</span>
+                            </legend>
+                            <div class="row">
+                                {% for field in r_form %}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">{{ field.label }}</label>
+                                        {{ field|as_crispy_field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+
                         <div class="row g-2 mt-4">
                             <div class="col-12 col-sm-6">
                                 <a href="{% url 'password_change' %}" class="btn btn-outline-warning w-100 py-2">
@@ -78,6 +121,30 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- Show all addresses (optional section for user clarity & UX) -->
+                    {% if profile.addresses.all %}
+                        <hr class="my-4">
+                        <div>
+                            <h6 class="mb-3 text-primary">Your Addresses</h6>
+                            <ul class="list-group">
+                                {% for addr in profile.addresses.all %}
+                                    <li class="list-group-item d-flex flex-column flex-md-row align-items-md-center">
+                                        <span>
+                                            <i class="bi bi-geo-alt text-secondary me-2"></i>
+                                            {{ addr }}
+                                        </span>
+                                        {% if addr.zipcode %}
+                                            <span class="badge bg-light text-secondary ms-md-auto mt-2 mt-md-0">
+                                                {{ addr.zipcode }}
+                                            </span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
