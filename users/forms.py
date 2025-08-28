@@ -8,11 +8,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'company_name',
             'image',
-            'email',
-            'phone_number',
-            'description',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
@@ -45,13 +41,11 @@ class RestaurantDetailsForm(forms.ModelForm):
     class Meta:
         model = RestaurantDetails
         fields = [
+            'company_name',
             'cuisine_type',
-            'established_year',
             'registration_number',
-            'tax_id',
             'website',
-            'capacity',
-            'is_verified',
+            'phone_number',
         ]
 # User Registration Form (extend as needed)
 class CustomUserCreationForm(UserCreationForm):
@@ -67,7 +61,7 @@ class UserUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ['username', 'first_name', 'last_name']
 
 # Custom Set Password Form (for password reset/change flows)
 class CustomSetPasswordForm(SetPasswordForm):
