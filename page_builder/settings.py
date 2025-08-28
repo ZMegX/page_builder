@@ -43,7 +43,7 @@ ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    'users',
+    'users.apps.UsersConfig',
     'page_builder_app_create_page.apps.PageBuilderAppCreatePageConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     'cloudinary',
     'cloudinary_storage',
+    'widget_tweaks',
     
 ]
 
@@ -146,3 +147,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'picardomegan@gmail.com'
+EMAIL_HOST_PASSWORD = 'zadjjhljtssxjnfh'
+DEFAULT_FROM_EMAIL = 'Webmaster <picardomegan@gmail.com>'
+
+LOGOUT_REDIRECT_URL = 'home'
