@@ -240,3 +240,76 @@ body {
     object-fit: contain;
     display: block;
 }
+/* Sticky navbar with white background and black outline */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    background-color: #fff !important;
+    border: 2px solid #000;         /* Black outline */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Username styling: plain black text */
+.navbar-username {
+    color: #000;
+    font-weight: bold;
+    margin-left: 0.5em;
+    text-shadow: none;
+}
+
+/* Profile image styling in navbar */
+.navbar-profile-img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: none;
+    margin-right: 0.5em;
+    background: #fff;
+    box-shadow: none;
+}
+
+/* Nav links: plain black text, no outline */
+.navbar .nav-link,
+.navbar .btn-link {
+    color: #000 !important;
+    text-shadow: none;
+    border: none;
+    outline: none;
+}
+
+.navbar .nav-link:hover,
+.navbar .btn-link:hover {
+    color: #333 !important;
+    text-decoration: underline;
+}
+
+/* Optional: Style mobile nav toggle button for sticky effect */
+.navbar-toggler {
+    z-index: 1060;
+}
+
+.fade-in-element {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in-element.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optional: stagger effect for feature cards */
+.feature-card {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.feature-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
