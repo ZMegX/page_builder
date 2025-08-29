@@ -1,31 +1,59 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
-
+{% load static %}
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
-        <div class="card-body">
-            <h3 class="card-title text-center mb-4">Login</h3>
-
-            <form method="POST">  
-                {% csrf_token %}
-                <fieldset class="form-group">
-                    {{ form|crispy }}
-                </fieldset>  
-
-                <button class="btn btn-primary w-100 mt-3" type="submit">Login</button>
-                <input type="hidden" name="next" value="{% url 'profile' %}" />
-            </form>
-
-            <div class="border-top pt-3 mt-4">
-                <a href="{% url 'register' %}" class="btn btn-outline-primary w-100 mb-2">
-                    Sign Up Now
-                </a>
-                <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary w-100">
-                    Forgot your password?
-                </a>
-            </div>
+<div class="container" style="padding-top: 48px; max-width: 440px;">
+    <div class="card shadow border-0 rounded-4 p-5">
+        <div class="text-center mb-3">
+          <div class="logo-avatar">
+              <img src="{% static 'images/logo.png' %}" alt="Logo">
+          </div>
+        </div>
+            <h3 class="fw-bold mb-0" style="color:#222;">Login</h3>
+      
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ form|crispy }}
+            </fieldset>
+            <button class="btn btn-outline-dark w-100 mt-3 fw-semibold" style="border-radius:0.6rem; font-size:1.12rem; background:#fff;">
+                Login
+            </button>
+            <input type="hidden" name="next" value="{% url 'profile' %}" />
+        </form>
+        <div class="border-top pt-3 mt-4">
+            <a href="{% url 'register' %}" class="btn btn-outline-dark w-100 mb-2 fw-semibold" style="border-radius:0.6rem; background:#fff;">
+                Sign Up Now
+            </a>
+            <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary w-100 fw-semibold" style="border-radius:0.6rem;">
+                Forgot your password?
+            </a>
         </div>
     </div>
 </div>
+<style>
+  body { background: #fff !important; }
+  .btn-outline-dark {
+    color: #222 !important;
+    border: 1.5px solid #222 !important;
+    background: #fff !important;
+    transition: color .2s, background .2s;
+  }
+  .btn-outline-dark:hover, .btn-outline-dark:focus {
+    color: #fff !important;
+    background: #222 !important;
+    border: 1.5px solid #222 !important;
+  }
+  .btn-outline-secondary {
+    color: #555 !important;
+    border: 1.5px solid #bbb !important;
+    background: #fff !important;
+    transition: color .2s, background .2s;
+  }
+  .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+    color: #fff !important;
+    background: #bbb !important;
+    border: 1.5px solid #bbb !important;
+  }
+</style>
 {% endblock content %}

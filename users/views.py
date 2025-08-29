@@ -33,7 +33,7 @@ def profile_manage(request):
         # get or create restaurant details instance for the profile
         r_form = RestaurantDetailsForm(request.POST, instance=restaurant_details)
 
-        if u_form.is_valid() and p_form.is_valid() and address_form.is_valid():
+        if u_form.is_valid() and p_form.is_valid() and address_form.is_valid() and r_form.is_valid():
             u_form.save()
             p_form.save()
             address = address_form.save()
@@ -52,6 +52,7 @@ def profile_manage(request):
         'address_form': address_form,
         'profile': profile,
         'r_form': r_form,
+        'restaurant_details': restaurant_details,
 
     })
 

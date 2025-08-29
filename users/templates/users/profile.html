@@ -3,12 +3,11 @@
 {% load static %}
 
 {% block content %}
-<div class="container py-5" style="min-height: 80vh;">
+<div class="container profile-container">
     <div class="row justify-content-center">
-        <div class="col-lg-10">
-
+        <div class="col-xl-11 col-lg-12">
             <!-- Profile card header -->
-            <div class="card shadow-lg border-0 rounded-4 mb-4">
+            <div class="card profile-card shadow-lg border-0 rounded-4 mb-4">
                 <div class="card-body bg-light rounded-top-4 p-4 d-flex flex-column flex-md-row align-items-center">
                     <div class="me-md-4 mb-3 mb-md-0">
                         {% if user.profile.image %}
@@ -24,19 +23,33 @@
                         {% endif %}
                     </div>
                     <div>
-                        <h3 class="fw-bold mb-1">{{ user.username }}</h3>
-                        <div class="mb-1 text-muted">
-                            <i class="bi bi-envelope-at me-1"></i>{{ user.email }}
+                            <h3 class="fw-bold mb-1">{{ user.username }}</h3>
+                            <div class="mb-1 text-muted">
+                                <i class="bi bi-envelope-at me-1"></i>{{ user.email }}
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <a href="{% url 'password_change' %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-key me-1"></i> Change Password
+                                </a>
+                            </div>
                         </div>
-                        <div class="d-flex flex-wrap gap-2 mt-2">
-                            <a href="{% url 'password_change' %}" class="btn btn-sm btn-outline-warning">
-                                <i class="bi bi-key me-1"></i> Change Password
-                            </a>
+                        <pre>{% if restaurant_details %}</pre>
+                        <div class="ms-md-4 mt-3 mt-md-0 text-md-end">
+                            {% if restaurant_details.name %}
+                                <div class="fw-semibold fs-5">
+                                    <i class="bi bi-shop me-2"></i>{{ restaurant_details.name }}
+                                </div>
+                            {% endif %}
+                            {% if restaurant_details.registration_number %}
+                                <div class="text-muted small">
+                                    Registration #: {{ restaurant_details.registration_number }}
+                                </div>
+                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-
             <form method="POST" enctype="multipart/form-data" autocomplete="off">
                 {% csrf_token %}
 
@@ -71,14 +84,13 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Restaurant Details -->
                     <div class="col-md-6">
                         <div class="card shadow-sm border-0 rounded-4 h-100">
                             <div class="card-header bg-white border-bottom-0 rounded-top-4">
                                 <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
                                     <i class="bi bi-shop me-2"></i>Restaurant Details
-                                    <span class="fs-6 fw-normal text-muted ms-2">(Only if you are a restaurant)</span>
+                                    <span class="fs-6 fw-normal text-muted ms-2"></span>
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -96,7 +108,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Button Row: Edit Address (modal) and Save -->
                 <div class="row g-2 mt-4">
                     <div class="col-12 col-sm-6">
@@ -105,13 +116,12 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-6">
-                        <button class="btn btn-primary w-100 py-2" type="submit">
+                        <button class="btn btn-outline-dark w-100 py-2 fw-semibold" style="border-radius:0.6rem; font-size:1.1rem; background:#fff;" type="submit">
                             <i class="bi bi-save me-1"></i> Update Profile
                         </button>
                     </div>
                 </div>
             </form>
-
             <!-- Address Modal -->
             <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -129,7 +139,6 @@
                                 <div class="row g-4">
                                     {% for field in address_form %}
                                         <div class="col-md-6">
-                                            <label class="form-label fw-semibold">{{ field.label }}</label>
                                             {{ field|as_crispy_field }}
                                             {% for error in field.errors %}
                                                 <div class="invalid-feedback d-block">{{ error }}</div>
@@ -140,7 +149,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-outline-dark fw-semibold" style="background:#fff;">
                                     <i class="bi bi-save me-1"></i> Save Address
                                 </button>
                             </div>
@@ -148,7 +157,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Addresses list -->
             {% if profile.addresses.all %}
                 <div class="card shadow-sm border-0 rounded-4 mt-5">

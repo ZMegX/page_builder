@@ -41,7 +41,7 @@ class RestaurantDetailsForm(forms.ModelForm):
     class Meta:
         model = RestaurantDetails
         fields = [
-            'company_name',
+            'name',
             'cuisine_type',
             'registration_number',
             'website',

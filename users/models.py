@@ -43,13 +43,17 @@ class Profile(models.Model):
         return self.user.username
     
 class RestaurantDetails(models.Model):
+    class Meta:
+        verbose_name = "Restaurant Detail"
+        verbose_name_plural = "Restaurant Details"
+        
     profile = models.OneToOneField('Profile', on_delete=models.CASCADE, related_name='restaurant_details')
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    company_name = models.CharField(max_length=200, blank=True, null=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
 
 
     def __str__(self):
-        return f"{self.profile.company_name} Restaurant Details"
+        return f"{self.profile.user.username} Restaurant Details"
