@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Build your page: <span class="text-primary">{{ template.name }}</span></h2>
+  <form method="post" id="builder-form">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label fw-semibold d-flex align-items-center">
+        {{ form.title.label }} <span class="text-danger ms-1">*</span>
+        <button type="button" class="btn btn-link btn-sm ms-2 p-0 help-icon" data-bs-toggle="modal" data-bs-target="#helpModal" title="Field Info" aria-label="Field Info">
+          <i class="bi bi-info-circle fs-5 text-primary"></i>
+        </button>
+      </label>
+      {{ form.title|add_class:"form-control" }}
+      {% for error in form.title.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Page Components</label>
+      <div id="component-list"></div>
+      <button type="button" class="btn btn-outline-primary mt-2" onclick="addComponent()">Add Component</button>
+      {{ form.components_data }}
+    </div>
+    <button class="btn btn-success">Save Page</button>
+  </form>
+</div>
+
+<!-- Modal for help_text -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-primary" id="helpModalLabel">
+          <i class="bi bi-info-circle me-2"></i>Field Information
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <div class="mb-3">
+          <span class="fw-semibold text-dark">{{ form.title.label }}:</span>
+          <div class="small text-muted mt-1">{{ form.title.help_text|linebreaksbr }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let components = [];
+
+function updateComponentList() {
+  const listDiv = document.getElementById("component-list");
+  listDiv.innerHTML = "";
+  components.forEach((comp, idx) => {
+    let html = `
+      <div class="card p-2 mb-2">
+        <select class="form-select mb-2" onchange="setType(${idx}, this.value)">
+          <option value="header" ${comp.type === "header" ? "selected" : ""}>Header</option>
+          <option value="text" ${comp.type === "text" ? "selected" : ""}>Text</option>
+          <option value="image" ${comp.type === "image" ? "selected" : ""}>Image</option>
+        </select>
+        <input type="text" class="form-control mb-2" placeholder="Content / URL" value="${comp.content.replace(/"/g, '&quot;')}" oninput="setContent(${idx}, this.value)">
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeComponent(${idx})">Remove</button>
+      </div>
+    `;
+    listDiv.innerHTML += html;
+  });
+  document.getElementById("id_components_data").value = JSON.stringify(components);
+}
+
+function addComponent() {
+  components.push({type: "header", content: ""});
+  updateComponentList();
+}
+function setType(idx, val) {
+  components[idx].type = val;
+  updateComponentList();
+}
+function setContent(idx, val) {
+  components[idx].content = val;
+  updateComponentList();
+}
+function removeComponent(idx) {
+  components.splice(idx, 1);
+  updateComponentList();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  updateComponentList();
+});
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}

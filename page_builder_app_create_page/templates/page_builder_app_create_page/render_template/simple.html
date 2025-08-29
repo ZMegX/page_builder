@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ webpage.title }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    {% for comp in components %}
+      {% if comp.type == "header" %}
+        <h1>{{ comp.content }}</h1>
+      {% elif comp.type == "text" %}
+        <p>{{ comp.content }}</p>
+      {% elif comp.type == "image" %}
+        <img src="{{ comp.content }}" alt="" class="img-fluid mb-3">
+      {% endif %}
+    {% endfor %}
+  </div>
+</body>
+</html>
