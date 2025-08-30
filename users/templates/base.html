@@ -24,6 +24,11 @@
         <div class="collapse navbar-collapse" id="navbarContent">
           <ul class="navbar-nav ms-auto align-items-center">
             {% if user.is_authenticated %}
+            <li class="nav-item ms-2">
+              <a href="{% url 'page_builder_app_create_page:builder_home' %}" class="nav-link btn btn-link p-0 border-0 bg-transparent">
+                Pick a Style
+              </a>
+            </li>
             <!-- Profile link -->
             <li class="nav-item">
               <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center">

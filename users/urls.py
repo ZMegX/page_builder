@@ -22,4 +22,8 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('address/<int:address_id>/edit/', views.address_edit, name='address_edit'),
+    path('address/<int:address_id>/delete/', views.address_delete, name='address_delete'),
+    path("address/add/ajax/", views.address_add_ajax, name="address_add_ajax"),
+
 ]

@@ -11,14 +11,19 @@ class ProfileForm(forms.ModelForm):
             'image',
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make image optional
         self.fields['image'].required = False
+
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
 
 # Profile Update Form (same as ProfileForm, can be omitted if not differing)
 ProfileUpdateForm = ProfileForm
@@ -54,14 +59,6 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ("email",)
-
-# User Update Form
-class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
-
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name']
 
 # Custom Set Password Form (for password reset/change flows)
 class CustomSetPasswordForm(SetPasswordForm):

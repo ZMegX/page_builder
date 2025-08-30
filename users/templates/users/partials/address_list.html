@@ -1,0 +1,14 @@
+<div class="row g-4">
+    {% for address in profile.addresses.all %}
+        <div>
+            {{ address }}
+            <a href="{% url 'address_edit' address.id %}">Edit</a>
+            <a href="{% url 'address_delete' address.id %}">Delete</a>
+        </div>
+    {% empty %}
+        <p>No addresses saved.</p>
+    {% endfor %}
+</div>
+<button type="button" class="btn btn-outline-primary mt-3" id="show-address-form">
+    <i class="bi bi-plus-lg me-1"></i> Add Address
+</button>
