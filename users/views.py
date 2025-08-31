@@ -44,9 +44,7 @@ def profile_manage(request):
         if p_form.is_valid():
             p_form.save()
         if address_form.is_valid():
-            address = address_form.save()
-            profile.addresses.set([address])  # replace instead of adding duplicates
-        if r_form.is_valid():
+            profile.addresses.add(address_form.save())  
             r_form.save()
         messages.success(request, "Your profile has been updated!")
 
