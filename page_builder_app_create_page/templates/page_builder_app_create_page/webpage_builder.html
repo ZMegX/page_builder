@@ -3,93 +3,123 @@
 {% block content %}
 <div class="container py-5">
   <h2 class="mb-4">Build your page: <span class="text-primary">{{ template.name }}</span></h2>
-  <form method="post" id="builder-form">
+  <form method="post" enctype="multipart/form-data" id="builder-form">
     {% csrf_token %}
     <div class="mb-3">
-      <label class="form-label fw-semibold d-flex align-items-center">
-        {{ form.title.label }} <span class="text-danger ms-1">*</span>
-        <button type="button" class="btn btn-link btn-sm ms-2 p-0 help-icon" data-bs-toggle="modal" data-bs-target="#helpModal" title="Field Info" aria-label="Field Info">
-          <i class="bi bi-info-circle fs-5 text-primary"></i>
-        </button>
-      </label>
-      {{ form.title|add_class:"form-control" }}
+      {{ form.title.label_tag }} {{ form.title|add_class:"form-control form-control-lg" }}
+      <div class="form-text">{{ form.title.help_text }}</div>
       {% for error in form.title.errors %}
         <div class="text-danger small">{{ error }}</div>
       {% endfor %}
     </div>
     <div class="mb-3">
-      <label class="form-label fw-semibold">Page Components</label>
-      <div id="component-list"></div>
-      <button type="button" class="btn btn-outline-primary mt-2" onclick="addComponent()">Add Component</button>
-      {{ form.components_data }}
+      {{ form.description.label_tag }} {{ form.description|add_class:"form-control" }}
+      <div class="form-text">{{ form.description.help_text }}</div>
+      {% for error in form.description.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
     </div>
+    <div class="mb-3">
+      {{ form.cover_image.label_tag }} {{ form.cover_image|add_class:"form-control" }}
+      <div class="form-text">{{ form.cover_image.help_text }}</div>
+      {% for error in form.cover_image.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <h5>Page Components</h5>
+    <div id="components-list">
+      {{ formset.management_form }}
+      {% for f in formset %}
+        <div class="card p-3 mb-3 component-form">
+          <div class="row g-2">
+            <div class="col-md-5">
+              {{ f.type.label_tag }} {{ f.type|add_class:"form-select" }}
+              {% if f.type.help_text %}<div class="form-text">{{ f.type.help_text }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              {{ f.content.label_tag }} {{ f.content|add_class:"form-control" }}
+              {% if f.content.help_text %}<div class="form-text">{{ f.content.help_text }}</div>{% endif %}
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-danger btn-remove-component">Remove</button>
+            </div>
+          </div>
+          {{ f.DELETE }}
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-component-btn" class="btn btn-outline-primary mb-4">Add Component</button>
+    <br>
     <button class="btn btn-success">Save Page</button>
   </form>
 </div>
 
-<!-- Modal for help_text -->
-<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-4">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold text-primary" id="helpModalLabel">
-          <i class="bi bi-info-circle me-2"></i>Field Information
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body pt-2">
-        <div class="mb-3">
-          <span class="fw-semibold text-dark">{{ form.title.label }}:</span>
-          <div class="small text-muted mt-1">{{ form.title.help_text|linebreaksbr }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-let components = [];
+document.addEventListener('DOMContentLoaded', function() {
+  let componentsList = document.getElementById('components-list');
+  let addBtn = document.getElementById('add-component-btn');
+  let totalForms = document.getElementById('id_form-TOTAL_FORMS');
 
-function updateComponentList() {
-  const listDiv = document.getElementById("component-list");
-  listDiv.innerHTML = "";
-  components.forEach((comp, idx) => {
-    let html = `
-      <div class="card p-2 mb-2">
-        <select class="form-select mb-2" onchange="setType(${idx}, this.value)">
-          <option value="header" ${comp.type === "header" ? "selected" : ""}>Header</option>
-          <option value="text" ${comp.type === "text" ? "selected" : ""}>Text</option>
-          <option value="image" ${comp.type === "image" ? "selected" : ""}>Image</option>
-        </select>
-        <input type="text" class="form-control mb-2" placeholder="Content / URL" value="${comp.content.replace(/"/g, '&quot;')}" oninput="setContent(${idx}, this.value)">
-        <button type="button" class="btn btn-sm btn-danger" onclick="removeComponent(${idx})">Remove</button>
-      </div>
-    `;
-    listDiv.innerHTML += html;
+  function updateRemoveButtons() {
+    const removeBtns = document.querySelectorAll('.btn-remove-component');
+    removeBtns.forEach((btn, idx) => {
+      btn.onclick = function() {
+        // If only one form remains, just clear it
+        if (parseInt(totalForms.value, 10) === 1) {
+          // Clear values
+          const form = btn.closest('.component-form');
+          form.querySelectorAll('input, select').forEach(el => {
+            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+            else el.value = "";
+          });
+        } else {
+          // Remove the form and update indices
+          btn.closest('.component-form').remove();
+          totalForms.value = document.querySelectorAll('.component-form').length;
+          reindexForms();
+        }
+      }
+    });
+  }
+
+  function reindexForms() {
+    // Update form indices for correct POST data
+    const forms = document.querySelectorAll('.component-form');
+    forms.forEach((form, idx) => {
+      form.querySelectorAll('input, select, label').forEach(el => {
+        if (el.name) el.name = el.name.replace(/form-\d+-/, `form-${idx}-`);
+        if (el.id) el.id = el.id.replace(/form-\d+-/, `form-${idx}-`);
+        if (el.htmlFor) el.htmlFor = el.htmlFor.replace(/form-\d+-/, `form-${idx}-`);
+      });
+    });
+  }
+
+  addBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    // Get the last form and clone it
+    const forms = document.querySelectorAll('.component-form');
+    const lastForm = forms[forms.length - 1];
+    const newForm = lastForm.cloneNode(true);
+
+    // Clear values in new form
+    newForm.querySelectorAll('input, select').forEach(el => {
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else el.value = "";
+    });
+
+    // Remove DELETE checkbox in new form (if present)
+    const delInput = newForm.querySelector('input[type=checkbox][name$=DELETE]');
+    if (delInput) delInput.checked = false;
+
+    componentsList.appendChild(newForm);
+
+    totalForms.value = forms.length + 1;
+    reindexForms();
+    updateRemoveButtons();
   });
-  document.getElementById("id_components_data").value = JSON.stringify(components);
-}
 
-function addComponent() {
-  components.push({type: "header", content: ""});
-  updateComponentList();
-}
-function setType(idx, val) {
-  components[idx].type = val;
-  updateComponentList();
-}
-function setContent(idx, val) {
-  components[idx].content = val;
-  updateComponentList();
-}
-function removeComponent(idx) {
-  components.splice(idx, 1);
-  updateComponentList();
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  updateComponentList();
+  updateRemoveButtons();
 });
 </script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 {% endblock %}
