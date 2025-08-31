@@ -2,8 +2,9 @@ $('#addressModal').on('submit', '#addressForm', function(e) {
     e.preventDefault();
     var $form = $(this);
     var formData = $form.serialize();
+    var url = $('#address-form-section').data('url');
     $.ajax({
-        url: "{% url 'address_add_ajax' %}",
+        url: url,
         method: "POST",
         data: formData,
         success: function(data) {
