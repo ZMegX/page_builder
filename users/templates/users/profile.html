@@ -146,11 +146,13 @@
                                             <p>No addresses saved.</p>
                                         {% endfor %}
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary mt-3" id="show-address-form">
+                                    <button type="button" id="show-address-form" 
+                                            class="btn btn-outline-primary mt-3">
                                         <i class="bi bi-plus-lg me-1"></i> Add Address
                                     </button>
+
                                 </div>
-                                <div id="address-form-section" style="display:none;">
+                                <div id="address-form-section" data-url="{% url 'address_add_ajax' %}" style="display:none;">
                                     <form id="addressForm" method="post" autocomplete="off">
                                         {% csrf_token %}
                                         {{ address_form.as_p }}
@@ -168,7 +170,7 @@
                     </div>
                 </div>
                 <!-- Addresses list -->
-                {% if profile.addresses.all %}
+                {% if profile.addresses.exists %}
                     <div class="card shadow-sm border-0 rounded-4 mt-5">
                         <div class="card-body">
                             <h6 class="mb-3 text-primary">
