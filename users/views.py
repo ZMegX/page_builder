@@ -27,37 +27,44 @@ def register(request):
 @login_required
 def profile_manage(request):
     user = request.user
-    profile, created = Profile.objects.get_or_create(user=user)
+    profile, _ = Profile.objects.get_or_create(user=user)
     restaurant_details, _ = RestaurantDetails.objects.get_or_create(profile=profile)
+
+    # Get the first address if it exists
+    address_instance = profile.addresses.first()
 
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
-        address_form = AddressForm(request.POST)
-        # get or create restaurant details instance for the profile
+        address_form = AddressForm(request.POST, instance=address_instance)
         r_form = RestaurantDetailsForm(request.POST, instance=restaurant_details)
 
-        if u_form.is_valid() and p_form.is_valid() and address_form.is_valid() and r_form.is_valid():
+        if u_form.is_valid():
             u_form.save()
+        if p_form.is_valid():
             p_form.save()
+        if address_form.is_valid():
             address = address_form.save()
-            profile.addresses.add(address)
+            profile.addresses.set([address])  # replace instead of adding duplicates
+        if r_form.is_valid():
             r_form.save()
-            return redirect('profile')
+        messages.success(request, "Your profile has been updated!")
+
+        return redirect('profile')
+
     else:
         u_form = UserUpdateForm(instance=user)
         p_form = ProfileUpdateForm(instance=profile)
-        address_form = AddressForm()
+        address_form = AddressForm(instance=address_instance)
         r_form = RestaurantDetailsForm(instance=restaurant_details)
 
     return render(request, 'users/profile.html', {
         'u_form': u_form,
         'p_form': p_form,
         'address_form': address_form,
-        'profile': profile,
         'r_form': r_form,
+        'profile': profile,
         'restaurant_details': restaurant_details,
-
     })
 
 @login_required
