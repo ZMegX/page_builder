@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Template, Webpage
-from .forms import WebpageBuilderForm
+from .forms import WebpageBuilderForm, ComponentFormSet
 import json
 
 @login_required
-def dashboard_home(request):
+def builder_home(request):
     templates = Template.objects.all()
     return render(request, "page_builder_app_create_page/select_template.html", {"templates": templates})
 
@@ -13,18 +13,33 @@ def dashboard_home(request):
 def webpage_builder(request, template_slug):
     template = get_object_or_404(Template, slug=template_slug)
     if request.method == "POST":
-        form = WebpageBuilderForm(request.POST)
-        if form.is_valid():
+        form = WebpageBuilderForm(request.POST, request.FILES)
+        formset = ComponentFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            components_data = [
+                {
+                    "type": comp_form.cleaned_data["type"],
+                    "content": comp_form.cleaned_data["content"]
+                }
+                for comp_form in formset
+                if comp_form.cleaned_data and not comp_form.cleaned_data.get('DELETE', False)
+            ]
             Webpage.objects.create(
                 user=request.user,
                 template=template,
                 title=form.cleaned_data["title"],
-                components_data=json.loads(form.cleaned_data["components_data"])
+                # add description/cover_image if your model supports
+                components_data=components_data,
             )
             return redirect("my_webpages")
     else:
         form = WebpageBuilderForm()
-    return render(request, "page_builder_app_create_page/webpage_builder.html", {"template": template, "form": form})
+        formset = ComponentFormSet()
+    return render(request, "page_builder_app_create_page/webpage_builder.html", {
+        "template": template,
+        "form": form,
+        "formset": formset,
+    })
 
 @login_required
 def my_webpages(request):
