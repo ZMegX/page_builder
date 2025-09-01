@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'widget_tweaks',
+    'menus',
     
     
 ]
@@ -84,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'page_builder.context_processors.google_maps_api_key',
             ],
         },
     },
@@ -160,3 +162,5 @@ LOGOUT_REDIRECT_URL = 'home'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
