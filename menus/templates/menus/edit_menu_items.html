@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Edit Menu: {{ menu.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price (€)</th>
+                <th>Category</th>
+                <th>Available</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+            <tr>
+                <td>{{ form.name }}</td>
+                <td>{{ form.description }}</td>
+                <td>{{ form.price }}</td>
+                <td>{{ form.category }}</td>
+                <td>{{ form.is_available }}</td>
+                <td>{{ form.DELETE }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button id="add-row" class="btn btn-primary mt-3">+ Add Item</button>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Script to dynamically add rows -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Simple add-row functionality
+    $(document).ready(function(){
+        let formCount = {{ formset.total_form_count }};
+        let formTemplate = '{{ formset.empty_form.as_table|escapejs }}';
+
+        $("#add-row").click(function(e){
+            e.preventDefault();
+            let newForm = formTemplate.replace(/__prefix__/g, formCount);
+            $("tbody").append(newForm);
+            formCount++;
+            $("#id_form-TOTAL_FORMS").val(formCount);
+        });
+    });
+</script>
+
+{% endblock %}
+
