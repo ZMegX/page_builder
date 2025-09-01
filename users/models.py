@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
 
 class Address(models.Model):
+    profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='addresses', null=True, blank=True, )
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, blank=True, null=True)
@@ -15,7 +16,7 @@ class Address(models.Model):
         return f"{self.street}, {self.city}, {self.country}"
 
 class SocialLink(models.Model):
-    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='social_links')
+    profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='social_links')
     name = models.CharField(max_length=50)   # e.g., 'Instagram'
     url = models.URLField()
 
@@ -23,7 +24,7 @@ class SocialLink(models.Model):
         return f"{self.name} ({self.profile.company_name})"
 
 class OpeningHour(models.Model):
-    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='opening_hours')
+    profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='opening_hours')
     day_of_week = models.CharField(max_length=10)  # e.g., 'Monday'
     open_time = models.TimeField()
     close_time = models.TimeField()
@@ -42,17 +43,17 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-class RestaurantDetails(models.Model):
+class RestaurantProfile(models.Model):
     class Meta:
-        verbose_name = "Restaurant Detail"
-        verbose_name_plural = "Restaurant Details"
+        verbose_name = "Restaurant Profile"
+        verbose_name_plural = "Restaurant Profiles"
         
-    profile = models.OneToOneField('Profile', on_delete=models.CASCADE, related_name='restaurant_details')
+    profile = models.OneToOneField('Profile', null=True, blank=True, on_delete=models.CASCADE, related_name='restaurant_details')
+    name = models.CharField(max_length=200, blank=True, null=True)
+    logo = CloudinaryField('image', blank=True, null=True)
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
-    website = models.URLField(blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    name = models.CharField(max_length=200, blank=True, null=True)
 
 
     def __str__(self):
