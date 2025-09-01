@@ -31,6 +31,11 @@
                 Pick a Style
               </a>
             </li>
+            {% if request.user.is_authenticated and request.user.profile.restaurant_details %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'menus:create_menu' %}">Create Menu</a>
+              </li>
+            {% endif %}
             <!-- Profile link -->
             <li class="nav-item">
               <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center">
