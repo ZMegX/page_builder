@@ -1,125 +1,91 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% load static %}
 {% block content %}
 <div class="container py-5">
   <h2 class="mb-4">Build your page: <span class="text-primary">{{ template.name }}</span></h2>
   <form method="post" enctype="multipart/form-data" id="builder-form">
     {% csrf_token %}
+    <!-- TITLE -->
     <div class="mb-3">
-      {{ form.title.label_tag }} {{ form.title|add_class:"form-control form-control-lg" }}
-      <div class="form-text">{{ form.title.help_text }}</div>
-      {% for error in form.title.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
+      <label class="form-label fw-semibold">{{ form.title.label }}</label>
+      {{ form.title|add_class:"form-control form-control-lg" }}
+      {% for error in form.title.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
     </div>
+    <!-- DESCRIPTION -->
     <div class="mb-3">
-      {{ form.description.label_tag }} {{ form.description|add_class:"form-control" }}
-      <div class="form-text">{{ form.description.help_text }}</div>
-      {% for error in form.description.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
+      <label class="form-label fw-semibold">{{ form.description.label }}</label>
+      {{ form.description|add_class:"form-control" }}
+      {% for error in form.description.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
     </div>
+    <!-- COVER IMAGE -->
     <div class="mb-3">
-      {{ form.cover_image.label_tag }} {{ form.cover_image|add_class:"form-control" }}
-      <div class="form-text">{{ form.cover_image.help_text }}</div>
-      {% for error in form.cover_image.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
+      <label class="form-label fw-semibold">{{ form.cover_image.label }}</label>
+      {{ form.cover_image|add_class:"form-control" }}
+      {% for error in form.cover_image.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
     </div>
-
-    <h5>Page Components</h5>
+    <!-- ADVANCED OPTIONS -->
+    <div class="form-check form-switch mb-3">
+      <input class="form-check-input" type="checkbox" id="toggle-advanced">
+      <label class="form-check-label" for="toggle-advanced">Show Advanced Options</label>
+    </div>
+    <div id="advanced-form" style="display:none;">
+      <div class="mb-3">{{ form.seo_title|add_class:"form-control" }}</div>
+      <div class="mb-3">{{ form.seo_description|add_class:"form-control" }}</div>
+      <div class="mb-3">{{ form.layout_style|add_class:"form-select" }}</div>
+      <div class="mb-3">{{ form.published|add_class:"form-check-input ms-2" }}</div>
+    </div>
+    <!-- COMPONENTS -->
+    <h5 class="mt-4">Page Components</h5>
     <div id="components-list">
       {{ formset.management_form }}
       {% for f in formset %}
-        <div class="card p-3 mb-3 component-form">
-          <div class="row g-2">
-            <div class="col-md-5">
-              {{ f.type.label_tag }} {{ f.type|add_class:"form-select" }}
-              {% if f.type.help_text %}<div class="form-text">{{ f.type.help_text }}</div>{% endif %}
-            </div>
-            <div class="col-md-6">
-              {{ f.content.label_tag }} {{ f.content|add_class:"form-control" }}
-              {% if f.content.help_text %}<div class="form-text">{{ f.content.help_text }}</div>{% endif %}
-            </div>
-            <div class="col-md-1 d-flex align-items-end">
-              <button type="button" class="btn btn-outline-danger btn-remove-component">Remove</button>
-            </div>
+      <div class="card p-3 mb-3 component-form" data-index="{{ forloop.counter0 }}">
+        <div class="row g-2">
+          <div class="col-md-5">{{ f.type|add_class:"form-select" }}</div>
+          <div class="col-md-6">{{ f.content|add_class:"form-control" }}</div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="button" class="btn btn-outline-danger btn-remove-component">Remove</button>
           </div>
-          {{ f.DELETE }}
         </div>
+        <!-- Menu item fields -->
+        <div class="menu-item-fields mt-3" style="display:none;">
+          <div class="row g-2">
+            <div class="col-md-4">{{ f.item_name|add_class:"form-control" }}</div>
+            <div class="col-md-4">{{ f.item_price|add_class:"form-control" }}</div>
+            <div class="col-md-4">{{ f.item_photo|add_class:"form-control" }}</div>
+          </div>
+        </div>
+        <!-- Advanced component fields -->
+        <div class="advanced-component-fields mt-3" style="display:none;">
+          <div class="row g-2">
+            <div class="col">{{ f.extra_options|add_class:"form-control" }}</div>
+            <div class="col">{{ f.visibility|add_class:"form-select" }}</div>
+          </div>
+        </div>
+        {{ f.DELETE }}
+      </div>
       {% endfor %}
     </div>
     <button type="button" id="add-component-btn" class="btn btn-outline-primary mb-4">Add Component</button>
-    <br>
+    <!-- ADDRESS & MAP -->
+    <div class="mb-4">
+      <label for="id_address" class="form-label fw-semibold">Restaurant Address</label>
+      {{ form.address|add_class:"form-control" }}
+      {{ form.latitude }}
+      {{ form.longitude }}
+      <div id="map" style="height: 300px; margin-top: 10px;" class="rounded shadow-sm"></div>
+    </div>
+
     <button class="btn btn-success">Save Page</button>
   </form>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  let componentsList = document.getElementById('components-list');
-  let addBtn = document.getElementById('add-component-btn');
-  let totalForms = document.getElementById('id_form-TOTAL_FORMS');
-
-  function updateRemoveButtons() {
-    const removeBtns = document.querySelectorAll('.btn-remove-component');
-    removeBtns.forEach((btn, idx) => {
-      btn.onclick = function() {
-        // If only one form remains, just clear it
-        if (parseInt(totalForms.value, 10) === 1) {
-          // Clear values
-          const form = btn.closest('.component-form');
-          form.querySelectorAll('input, select').forEach(el => {
-            if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-            else el.value = "";
-          });
-        } else {
-          // Remove the form and update indices
-          btn.closest('.component-form').remove();
-          totalForms.value = document.querySelectorAll('.component-form').length;
-          reindexForms();
-        }
-      }
-    });
-  }
-
-  function reindexForms() {
-    // Update form indices for correct POST data
-    const forms = document.querySelectorAll('.component-form');
-    forms.forEach((form, idx) => {
-      form.querySelectorAll('input, select, label').forEach(el => {
-        if (el.name) el.name = el.name.replace(/form-\d+-/, `form-${idx}-`);
-        if (el.id) el.id = el.id.replace(/form-\d+-/, `form-${idx}-`);
-        if (el.htmlFor) el.htmlFor = el.htmlFor.replace(/form-\d+-/, `form-${idx}-`);
-      });
-    });
-  }
-
-  addBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    // Get the last form and clone it
-    const forms = document.querySelectorAll('.component-form');
-    const lastForm = forms[forms.length - 1];
-    const newForm = lastForm.cloneNode(true);
-
-    // Clear values in new form
-    newForm.querySelectorAll('input, select').forEach(el => {
-      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-      else el.value = "";
-    });
-
-    // Remove DELETE checkbox in new form (if present)
-    const delInput = newForm.querySelector('input[type=checkbox][name$=DELETE]');
-    if (delInput) delInput.checked = false;
-
-    componentsList.appendChild(newForm);
-
-    totalForms.value = forms.length + 1;
-    reindexForms();
-    updateRemoveButtons();
-  });
-
-  updateRemoveButtons();
-});
-</script>
+{% endblock %}
+<!-- SCRIPTS -->
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'page_builder_app_create_page/webpage_builder.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+<script src="{% static 'js/webpageBuilder.js' %}"></script>
 {% endblock %}
