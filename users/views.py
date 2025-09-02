@@ -9,9 +9,9 @@ from .forms import (
                     CustomUserCreationForm, 
                     UserUpdateForm, 
                     ProfileUpdateForm,
-                    RestaurantDetailsForm
+                    RestaurantDetailsForm,
                     )
-from .models import Profile, RestaurantDetails, Address
+from .models import Profile, RestaurantProfile, Address
 
 def register(request):
     if request.method == 'POST':
@@ -28,7 +28,7 @@ def register(request):
 def profile_manage(request):
     user = request.user
     profile, _ = Profile.objects.get_or_create(user=user)
-    restaurant_details, _ = RestaurantDetails.objects.get_or_create(profile=profile)
+    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(profile=profile)
 
     # Get the first address if it exists
     address_instance = profile.addresses.first()
@@ -37,7 +37,7 @@ def profile_manage(request):
         u_form = UserUpdateForm(request.POST, instance=user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         address_form = AddressForm(request.POST, instance=address_instance)
-        r_form = RestaurantDetailsForm(request.POST, instance=restaurant_details)
+        r_form = RestaurantDetailsForm(request.POST, instance=restaurant_profile)
 
         if u_form.is_valid():
             u_form.save()
@@ -45,6 +45,7 @@ def profile_manage(request):
             p_form.save()
         if address_form.is_valid():
             profile.addresses.add(address_form.save())  
+        if r_form.is_valid():
             r_form.save()
         messages.success(request, "Your profile has been updated!")
 
@@ -54,7 +55,7 @@ def profile_manage(request):
         u_form = UserUpdateForm(instance=user)
         p_form = ProfileUpdateForm(instance=profile)
         address_form = AddressForm(instance=address_instance)
-        r_form = RestaurantDetailsForm(instance=restaurant_details)
+        r_form = RestaurantDetailsForm(instance=restaurant_profile)
 
     return render(request, 'users/profile.html', {
         'u_form': u_form,
@@ -62,7 +63,7 @@ def profile_manage(request):
         'address_form': address_form,
         'r_form': r_form,
         'profile': profile,
-        'restaurant_details': restaurant_details,
+        'restaurant_details': restaurant_profile,
     })
 
 @login_required

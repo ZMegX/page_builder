@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
-from .models import Profile, Address, RestaurantDetails
+from users.models import Profile, Address, RestaurantProfile
 
 # Profile Create/Edit Form
 class ProfileForm(forms.ModelForm):
@@ -44,13 +44,14 @@ class AddressForm(forms.ModelForm):
 
 class RestaurantDetailsForm(forms.ModelForm):
     class Meta:
-        model = RestaurantDetails
+        model = RestaurantProfile
         fields = [
             'name',
             'cuisine_type',
             'registration_number',
-            'website',
             'phone_number',
+            'logo',
+            
         ]
 # User Registration Form (extend as needed)
 class CustomUserCreationForm(UserCreationForm):
@@ -66,3 +67,4 @@ class CustomSetPasswordForm(SetPasswordForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+

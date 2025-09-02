@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import RestaurantDetails
+from users.models import RestaurantProfile
 
-class RestaurantDetailsAdmin(admin.ModelAdmin):
-    list_display = ('profile', 'name', 'registration_number', 'cuisine_type', 'phone_number')
+class RestaurantProfileAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'name', 'registration_number', 'cuisine_type', 'phone_number', 'logo', )
 
-admin.site.register(RestaurantDetails, RestaurantDetailsAdmin)
+admin.site.register(RestaurantProfile, RestaurantProfileAdmin)
