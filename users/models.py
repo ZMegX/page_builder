@@ -34,8 +34,7 @@ class OpeningHour(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = CloudinaryField('image', blank=True, null=True)
-    email = models.EmailField(max_length=254)
+    image = CloudinaryField('Profile picture', blank=True, null=True)
     addresses = models.ManyToManyField(Address, blank=True, related_name='profiles')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -47,14 +46,17 @@ class RestaurantProfile(models.Model):
     class Meta:
         verbose_name = "Restaurant Profile"
         verbose_name_plural = "Restaurant Profiles"
-        
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='restaurant_profile', null=True, blank=True)
     profile = models.OneToOneField('Profile', null=True, blank=True, on_delete=models.CASCADE, related_name='restaurant_details')
     name = models.CharField(max_length=200, blank=True, null=True)
-    logo = CloudinaryField('image', blank=True, null=True)
+    logo = CloudinaryField('Restaurant logo', blank=True, null=True)
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
 
 
     def __str__(self):
-        return f"{self.profile.user.username} Restaurant Details"
+        if self.profile and self.profile.user:
+            return f"{self.profile.user.username} Restaurant Details"
+        return f"{self.name or 'Unnamed'} Restaurant"

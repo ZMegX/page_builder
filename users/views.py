@@ -28,34 +28,46 @@ def register(request):
 def profile_manage(request):
     user = request.user
     profile, _ = Profile.objects.get_or_create(user=user)
-    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(profile=profile)
-
-    # Get the first address if it exists
+    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=user)  # use user, not profile
     address_instance = profile.addresses.first()
 
+    # Default forms: all initialized with their instances for GET or after non-matching POST
+    u_form = UserUpdateForm(instance=user)
+    p_form = ProfileUpdateForm(instance=profile)
+    address_form = AddressForm(instance=address_instance)
+    r_form = RestaurantDetailsForm(instance=restaurant_profile)
+
     if request.method == 'POST':
-        u_form = UserUpdateForm(request.POST, instance=user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
-        address_form = AddressForm(request.POST, instance=address_instance)
-        r_form = RestaurantDetailsForm(request.POST, instance=restaurant_profile)
-
-        if u_form.is_valid():
-            u_form.save()
-        if p_form.is_valid():
-            p_form.save()
-        if address_form.is_valid():
-            profile.addresses.add(address_form.save())  
-        if r_form.is_valid():
-            r_form.save()
-        messages.success(request, "Your profile has been updated!")
-
-        return redirect('profile')
-
-    else:
-        u_form = UserUpdateForm(instance=user)
-        p_form = ProfileUpdateForm(instance=profile)
-        address_form = AddressForm(instance=address_instance)
-        r_form = RestaurantDetailsForm(instance=restaurant_profile)
+        # Save User/Profile info
+        if 'save_profile' in request.POST:
+            u_form = UserUpdateForm(request.POST, instance=user)
+            p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+            if u_form.is_valid() and p_form.is_valid():
+                u_form.save()
+                p_form.save()
+                messages.success(request, "Profile info updated!")
+                return redirect('profile')
+            else:
+                messages.error(request, "Please correct the errors in your profile info.")
+        
+        elif 'save_restaurant' in request.POST:
+            r_form = RestaurantDetailsForm(request.POST, instance=restaurant_profile)
+            if r_form.is_valid():
+                r_form.save()
+                messages.success(request, "Restaurant details updated!")
+            else:
+                messages.error(request, "Please correct the errors in the restaurant details form.")
+            # Save Address
+        elif 'save_address' in request.POST:
+            address_form = AddressForm(request.POST, instance=address_instance)
+            if address_form.is_valid():
+                address_obj = address_form.save(commit=False)
+                address_obj.profile = profile
+                address_obj.save()
+                messages.success(request, "Address updated!")
+                return redirect('profile')
+            else:
+                messages.error(request, "Please correct the errors in your address.")
 
     return render(request, 'users/profile.html', {
         'u_form': u_form,
@@ -68,20 +80,23 @@ def profile_manage(request):
 
 @login_required
 def address_edit(request, address_id):
-    address = get_object_or_404(Address, id=address_id, profiles__user=request.user)
+    address = get_object_or_404(
+        Address, id=address_id,  profile__profile__user=request.user)
     if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address)
+        form = AddressForm(user=request.user.profile, instance=address)
         if form.is_valid():
-            form.save()
+            address = form.save(commit=False)
+            address.profile = form.cleaned_data['profile']  # This is needed because we exclude 'profile'
+            address.save()
             messages.success(request, "Address updated successfully.")
             return redirect('profile')
     else:
-        form = AddressForm(instance=address)
+        form = AddressForm(user=request.user.profile, instance=address)
     return render(request, 'users/address_edit.html', {'form': form, 'address': address})
 
 @login_required
 def address_delete(request, address_id):
-    address = get_object_or_404(Address, id=address_id, profiles__user=request.user)
+    address = get_object_or_404(Address, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
         # Remove the address from the profile, but not from other profiles
         profile = request.user.profile
@@ -96,16 +111,20 @@ def address_delete(request, address_id):
 @login_required
 def address_add_ajax(request):
     if request.method == "POST":
-        address_form = AddressForm(request.POST)
+        address_form = AddressForm(user=request.user)  # <-- FIXED
         if address_form.is_valid():
             address = address_form.save()
-            # Add to current user's profile
-            profile = request.user.profile
-            profile.addresses.add(address)
-            # Render updated addresses list partial
+            # Link address to current user's restaurant profile
+            restaurant_profile = RestaurantProfile.objects.get(user=request.user)
+            address.profile = restaurant_profile
+            restaurant_profile.address = address
+            restaurant_profile.save()
+            address.save()
+            # refresh the profile object
+            address_form = AddressForm(instance=address)
             address_list_html = render_to_string(
                 "users/partials/address_list.html",
-                {"profile": profile},
+                {"address_form": address_form},
                 request=request
             )
             return JsonResponse({"address_list_html": address_list_html})

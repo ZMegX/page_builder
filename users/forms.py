@@ -19,7 +19,6 @@ class ProfileForm(forms.ModelForm):
         self.fields['image'].required = False
 
 class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
 
     class Meta:
         model = User
@@ -41,6 +40,7 @@ class AddressForm(forms.ModelForm):
             'latitude',
             'longitude',
         ]
+
 
 class RestaurantDetailsForm(forms.ModelForm):
     class Meta:
