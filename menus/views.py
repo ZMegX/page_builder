@@ -21,15 +21,14 @@ def create_menu(request):
 
     if request.method == "POST":
         form = MenuForm(request.POST)
+        formset = MenuItemFormSet(request.POST)
         if form.is_valid():
-            menu = form.save(commit=False)
-            menu.restaurant = restaurant_profile  # attach restaurant profile
-            menu.save()
-            return redirect("menus:edit_menu_items", menu_id=menu.id)
+            menu = formset.save()
+            return redirect('menu_list')
     else:
         form = MenuForm()
-
-    return render(request, "menus/create_menu.html", {"form": form})
+        formset = MenuItemFormSet()
+    return render(request, "menus/create_menu.html", {"form": form, 'formset': formset})
 
 
 def edit_menu_items(request, menu_id):

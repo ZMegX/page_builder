@@ -5,8 +5,10 @@ from cloudinary.models import CloudinaryField
 from users.models import RestaurantProfile
 
 
+
+
 class Menu(models.Model):
-    restaurant = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE, related_name="menus")
+    restaurant = models.ForeignKey(RestaurantProfile, on_delete=models.CASCADE, related_name='menu_items')
     name = models.CharField(max_length=255)  # e.g. "Dinner Menu", "Lunch Specials"
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)  # useful if they have seasonal menus
@@ -19,7 +21,6 @@ class Menu(models.Model):
 
     def __str__(self):
         return f"{self.restaurant.name} - {self.name}"
-
 
 class MenuItem(models.Model):
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name="items")

@@ -1,7 +1,18 @@
 from django import forms
-from django.forms import modelformset_factory
-from .models import MenuItem
+from django.forms import inlineformset_factory
+from .models import MenuItem, Menu
 
+
+class MenuForm(forms.ModelForm):
+    items = forms.ModelMultipleChoiceField(
+        queryset=MenuItem.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    class Meta:
+        model = Menu
+        fields = ['name', 'items']
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
@@ -16,7 +27,8 @@ class MenuItemForm(forms.ModelForm):
         }
 
 
-MenuItemFormSet = modelformset_factory(
+MenuItemFormSet = inlineformset_factory(
+    Menu,
     MenuItem,
     form=MenuItemForm,
     extra=1,  # one blank form by default
