@@ -2,3 +2,5 @@ venv/
 staticfiles/
 page_builder/templates/
 .env
+checklist.md
+tasklist.md

@@ -55,7 +55,21 @@ class WebpageBuilderForm(forms.Form):
         help_text="Optional. Shown at the top of your page if provided."
     )
 
-    # Remove components_data; you now use the formset for components
-
-    class Meta:
-        fields = ['title', 'description', 'cover_image']
+    address = forms.CharField(
+        label="Restaurant Address",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'id': 'id_address',  # <-- important for JS
+            'placeholder': 'Enter restaurant address...',
+        }),
+        required=False
+    )
+    latitude = forms.FloatField(
+        widget=forms.HiddenInput(attrs={'id': 'id_latitude'}),
+        required=False
+    )
+    longitude = forms.FloatField(
+        widget=forms.HiddenInput(attrs={'id': 'id_longitude'}),
+        required=False
+    )
+    

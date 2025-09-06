@@ -31,6 +31,33 @@ class Webpage(models.Model):
     title = models.CharField(max_length=255)
     components_data = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} ({self.user.username})"
+    
+class PageElement(models.Model):
+    ELEMENT_TYPES = [
+        ('text', 'Text'),
+        ('image', 'Image'),
+        ('button', 'Button'),
+        
+    ]
+    webpage = models.ForeignKey(Webpage, on_delete=models.CASCADE, related_name="elements")
+    element_type = models.CharField(max_length=50, choices=ELEMENT_TYPES)
+    order = models.PositiveIntegerField(default=0)
+
+    # Text/Image/Button fields
+    content = models.TextField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
+
+
+    class Meta:
+        ordering = ['order']
+
+    
+
+    def __str__(self):
+        return f"{self.element_type} - {self.item_name or self.content or 'Element'}"

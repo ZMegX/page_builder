@@ -1,15 +1,15 @@
-{% for el in webpage.elements.all %}
-  {% if el.element_type == "menu_item" %}
-    <div class="menu-item">
-      {% if el.item_photo %}
-        <img src="{{ el.item_photo.url }}" alt="{{ el.item_name }}">
-      {% endif %}
-      <div>
-        <h3>{{ el.item_name }}</h3>
-        <p>${{ el.item_price }}</p>
-      </div>
-    </div>
-  {% elif el.element_type == "text" %}
-    <p>{{ el.content }}</p>
-  {% endif %}
-{% endfor %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ webpage.title }}</title>
+</head>
+<body>
+    <h1>{{ webpage.title }}</h1>
+    {% for component in components %}
+        <div>
+            <strong>{{ component.type }}</strong>: {{ component.content }}
+        </div>
+    {% endfor %}
+    <!-- You can customize this template as needed! -->
+</body>
+</html>

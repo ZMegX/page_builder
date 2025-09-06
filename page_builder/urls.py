@@ -17,7 +17,7 @@ urlpatterns = [
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
-    path('builder/', include('page_builder_app_create_page.urls')),  # This makes your dashboard app the root page
+    path('builder/', include('page_builder_app_create_page.urls', namespace='page_builder_app_create_page')),  # This makes your dashboard app the root page
     path('menus/', include('menus.urls', namespace='menus')),
 
 ]
