@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f, #4d9de0);
+    }
+    
+    .form-body {
+        padding: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .price-input {
+        position: relative;
+    }
+    
+    .price-input::before {
+        content: '$';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-weight: 600;
+        z-index: 10;
+    }
+    
+    .price-input input {
+        padding-left: 2.5rem;
+    }
+    
+    .section-preview {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+    
+    .availability-toggle {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 2px dashed #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .availability-toggle.active {
+        background: #d4edda;
+        border-color: #c3e6cb;
+    }
+    
+    .btn-save {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        min-width: 150px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        background: linear-gradient(45deg, #218838, #1ea080);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        min-width: 150px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .preview-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .preview-header {
+        background: #f8f9fa;
+        margin: -1.5rem -1.5rem 1rem -1.5rem;
+        padding: 1rem 1.5rem;
+        border-radius: 13px 13px 0 0;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .required-field {
+        color: #dc3545;
+    }
+    
+    @media (max-width: 768px) {
+        .form-container {
+            margin-top: 1rem;
+        }
+        
+        .form-header, .form-body {
+            padding: 1.5rem 1rem;
+        }
+        
+        .btn-save, .btn-cancel {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'menus:menu_list' %}">
+                            <i class="fas fa-utensils me-2"></i>My Menus
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'menus:menu_detail' menu.pk %}">{{ menu.name }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Item</li>
+                </ol>
+            </nav>
+
+            <!-- Form Container -->
+            <div class="form-container">
+                <!-- Header -->
+                <div class="form-header">
+                    <i class="fas fa-plus-circle fa-3x mb-3"></i>
+                    <h2 class="mb-2">{{ title }}</h2>
+                    <p class="mb-0 lead">Add a new delicious item to your menu</p>
+                </div>
+
+                <!-- Form Body -->
+                <div class="form-body">
+                    <form method="post" id="addItemForm">
+                        {% csrf_token %}
+                        
+                        <!-- Item Name -->
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="fas fa-signature me-2 text-primary"></i>
+                                Item Name <span class="required-field">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Enter a catchy name for your menu item</small>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left me-2 text-success"></i>
+                                Description
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Describe ingredients, preparation method, or special features</small>
+                        </div>
+
+                        <!-- Price and Section Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.price.id_for_label }}" class="form-label">
+                                        <i class="fas fa-dollar-sign me-2 text-warning"></i>
+                                        Price <span class="required-field">*</span>
+                                    </label>
+                                    <div class="price-input">
+                                        {{ form.price }}
+                                    </div>
+                                    {% if form.price.errors %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form.price.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">Enter price in dollars (e.g., 12.99)</small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.section.id_for_label }}" class="form-label">
+                                        <i class="fas fa-list me-2 text-info"></i>
+                                        Menu Section <span class="required-field">*</span>
+                                    </label>
+                                    {{ form.section }}
+                                    {% if form.section.errors %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form.section.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">Choose the appropriate menu section</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Availability Toggle -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-toggle-on me-2 text-success"></i>
+                                Availability
+                            </label>
+                            <div class="availability-toggle" id="availabilityToggle">
+                                <div class="form-check">
+                                    {{ form.is_available }}
+                                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                        <strong>This item is available for ordering</strong>
+                                    </label>
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    Unchecked items will be shown as "Currently Unavailable" to customers
+                                </small>
+                            </div>
+                            {% if form.is_available.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.is_available.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-save me-3">
+                                <i class="fas fa-save me-2"></i>
+                                Add Item
+                            </button>
+                            <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-cancel">
+                                <i class="fas fa-times me-2"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Live Preview Card -->
+            <div class="preview-card" id="previewCard" style="display: none;">
+                <div class="preview-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-eye me-2 text-primary"></i>
+                        Live Preview
+                    </h6>
+                </div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-2" id="previewName">Item Name</h5>
+                        <p class="text-muted mb-2" id="previewDescription">Item description will appear here...</p>
+                        <span class="badge bg-secondary" id="previewSection">Section</span>
+                        <span class="badge bg-success ms-2" id="previewAvailability">Available</span>
+                    </div>
+                    <div class="text-end">
+                        <h4 class="text-primary mb-0" id="previewPrice">$0.00</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Quick Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Use descriptive, appetizing names</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Include key ingredients or cooking methods</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Price competitively for your market</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Organize items by logical sections</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Mark seasonal items as unavailable when needed</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Keep descriptions concise but informative</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('addItemForm');
+    const previewCard = document.getElementById('previewCard');
+    const availabilityToggle = document.getElementById('availabilityToggle');
+    const availabilityCheckbox = document.querySelector('#{{ form.is_available.id_for_label }}');
+    
+    // Form inputs
+    const nameInput = document.querySelector('#{{ form.name.id_for_label }}');
+    const descriptionInput = document.querySelector('#{{ form.description.id_for_label }}');
+    const priceInput = document.querySelector('#{{ form.price.id_for_label }}');
+    const sectionSelect = document.querySelector('#{{ form.section.id_for_label }}');
+    
+    // Preview elements
+    const previewName = document.getElementById('previewName');
+    const previewDescription = document.getElementById('previewDescription');
+    const previewPrice = document.getElementById('previewPrice');
+    const previewSection = document.getElementById('previewSection');
+    const previewAvailability = document.getElementById('previewAvailability');
+    
+    // Update availability toggle appearance
+    function updateAvailabilityToggle() {
+        if (availabilityCheckbox.checked) {
+            availabilityToggle.classList.add('active');
+        } else {
+            availabilityToggle.classList.remove('active');
+        }
+    }
+    
+    // Update live preview
+    function updatePreview() {
+        const hasContent = nameInput.value.trim() || descriptionInput.value.trim() || priceInput.value;
+        
+        if (hasContent) {
+            previewCard.style.display = 'block';
+            
+            previewName.textContent = nameInput.value.trim() || 'Item Name';
+            previewDescription.textContent = descriptionInput.value.trim() || 'Item description will appear here...';
+            
+            const price = parseFloat(priceInput.value) || 0;
+            previewPrice.textContent = '$' + price.toFixed(2);
+            
+            const sectionText = sectionSelect.options[sectionSelect.selectedIndex]?.text || 'Section';
+            previewSection.textContent = sectionText;
+            
+            if (availabilityCheckbox.checked) {
+                previewAvailability.textContent = 'Available';
+                previewAvailability.className = 'badge bg-success ms-2';
+            } else {
+                previewAvailability.textContent = 'Unavailable';
+                previewAvailability.className = 'badge bg-warning ms-2';
+            }
+        } else {
+            previewCard.style.display = 'none';
+        }
+    }
+    
+    // Event listeners
+    availabilityCheckbox.addEventListener('change', function() {
+        updateAvailabilityToggle();
+        updatePreview();
+    });
+    
+    // Live preview updates
+    [nameInput, descriptionInput, priceInput, sectionSelect].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updatePreview);
+            input.addEventListener('change', updatePreview);
+        }
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Adding...';
+        submitBtn.disabled = true;
+    });
+    
+    // Auto-focus first input
+    if (nameInput) {
+        nameInput.focus();
+    }
+    
+    // Initialize
+    updateAvailabilityToggle();
+    updatePreview();
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+S to save
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            form.submit();
+        }
+        // Escape to cancel
+        if (e.key === 'Escape') {
+            window.location.href = '{% url "menus:menu_detail" menu.pk %}';
+        }
+    });
+});
+</script>
+{% endblock %}

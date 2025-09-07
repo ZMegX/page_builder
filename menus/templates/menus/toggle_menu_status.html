@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Toggle Menu Status - {{ menu.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
+    
+    .status-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .status-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f, #4d9de0);
+    }
+    
+    .status-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+    
+    .status-active {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+    
+    .status-inactive {
+        background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+    }
+    
+    .action-buttons {
+        padding: 2rem;
+        background: #f8f9fa;
+        text-align: center;
+    }
+    
+    .btn-toggle {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        border: none;
+        margin: 0.5rem;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+    
+    .btn-activate {
+        background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+        color: white;
+    }
+    
+    .btn-activate:hover {
+        background: linear-gradient(45deg, #4e9f27, #96d4b8);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+    }
+    
+    .btn-deactivate {
+        background: linear-gradient(45deg, #ff6b6b, #ffa500);
+        color: white;
+    }
+    
+    .btn-deactivate:hover {
+        background: linear-gradient(45deg, #ff5252, #ff9800);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .menu-info {
+        background: white;
+        padding: 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .badge-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .warning-box {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .warning-box .warning-icon {
+        color: #856404;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .status-header {
+            padding: 1.5rem 1rem;
+        }
+        
+        .status-icon {
+            font-size: 3rem;
+        }
+        
+        .action-buttons {
+            padding: 1.5rem 1rem;
+        }
+        
+        .btn-toggle {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+        
+        .menu-info {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'menus:menu_list' %}">
+                            <i class="fas fa-utensils me-2"></i>My Menus
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'menus:menu_detail' menu.pk %}">{{ menu.name }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Toggle Status</li>
+                </ol>
+            </nav>
+
+            <!-- Status Card -->
+            <div class="card status-card">
+                <!-- Header with current status -->
+                <div class="status-header {% if menu.is_active %}status-active{% else %}status-inactive{% endif %}">
+                    <div class="status-icon">
+                        {% if menu.is_active %}
+                            <i class="fas fa-check-circle"></i>
+                        {% else %}
+                            <i class="fas fa-pause-circle"></i>
+                        {% endif %}
+                    </div>
+                    <h2 class="mb-2">{{ menu.name }}</h2>
+                    <p class="mb-0 lead">
+                        Current Status: 
+                        <span class="status-badge {% if menu.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                            {% if menu.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </p>
+                </div>
+
+                <!-- Menu Information -->
+                <div class="menu-info">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Menu Information
+                    </h5>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-utensils me-2"></i>Menu Name
+                        </span>
+                        <span class="info-value">{{ menu.name }}</span>
+                    </div>
+                    
+                    {% if menu.description %}
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-align-left me-2"></i>Description
+                        </span>
+                        <span class="info-value">{{ menu.description|truncatechars:50 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-list me-2"></i>Total Items
+                        </span>
+                        <span class="info-value">{{ menu.items.count }} items</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-eye me-2"></i>Available Items
+                        </span>
+                        <span class="info-value">{{ menu.items.filter.is_available.count }} available</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-calendar me-2"></i>Created
+                        </span>
+                        <span class="info-value">{{ menu.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-clock me-2"></i>Last Updated
+                        </span>
+                        <span class="info-value">{{ menu.updated_at|timesince }} ago</span>
+                    </div>
+                </div>
+
+                <!-- Warning/Info Box -->
+                {% if menu.is_active %}
+                <div class="warning-box">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle warning-icon"></i>
+                        <div>
+                            <h6 class="mb-1">Deactivating Menu</h6>
+                            <p class="mb-0">
+                                If you deactivate this menu, it will no longer be visible to customers. 
+                                You can reactivate it at any time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="warning-box">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle warning-icon text-info"></i>
+                        <div>
+                            <h6 class="mb-1">Activating Menu</h6>
+                            <p class="mb-0">
+                                Activating this menu will make it visible to customers. 
+                                Make sure all items are properly configured.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <h5 class="mb-4">
+                        What would you like to do?
+                    </h5>
+                    
+                    <form method="post" class="d-inline" id="toggleForm">
+                        {% csrf_token %}
+                        {% if menu.is_active %}
+                            <button type="submit" class="btn btn-toggle btn-deactivate" id="toggleButton">
+                                <i class="fas fa-pause me-2"></i>
+                                Deactivate Menu
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-toggle btn-activate" id="toggleButton">
+                                <i class="fas fa-play me-2"></i>
+                                Activate Menu
+                            </button>
+                        {% endif %}
+                    </form>
+                    
+                    <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-toggle btn-cancel">
+                        <i class="fas fa-times me-2"></i>
+                        Cancel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'menus:menu_edit' menu.pk %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-edit d-block mb-1"></i>
+                                Edit Menu
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'menus:menu_duplicate' menu.pk %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-copy d-block mb-1"></i>
+                                Duplicate
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'menus:menu_export' menu.pk %}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="fas fa-download d-block mb-1"></i>
+                                Export
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'menus:menu_list' %}" class="btn btn-outline-dark btn-sm w-100">
+                                <i class="fas fa-list d-block mb-1"></i>
+                                All Menus
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header {% if menu.is_active %}bg-warning{% else %}bg-success{% endif %} text-dark">
+                <h5 class="modal-title" id="confirmModalLabel">
+                    <i class="fas fa-question-circle me-2"></i>
+                    Confirm Status Change
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    Are you sure you want to 
+                    <strong>{% if menu.is_active %}deactivate{% else %}activate{% endif %}</strong> 
+                    the menu "{{ menu.name }}"?
+                </p>
+                
+                {% if menu.is_active %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Note:</strong> Deactivating this menu will hide it from customers immediately.
+                </div>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Note:</strong> Activating this menu will make it visible to customers.
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn {% if menu.is_active %}btn-warning{% else %}btn-success{% endif %}" id="confirmToggle">
+                    <i class="fas {% if menu.is_active %}fa-pause{% else %}fa-play{% endif %} me-2"></i>
+                    {% if menu.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleForm = document.getElementById('toggleForm');
+    const toggleButton = document.getElementById('toggleButton');
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const confirmToggle = document.getElementById('confirmToggle');
+    
+    // Show confirmation modal instead of direct form submission
+    toggleButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        confirmModal.show();
+    });
+    
+    // Handle confirmed toggle
+    confirmToggle.addEventListener('click', function() {
+        // Show loading state
+        toggleButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+        toggleButton.disabled = true;
+        
+        // Submit form
+        toggleForm.submit();
+    });
+    
+    // Auto-hide modal after 3 seconds if no action
+    let modalTimeout;
+    document.getElementById('confirmModal').addEventListener('shown.bs.modal', function() {
+        modalTimeout = setTimeout(() => {
+            confirmModal.hide();
+        }, 10000); // 10 seconds timeout
+    });
+    
+    document.getElementById('confirmModal').addEventListener('hidden.bs.modal', function() {
+        clearTimeout(modalTimeout);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Press 'T' to toggle
+        if (e.key.toLowerCase() === 't' && !e.ctrlKey && !e.altKey) {
+            toggleButton.click();
+        }
+        // Press 'Escape' to cancel
+        if (e.key === 'Escape') {
+            confirmModal.hide();
+        }
+    });
+    
+    // Add visual feedback for button hover
+    toggleButton.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+    });
+    
+    toggleButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+});
+</script>
+{% endblock %}

@@ -4,7 +4,16 @@ from . import views
 app_name = "menus"
 
 urlpatterns = [
-    path("menu/<int:menu_id>/items/", views.edit_menu_items, name="edit_menu_items"),
-    path("menu/<int:menu_id>/", views.menu_detail, name="menu_detail"),
-    path("menu/new/", views.create_menu, name="create_menu"),
+    path('', views.menu_list, name='menu_list'),
+    path('create/', views.create_menu, name='menu_create'),
+    path('<int:pk>/', views.menu_detail, name='menu_detail'),  # Changed to pk
+    path('<int:pk>/edit/', views.edit_menu, name='edit_menu'),  # Changed to pk
+    path('<int:pk>/delete/', views.delete_menu, name='delete_menu'),  # Changed to pk
+    path('<int:pk>/toggle-status/', views.toggle_menu_status, name='menu_toggle_status'),  # Changed to pk
+    path('<int:pk>/duplicate/', views.menu_duplicate, name='menu_duplicate'),  # Changed to pk
+    path('<int:pk>/export/', views.menu_export, name='menu_export'),  # Changed to pk
+    path('<int:menu_id>/items/add/', views.add_menu_item, name='menu_items_add'),  # Keep menu_id for clarity
+    path('item/<int:item_id>/', views.menu_item_detail, name='menu_item_detail'),
+    path('public/<int:menu_id>/', views.public_menu_detail, name='public_menu_detail'),
+
 ]

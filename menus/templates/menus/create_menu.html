@@ -1,19 +1,189 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Menu</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="container py-4">
-    <h2>Create a New Menu</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {{ formset.management_form }}
-        {% for f in formset %}
-            {{ f.as_p }}
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Create Menu{% endblock %}
+{% block content %}
+
+<!-- Display Django messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<h1 class="mb-4">{{ title|default:"Create Menu" }}</h1>
+<form method="post" enctype="multipart/form-data" id="menuForm" class="needs-validation" novalidate autocomplete="off">
+  {% csrf_token %}
+  <div class="mb-3">
+    {% for field in form.visible_fields %}
+      <div class="form-floating mb-3">
+        {{ field }}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <h2 class="mt-4">Menu Items</h2>
+  {{ formset.management_form }}
+  
+  <!-- Display formset errors -->
+  {% if formset.non_form_errors %}
+    <div class="alert alert-danger">
+      {{ formset.non_form_errors }}
+    </div>
+  {% endif %}
+  
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle" id="menuItemsTable">
+      <thead class="table-light">
+        <tr>
+          <th>Section</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Ingredients</th> <!-- Changed from Description to Ingredients -->
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for form in formset %}
+          <tr class="menu-form-row">
+            <td>
+              {{ form.section }}
+              {% if form.section.errors %}
+                <div class="text-danger small">{{ form.section.errors|striptags }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="text-danger small">{{ form.name.errors|striptags }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {{ form.price }}
+              {% if form.price.errors %}
+                <div class="text-danger small">{{ form.price.errors|striptags }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {{ form.ingredients }} <!-- Changed from form.description to form.ingredients -->
+              {% if form.ingredients.errors %}
+                <div class="text-danger small">{{ form.ingredients.errors|striptags }}</div>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if form.instance.pk %}
+                {{ form.DELETE }}
+              {% else %}
+                <button type="button" class="btn btn-danger btn-sm remove-row" title="Remove row">&times;</button>
+              {% endif %}
+              <!-- Include hidden form.id field for existing instances -->
+              {% if form.instance.pk %}{{ form.id }}{% endif %}
+            </td>
+          </tr>
         {% endfor %}
-        <button type="submit" class="btn btn-success">Create</button>
-    </form>
-</body>
-</html>
+      </tbody>
+    </table>
+  </div>
+  <button type="button" id="addRowBtn" class="btn btn-secondary mb-3">Add Item</button>
+  <br>
+  <button type="submit" class="btn btn-primary">Save Menu</button>
+</form>
+
+<style>
+/* Custom CSS for better spacing and feedback */
+#menuItemsTable input, #menuItemsTable select, #menuItemsTable textarea {
+  min-width: 120px;
+  border: none;
+  background: transparent;
+}
+#menuItemsTable input:focus, #menuItemsTable select:focus, #menuItemsTable textarea:focus {
+  border: 2px solid #0d6efd;
+  background: #fff;
+}
+.menu-form-row td {
+  vertical-align: middle;
+  padding: 0.5rem;
+}
+.text-danger.small {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+@media (max-width: 768px) {
+  #menuItemsTable th, #menuItemsTable td {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.3rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add item row from template
+  let addRowBtn = document.getElementById('addRowBtn');
+  let tableBody = document.querySelector('#menuItemsTable tbody');
+  let formIdx = {{ formset.total_form_count }};
+  
+  // Create empty row template programmatically
+  function createEmptyRow(idx) {
+    return `
+      <tr class="menu-form-row">
+        <td>
+          <select name="form-${idx}-section" class="form-select" id="id_form-${idx}-section">
+            <option value="">---------</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="dessert">Dessert</option>
+            <option value="drinks">Drinks</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" name="form-${idx}-name" class="form-control" placeholder="Item name..." maxlength="80" id="id_form-${idx}-name">
+        </td>
+        <td>
+          <input type="number" name="form-${idx}-price" class="form-control" step="0.01" min="0" placeholder="0.00" id="id_form-${idx}-price">
+        </td>
+        <td>
+          <textarea name="form-${idx}-ingredients" class="form-control" placeholder="List main ingredients..." rows="2" maxlength="200" id="id_form-${idx}-ingredients"></textarea>
+        </td>
+        <td class="text-center">
+          <button type="button" class="btn btn-danger btn-sm remove-row" title="Remove row">&times;</button>
+        </td>
+      </tr>
+    `;
+  }
+
+  addRowBtn.addEventListener('click', function() {
+    let newRowHtml = createEmptyRow(formIdx);
+    tableBody.insertAdjacentHTML('beforeend', newRowHtml);
+    formIdx++;
+    document.getElementById('id_form-TOTAL_FORMS').value = formIdx;
+  });
+
+  // Remove row functionality for newly added rows
+  tableBody.addEventListener('click', function(e) {
+    if(e.target.classList.contains('remove-row')) {
+      e.target.closest('tr').remove();
+      formIdx--;
+      document.getElementById('id_form-TOTAL_FORMS').value = formIdx;
+    }
+  });
+
+  // Bootstrap validation
+  let form = document.getElementById('menuForm');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+});
+</script>
+{% endblock %}
