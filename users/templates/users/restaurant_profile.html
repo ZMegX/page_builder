@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block title %}Restaurant Profile - Page Builder{% endblock %}
+{% load static crispy_forms_tags %}
+
+{% block content %}
+<div class="container py-4">
+  <form method="POST" enctype="multipart/form-data" autocomplete="off" id="restaurantForm">
+    {% csrf_token %}
+
+    <div class="row g-4">
+      <!-- Left: Restaurant Details (card) -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4">
+            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+              <i class="bi bi-info-circle me-2"></i> Restaurant Details
+            </h5>
+          </div>
+          <button type="submit" class="btn btn-outline-success btn-sm ms-auto" name="save_rp">
+            <i class="bi bi-save me-1"></i> Save Details
+            </button>
+          <div class="card-body">
+            <div class="row g-4">
+              {# Render all profile fields except the logo (logo goes to the image card) #}
+              {% for field in rp_form %}
+                {% if field.name != "logo" %}
+                  <div class="col-12">
+                    {{ field|as_crispy_field }}
+                    {% for error in field.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Logo/Image (side-by-side) -->
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4">
+            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+              <i class="bi bi-image me-2"></i> Logo / Cover Image
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="ratio ratio-16x9 bg-light border rounded position-relative overflow-hidden">
+              {% if rp_form.instance.logo %}
+                <img
+                  id="logoPreview"
+                  src="{{ rp_form.instance.logo.url }}"
+                  class="w-100 h-100"
+                  style="object-fit: cover;"
+                  alt="Logo preview">
+              {% else %}
+                <img
+                  id="logoPreview"
+                  class="w-100 h-100 d-none"
+                  style="object-fit: cover;"
+                  alt="Logo preview">
+                <div id="logoPlaceholder" class="position-absolute top-50 start-50 translate-middle text-muted text-center">
+                  <i class="bi bi-image" style="font-size: 2rem;"></i>
+                  <div class="small">No image selected</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mt-3">
+              {# Render the logo file input here #}
+              {{ rp_form.logo|as_crispy_field }}
+              {% for error in rp_form.logo.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+              <div class="form-text">PNG or JPG. Square images work best.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address (full width below) -->
+      <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4">
+            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+              <i class="bi bi-geo-alt me-2"></i> Business Address
+            </h5>
+            <button type="submit" class="btn btn-outline-success btn-sm ms-auto" name="save_addr">
+                <i class="bi bi-save me-1"></i> Save Address
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="id_address" class="form-label">Restaurant Address</label>
+              {{ addr_form.address_search|as_crispy_field }}
+              <div class="form-text">Pick from suggestions or drag the pin on the map.</div>
+            </div>
+
+            {{ addr_form.street }}{{ addr_form.city }}{{ addr_form.state }}
+            {{ addr_form.country }}{{ addr_form.zipcode }}
+            {{ addr_form.latitude }}{{ addr_form.longitude }}
+
+            <div id="map" class="rounded shadow-sm mb-2" style="height: 320px;"></div>
+
+            {% if addr_form.non_field_errors %}
+              {% for e in addr_form.non_field_errors %}
+                <div class="invalid-feedback d-block">{{ e }}</div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex align-items-center">
+            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+              <i class="bi bi-share me-2"></i> Social Links
+            </h5>
+            <button type="submit" class="btn btn-outline-success btn-sm ms-2" name="save_social">
+                <i class="bi bi-save me-1"></i> Save Social
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm ms-auto" id="add-social-row">
+              <i class="bi bi-plus-lg me-1"></i> Add
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="social-formset" data-prefix="{{ social_fs.prefix }}">
+              {{ social_fs.management_form }}
+              {% for form in social_fs %}
+                <div class="row g-3 align-items-end social-form-row">
+                  <div class="col-12 col-md-4">
+                    {{ form.name|as_crispy_field }}
+                    {% for error in form.name.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-12 col-md-7">
+                    {{ form.url|as_crispy_field }}
+                    {% for error in form.url.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-12 col-md-1">
+                    {% if form.instance.pk %}
+                      <div class="form-check mt-2">
+                        {{ form.DELETE }} <label class="form-check-label">Del</label>
+                      </div>
+                    {% else %}
+                      <button type="button" class="btn btn-outline-danger w-100 remove-social-row">X</button>
+                    {% endif %}
+                  </div>
+                </div>
+                <hr>
+              {% endfor %}
+            </div>
+
+            <template id="social-empty-form">
+              {% with form=social_fs.empty_form %}
+              <div class="row g-3 align-items-end social-form-row">
+                <div class="col-12 col-md-4">
+                  {{ form.name }}
+                </div>
+                <div class="col-12 col-md-7">
+                  {{ form.url }}
+                </div>
+                <div class="col-12 col-md-1">
+                  <button type="button" class="btn btn-outline-danger w-100 remove-social-row">X</button>
+                </div>
+              </div>
+              <hr>
+              {% endwith %}
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opening Hours -->
+      <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex align-items-center">
+            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+              <i class="bi bi-clock me-2"></i> Opening Hours
+            </h5>
+            <button type="button" class="btn btn-outline-primary btn-sm ms-auto" id="add-hours-row">
+              <i class="bi bi-plus-lg me-1"></i> Add
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="hours-formset" data-prefix="{{ hours_fs.prefix }}">
+              {{ hours_fs.management_form }}
+              {% for form in hours_fs %}
+                <div class="row g-3 align-items-end hours-form-row">
+                  <div class="col-12 col-md-4">
+                    {{ form.day_of_week|as_crispy_field }}
+                    {% for error in form.day_of_week.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-6 col-md-3">
+                    {{ form.open_time|as_crispy_field }}
+                    {% for error in form.open_time.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-6 col-md-3">
+                    {{ form.close_time|as_crispy_field }}
+                    {% for error in form.close_time.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                  <div class="col-12 col-md-2">
+                    {% if form.instance.pk %}
+                      <div class="form-check mt-2">
+                        {{ form.DELETE }} <label class="form-check-label">Del</label>
+                      </div>
+                    {% else %}
+                      <button type="button" class="btn btn-outline-danger w-100 remove-hours-row">X</button>
+                    {% endif %}
+                  </div>
+                </div>
+                <hr>
+              {% endfor %}
+            </div>
+
+            <template id="hours-empty-form">
+              {% with form=hours_fs.empty_form %}
+              <div class="row g-3 align-items-end hours-form-row">
+                <div class="col-12 col-md-4">
+                  {{ form.day_of_week }}
+                </div>
+                <div class="col-6 col-md-3">
+                  {{ form.open_time }}
+                </div>
+                <div class="col-6 col-md-3">
+                  {{ form.close_time }}
+                </div>
+                <div class="col-12 col-md-2">
+                  <button type="button" class="btn btn-outline-danger w-100 remove-hours-row">X</button>
+                </div>
+              </div>
+              <hr>
+              {% endwith %}
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="col-12">
+        <button class="btn btn-outline-success w-100 py-2 fw-semibold" type="submit">
+          <i class="bi bi-save me-1"></i> Save All
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Scripts -->
+<script>
+  // Simple logo preview
+  (function() {
+    const input = document.querySelector('input[type="file"][name="logo"]');
+    const img = document.getElementById('logoPreview');
+    const ph = document.getElementById('logoPlaceholder');
+    if (!input) return;
+    input.addEventListener('change', function() {
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      if (img) {
+        img.src = url;
+        img.classList.remove('d-none');
+      }
+      if (ph) ph.classList.add('d-none');
+    });
+  })();
+</script>
+<script src="{% static 'js/restaurant_profile.js' %}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places" async defer loading="async"></script>
+{% endblock %}

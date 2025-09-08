@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'widget_tweaks',
     'menus',
+    'restaurant_site'
     
     
 ]
@@ -90,7 +91,9 @@ TEMPLATES = [
         },
     },
 ]
-
+TEMPLATES[0]["OPTIONS"]["context_processors"] += [
+    "users.context_processors.google_maps_key",
+]
 WSGI_APPLICATION = 'page_builder.wsgi.application'
 
 

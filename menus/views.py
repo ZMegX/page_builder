@@ -1,3 +1,5 @@
+from collections import defaultdict
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -9,6 +11,9 @@ from django.db.models import Avg  # Add this import
 from .models import Menu, MenuItem
 from users.models import RestaurantProfile, Profile
 from .forms import MenuForm, MenuItemFormSet, MenuItemForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @login_required
 def get_restaurant_profile_card(request):
@@ -65,28 +70,47 @@ def create_menu(request):
     })
 
 @login_required
-def menu_detail(request, pk):
-    menu = get_object_or_404(Menu, id=pk)
+def menu_detail(request, pk, int):
+    menu = get_object_or_404(
+        Menu.objects.prefetch_related("items"),
+        Q(pk=pk) & (Q(owner=request.user) | Q(is_active=True)),
+        )
     
-    # Optional: Check if user owns menu or menu is active
-    if not menu.is_active and menu.owner != request.user:
-        raise PermissionDenied("This menu is not available.")
-    
-    # Group items by section for better display
-    items_by_section = {}
+    items_by_section = defaultdict
     for item in menu.items.all():
-        section = item.get_section_display()  # Gets the human-readable version
-        if section not in items_by_section:
-            items_by_section[section] = []
-        items_by_section[section].append(item)
+        section = item.get_section_display().append(item)  # Gets the human-readable version
+
     
     context = {
         'menu': menu,
-        'items_by_section': items_by_section,
+        'items_by_section': dict(items_by_section),
         'is_owner': menu.owner == request.user,
         'total_items': menu.items.count()
     }
     return render(request, "menus/menu_detail.html", context)
+
+def public_menu_detail(request, slug: str, pk: int):
+    # public endpoint: slug = owner's username
+    owner = get_object_or_404(User, username=slug)
+    menu = get_object_or_404(
+        Menu.objects.prefetch_related("items"),
+        pk=pk,
+        owner=owner,
+        is_active=True,
+    )
+
+    items_by_section = defaultdict(list)
+    for item in menu.items.all():
+        items_by_section[item.get_section_display()].append(item)
+
+    context = {
+        "menu": menu,
+        "owner": owner,
+        "items_by_section": dict(items_by_section),
+        "is_owner": request.user.is_authenticated and menu.owner == request.user,
+        "total_items": menu.items.count(),
+    }
+    return render(request, "restaurant_site/menu_detail.html", context)
 
 @login_required
 def edit_menu(request, pk):
@@ -192,26 +216,6 @@ def menu_item_detail(request, item_id):
     }
     return render(request, "menus/menu_item_detail.html", context)
 
-# Public view for restaurant customers
-def public_menu_detail(request, pk):
-    """Public view for customers to see active menus"""
-    menu = get_object_or_404(Menu, id=pk, is_active=True)
-    
-    # Group items by section
-    items_by_section = {}
-    for item in menu.items.all():
-        section = item.get_section_display()
-        if section not in items_by_section:
-            items_by_section[section] = []
-        items_by_section[section].append(item)
-    
-    context = {
-        'menu': menu,
-        'items_by_section': items_by_section,
-        'is_public_view': True
-    }
-    return render(request, "menus/public_menu.html", context)
-
 # Additional helper views for the menu_list template functionality
 
 @login_required
@@ -284,8 +288,10 @@ def add_menu_item(request, pk):  # Using pk to match your URL pattern
 def my_menu(request):
     items = (
         MenuItem.objects
-        .filter(menu__owner=request.user)            # <- key change here
+        .filter(menu__owner=request.user, menu__is_active=True, is_available=True)            # <- key change here
         .select_related("menu")
         .order_by("menu__name", "section", "name")
     )
     return render(request, "menus/my_menu.html", {"items": items})
+
+

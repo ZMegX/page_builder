@@ -1,14 +1,24 @@
 <div class="row g-4">
-    {% for address in profile.addresses.all %}
-        <div>
-            {{ address }}
-            <a href="{% url 'address_edit' address.id %}">Edit</a>
-            <a href="{% url 'address_delete' address.id %}">Delete</a>
-        </div>
-    {% empty %}
-        <p>No addresses saved.</p>
-    {% endfor %}
+  {% for address in addresses %}
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <i class="bi bi-geo-alt text-secondary me-2"></i> {{ address }}
+        {% if address.zipcode %}
+          <span class="badge bg-light text-secondary ms-2">{{ address.zipcode }}</span>
+        {% endif %}
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button"
+                class="btn btn-sm btn-outline-primary js-edit-address"
+                data-address-id="{{ address.id }}">
+          <i class="bi bi-pencil"></i> Edit
+        </button>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'address_delete' address.id %}">
+          <i class="bi bi-trash"></i> Delete
+        </a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted mb-0">No addresses saved.</p>
+  {% endfor %}
 </div>
-<button type="button" class="btn btn-outline-primary mt-3" id="show-address-form">
-    <i class="bi bi-plus-lg me-1"></i> Add Address
-</button>
