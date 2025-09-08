@@ -12,7 +12,23 @@
     </div>
   {% endfor %}
 {% endif %}
-
+<div class="col-lg-4">
+    <!-- Restaurant profile card -->
+    {% include 'partials/restaurant_profile_card.html' %}
+    <!-- Optional: Add quick stats or recent menus card -->
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-header bg-info text-white rounded-top-4">
+          <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Quick Stats</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <span>Total Menus:</span>
+          <span class="fw-bold">{{ user.menus.count }}</span>
+        </div>
+            <!-- Add more stats as needed -->
+      </div>
+  </div>
+</div>
 <h1 class="mb-4">{{ title|default:"Create Menu" }}</h1>
 <form method="post" enctype="multipart/form-data" id="menuForm" class="needs-validation" novalidate autocomplete="off">
   {% csrf_token %}
@@ -129,6 +145,13 @@ document.addEventListener('DOMContentLoaded', function() {
   let tableBody = document.querySelector('#menuItemsTable tbody');
   let formIdx = {{ formset.total_form_count }};
   
+  // Get the total forms element - check multiple possible IDs
+  function getTotalFormsElement() {
+    return document.getElementById('id_form-TOTAL_FORMS') || 
+           document.querySelector('input[name="form-TOTAL_FORMS"]') ||
+           document.querySelector('input[name$="-TOTAL_FORMS"]');
+  }
+  
   // Create empty row template programmatically
   function createEmptyRow(idx) {
     return `
@@ -159,31 +182,52 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
   }
 
-  addRowBtn.addEventListener('click', function() {
-    let newRowHtml = createEmptyRow(formIdx);
-    tableBody.insertAdjacentHTML('beforeend', newRowHtml);
-    formIdx++;
-    document.getElementById('id_form-TOTAL_FORMS').value = formIdx;
-  });
+  // Add row event listener
+  if (addRowBtn) {
+    addRowBtn.addEventListener('click', function() {
+      let newRowHtml = createEmptyRow(formIdx);
+      tableBody.insertAdjacentHTML('beforeend', newRowHtml);
+      formIdx++;
+      
+      // Update total forms count
+      let totalFormsElement = getTotalFormsElement();
+      if (totalFormsElement) {
+        totalFormsElement.value = formIdx;
+      } else {
+        console.warn('Total forms element not found');
+      }
+    });
+  }
 
   // Remove row functionality for newly added rows
-  tableBody.addEventListener('click', function(e) {
-    if(e.target.classList.contains('remove-row')) {
-      e.target.closest('tr').remove();
-      formIdx--;
-      document.getElementById('id_form-TOTAL_FORMS').value = formIdx;
-    }
-  });
+  if (tableBody) {
+    tableBody.addEventListener('click', function(e) {
+      if(e.target.classList.contains('remove-row')) {
+        e.target.closest('tr').remove();
+        formIdx--;
+        
+        // Update total forms count
+        let totalFormsElement = getTotalFormsElement();
+        if (totalFormsElement) {
+          totalFormsElement.value = formIdx;
+        } else {
+          console.warn('Total forms element not found');
+        }
+      }
+    });
+  }
 
   // Bootstrap validation
   let form = document.getElementById('menuForm');
-  form.addEventListener('submit', function(event) {
-    if (!form.checkValidity()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    form.classList.add('was-validated');
-  });
+  if (form) {
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    });
+  }
 });
 </script>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -6,10 +7,27 @@ from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.db.models import Avg  # Add this import
 from .models import Menu, MenuItem
+from users.models import RestaurantProfile, Profile
 from .forms import MenuForm, MenuItemFormSet, MenuItemForm
 
 @login_required
+def get_restaurant_profile_card(request):
+    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=request.user)
+    
+    card_html = render_to_string(
+        'partials/restaurant_card.html',
+        {'restaurant_profile': restaurant_profile},
+        request=request
+    )
+    
+    return JsonResponse({'card_html': card_html})
+
+@login_required
 def create_menu(request):
+    user = request.user
+    profile, _ = Profile.objects.get_or_create(user=user)
+    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=user)
+    
     if request.method == "POST":
         form = MenuForm(request.POST, request.FILES)  # Added request.FILES for photo upload
         formset = MenuItemFormSet(request.POST)
@@ -41,7 +59,9 @@ def create_menu(request):
     return render(request, "menus/create_menu.html", {
         "form": form, 
         "formset": formset,
-        "title": "Create New Menu"
+        "title": "Create New Menu",
+        "restaurant_profile": restaurant_profile,
+        "profile": profile
     })
 
 @login_required
@@ -259,3 +279,13 @@ def add_menu_item(request, pk):  # Using pk to match your URL pattern
         "menu": menu,
         "title": f"Add Item to {menu.name}"
     })
+
+@login_required
+def my_menu(request):
+    items = (
+        MenuItem.objects
+        .filter(menu__owner=request.user)            # <- key change here
+        .select_related("menu")
+        .order_by("menu__name", "section", "name")
+    )
+    return render(request, "menus/my_menu.html", {"items": items})
