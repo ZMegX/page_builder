@@ -1,0 +1,76 @@
+{% load static %}
+<div class="row g-2 mt-4">
+  <button type="button" class="btn btn-outline-primary w-100 py-2" data-bs-toggle="modal" data-bs-target="#addressModal">
+    <i class="bi bi-geo-alt me-1"></i> Edit Address
+  </button>
+</div>
+
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addressModalLabel">
+          <i class="bi bi-geo-alt-fill me-2"></i>Address
+          <span class="fs-6 fw-normal text-muted ms-2">(Add or update your address)</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Address list (inside modal) -->
+        <div id="address-list-section">
+          <div id="address-list-container">
+            {% include "users/partials/address_list.html" with addresses=profile.addresses.all %}
+          </div>
+          <button type="button" id="show-address-form" class="btn btn-outline-primary mt-3">
+            <i class="bi bi-plus-lg me-1"></i> Add Address
+          </button>
+        </div>
+
+        <!-- Address form (hidden initially) -->
+        <div id="address-form-section"
+             class="mt-2"
+             data-url-add="{% url 'address_add_ajax' %}"
+             data-url-update-template="{% url 'address_update_ajax' 0 %}"
+             data-url-detail-template="{% url 'address_get_ajax' 0 %}"
+             data-api-key="{{ GOOGLE_MAPS_API_KEY }}"
+             style="display:none;">
+          <form id="addressForm" method="post" autocomplete="off">
+            {% csrf_token %}
+            <input type="hidden" id="id_address_id" name="address_id" />
+
+            <div class="mb-3">
+              <label for="id_address" class="form-label fw-semibold">Restaurant Address</label>
+              <input type="text"
+                     id="id_address"
+                     class="form-control"
+                     placeholder="Start typing address..."
+                     autocomplete="off" />
+              <div class="form-text">Select a suggestion or place/drag the marker.</div>
+            </div>
+
+            <!-- Hidden model fields populated by JS -->
+            {{ address_form.street }}
+            {{ address_form.city }}
+            {{ address_form.state }}
+            {{ address_form.country }}
+            {{ address_form.zipcode }}
+            {{ address_form.latitude }}
+            {{ address_form.longitude }}
+
+            <div id="addressMap" class="rounded shadow-sm mb-3" style="height: 300px;"></div>
+
+            <div id="address-form-errors" class="text-danger mt-2"></div>
+
+            <div class="mt-3 d-flex gap-2">
+              <button type="submit" class="btn btn-outline-dark fw-semibold" style="background:#fff;">
+                <i class="bi bi-save me-1"></i> Save Address
+              </button>
+              <button type="button" class="btn btn-outline-secondary" id="cancel-add-address">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div><!-- /modal-body -->
+    </div>
+  </div>
+</div>

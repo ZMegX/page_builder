@@ -4,3 +4,5 @@ page_builder/templates/
 .env
 checklist.md
 tasklist.md
+__pycache__/
+*.pyc

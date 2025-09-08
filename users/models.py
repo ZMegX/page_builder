@@ -21,7 +21,8 @@ class SocialLink(models.Model):
     url = models.URLField()
 
     def __str__(self):
-        return f"{self.name} ({self.profile.company_name})"
+        display = self.profile.name if getattr(self.profile, "name", None) else "Restaurant"
+        return f"{self.name} ({display})"
 
 class OpeningHour(models.Model):
     profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='opening_hours')

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Menu - Page Builder{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .menu-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #dc3545;
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+    .form-actions {
+        margin-top: 20px;
+    }
+    .delete-title {
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h1 class="delete-title">Delete Menu</h1>
+    
+    <div class="warning">
+        <strong>Warning!</strong> This action cannot be undone. Deleting this menu will permanently remove it and all associated menu items.
+    </div>
+
+    <div class="menu-info">
+        <h3>Menu Details:</h3>
+        <p><strong>Name:</strong> {{ menu.name }}</p>
+        {% if menu.description %}
+            <p><strong>Description:</strong> {{ menu.description }}</p>
+        {% endif %}
+        <p><strong>Created:</strong> {{ menu.created_at|date:"F d, Y" }}</p>
+        {% if menu.menuitem_set.count > 0 %}
+            <p><strong>Menu Items:</strong> {{ menu.menuitem_set.count }} item{{ menu.menuitem_set.count|pluralize }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete the menu "{{ menu.name }}"?</p>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, Delete Menu</button>
+            <a href="{% url 'menus:menu_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

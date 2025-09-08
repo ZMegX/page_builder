@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ menu.name }} - Menu{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Display Django messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Menu Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="d-flex align-items-center mb-3">
+        <h1 class="me-3">{{ menu.name }}</h1>
+        {% if menu.is_active %}
+          <span class="badge bg-success">Active</span>
+        {% else %}
+          <span class="badge bg-secondary">Inactive</span>
+        {% endif %}
+      </div>
+      
+      <!-- Owner Controls -->
+      {% if is_owner %}
+        <div class="btn-group mb-3" role="group">
+          <a href="{% url 'menus:edit_menu' menu.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-edit"></i> Edit Menu
+          </a>
+          <button type="button" class="btn btn-outline-secondary" onclick="toggleMenuStatus({{ menu.id }})">
+            <i class="fas fa-toggle-{% if menu.is_active %}on{% else %}off{% endif %}"></i>
+            {% if menu.is_active %}Deactivate{% else %}Activate{% endif %}
+          </button>
+          <a href="{% url 'menus:delete_menu' menu.id %}" class="btn btn-outline-danger">
+            <i class="fas fa-trash"></i> Delete
+          </a>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Menu Photo -->
+    <div class="col-md-4">
+      {% if menu.photo %}
+        <img src="{{ menu.photo.url }}" alt="{{ menu.name }}" class="img-fluid rounded shadow">
+      {% else %}
+        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+          <i class="fas fa-image fa-3x text-muted"></i>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Menu Statistics (for owners) -->
+  {% if is_owner %}
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card bg-light">
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col">
+                <h5 class="text-primary">{{ total_items }}</h5>
+                <small class="text-muted">Total Items</small>
+              </div>
+              <div class="col">
+                <h5 class="text-success">{{ items_by_section|length }}</h5>
+                <small class="text-muted">Sections</small>
+              </div>
+              <div class="col">
+                <h5 class="text-info">{{ menu.created_at|date:"M d, Y" }}</h5>
+                <small class="text-muted">Created</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Menu Items by Section -->
+  {% if items_by_section %}
+    {% for section, items in items_by_section.items %}
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h3 class="card-title mb-0">
+                <i class="fas fa-utensils me-2"></i>{{ section }}
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                {% for item in items %}
+                  <div class="col-lg-6 col-md-12 mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <h5 class="mb-1">
+                          <a href="{% url 'menus:menu_item_detail' item.id %}" class="text-decoration-none">
+                            {{ item.name }}
+                          </a>
+                        </h5>
+                        {% if item.ingredients %}
+                          <p class="text-muted small mb-1">{{ item.ingredients }}</p>
+                        {% endif %}
+                      </div>
+                      <div class="text-end">
+                        <span class="badge bg-success fs-6">${{ item.price }}</span>
+                      </div>
+                    </div>
+                    {% if not forloop.last %}
+                      <hr class="my-2">
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <!-- No items message -->
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="fas fa-info-circle me-2"></i>
+          {% if is_owner %}
+            This menu doesn't have any items yet. <a href="{% url 'menus:edit_menu' menu.id %}">Add some items</a> to get started!
+          {% else %}
+            This menu is currently empty.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Share Menu (for active menus) -->
+  {% if menu.is_active %}
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card bg-light">
+          <div class="card-body text-center">
+            <h5>Share this menu</h5>
+            <p class="mb-2">Public link:</p>
+            <div class="input-group">
+              <input type="text" class="form-control" value="{{ request.build_absolute_uri }}{% url 'menus:public_menu_detail' menu.id %}" id="shareUrl" readonly>
+              <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- JavaScript -->
+<script>
+// Toggle menu status
+function toggleMenuStatus(menuId) {
+  fetch(`/menus/menu/${menuId}/toggle/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload(); // Reload to update the UI
+    } else {
+      alert('Error: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while updating the menu status.');
+  });
+}
+
+// Copy share URL to clipboard
+function copyToClipboard() {
+  const shareUrl = document.getElementById('shareUrl');
+  shareUrl.select();
+  shareUrl.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(shareUrl.value).then(() => {
+    // Show success feedback
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    button.classList.remove('btn-outline-secondary');
+    button.classList.add('btn-success');
+    
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.classList.remove('btn-success');
+      button.classList.add('btn-outline-secondary');
+    }, 2000);
+  });
+}
+
+// Add CSRF token for AJAX requests
+document.addEventListener('DOMContentLoaded', function() {
+  // Add CSRF token as meta tag if not already present
+  if (!document.querySelector('meta[name="csrf-token"]')) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                     document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+    if (csrfToken) {
+      const meta = document.createElement('meta');
+      meta.name = 'csrf-token';
+      meta.content = csrfToken;
+      document.head.appendChild(meta);
+    }
+  }
+});
+</script>
+
+{% endblock %}

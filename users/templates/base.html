@@ -31,9 +31,23 @@
                 Pick a Style
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'restaurant_profile' %}">
+                <i class="bi bi-shop me-1"></i> Restaurant Profile
+              </a>
+            </li>
             {% if request.user.is_authenticated and request.user.profile.restaurant_details %}
               <li class="nav-item">
-                  <a class="nav-link" href="{% url 'menus:create_menu' %}">Create Menu</a>
+                  <a class="nav-link" href="{% url 'menus:menu_list' %}">Menu Studio</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'menus:my_menu' %}">My Menu</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'restaurant_site:menu' slug=request.user.username %}">Menu Items</a>
+              </li>
+              <li>
+                <a class="nav-link" href="{% url 'restaurant_site:menu' slug=request.user.username %}">View Public Menu</a>
               </li>
             {% endif %}
             <!-- Profile link -->

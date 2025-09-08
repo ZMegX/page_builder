@@ -29,9 +29,22 @@ ProfileUpdateForm = ProfileForm
 
 # Address Create/Edit Form
 class AddressForm(forms.ModelForm):
+    # Visible search input for Google Places Autocomplete (non-model)
+    address_search = forms.CharField(
+        required=False,
+        label='Restaurant Address',
+        widget=forms.TextInput(attrs={
+            'id': 'id_address',
+            'class': 'form-control',
+            'placeholder': 'Start typing address...',
+            'autocomplete': 'off'
+        })
+    )
+
     class Meta:
         model = Address
         fields = [
+            'address_search',  # non-model field to render the search input
             'street',
             'city',
             'state',
@@ -40,6 +53,25 @@ class AddressForm(forms.ModelForm):
             'latitude',
             'longitude',
         ]
+        widgets = {
+            # Keep components hidden; JS fills them
+            'street': forms.HiddenInput(attrs={'id': 'id_street'}),
+            'city': forms.HiddenInput(attrs={'id': 'id_city'}),
+            'state': forms.HiddenInput(attrs={'id': 'id_state'}),
+            'country': forms.HiddenInput(attrs={'id': 'id_country'}),
+            'zipcode': forms.HiddenInput(attrs={'id': 'id_zipcode'}),
+            'latitude': forms.HiddenInput(attrs={'id': 'id_latitude'}),
+            'longitude': forms.HiddenInput(attrs={'id': 'id_longitude'}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        street = cleaned.get('street')
+        city = cleaned.get('city')
+        country = cleaned.get('country')
+        if not street or not city or not country:
+            raise forms.ValidationError("Please select a full address to populate street, city, and country.")
+        return cleaned
 
 
 class RestaurantDetailsForm(forms.ModelForm):

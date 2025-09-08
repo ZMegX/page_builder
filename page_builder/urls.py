@@ -18,7 +18,9 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
     path('builder/', include('page_builder_app_create_page.urls', namespace='page_builder_app_create_page')),  # This makes your dashboard app the root page
-    path('menus/', include('menus.urls', namespace='menus')),
+    path("", include('menus.urls', namespace='menus')),
+    path("", include("restaurant_site.urls", namespace="restaurant_site")),
+    path("", include("menus.public_urls")),
 
 ]
 
