@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ profile.name }} — Restaurant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Left: One card with details -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex align-items-center">
+          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+            <i class="bi bi-shop me-2"></i> {{ profile.name }}
+          </h5>
+          {% if status.open_now %}
+            <span class="badge text-bg-success ms-auto">Open now</span>
+          {% else %}
+            <span class="badge text-bg-secondary ms-auto">Closed</span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if profile.cuisine_type %}
+            <div class="mb-2">
+              <i class="bi bi-egg-fried me-1"></i>
+              <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+            </div>
+          {% endif %}
+          {% if profile.phone_number %}
+            <div class="mb-2">
+              <i class="bi bi-telephone me-1"></i>
+              <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+            </div>
+          {% endif %}
+          {% if address %}
+            <div class="mb-2">
+              <i class="bi bi-geo-alt me-1"></i>
+              {{ address.street }}{% if address.city %}, {{ address.city }}{% endif %}
+              {% if address.state %}, {{ address.state }}{% endif %}
+              {% if address.zipcode %}, {{ address.zipcode }}{% endif %}
+              {% if address.country %}, {{ address.country }}{% endif %}
+              <div>
+                <a class="small" target="_blank" rel="noopener"
+                   href="https://www.google.com/maps/search/?api=1&query={{ address.street|urlencode }}%2C+{{ address.city|urlencode }}%2C+{{ address.country|urlencode }}">
+                   Get directions
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if status.today_hours %}
+            <div class="mb-2">
+              <i class="bi bi-clock me-1"></i>
+              <strong>Today's hours:</strong>
+              {% for oh in status.today_hours %}
+                {{ oh.open_time|time:"H:i" }}–{{ oh.close_time|time:"H:i" }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if profile.social_links.all %}
+            <div class="mt-3">
+              <strong>Follow us:</strong>
+              <div class="d-flex gap-2 mt-2 flex-wrap">
+                {% for sl in profile.social_links.all %}
+                  <a class="btn btn-sm btn-outline-secondary" href="{{ sl.url }}" target="_blank" rel="noopener">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="mt-4">
+            <a class="btn btn-primary" href="{% url 'restaurant_site:menu' slug=slug %}">
+              <i class="bi bi-journal-text me-1"></i> View Menu
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Image or Map next to it -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4">
+          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+            {% if profile.logo %}<i class="bi bi-image me-2"></i> Photo{% else %}<i class="bi bi-map me-2"></i> Map{% endif %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if profile.logo %}
+            <div class="ratio ratio-16x9 bg-light border rounded overflow-hidden">
+              <img src="{{ profile.logo.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ profile.name }} logo">
+            </div>
+          {% elif address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+            <div id="map" class="rounded border" style="height: 360px;"></div>
+          {% else %}
+            <div class="p-5 text-center text-muted">
+              <i class="bi bi-image" style="font-size: 2rem;"></i>
+              <div class="mt-2">No image or map available.</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+<script>
+  window.addEventListener('load', function() {
+    if (!(window.google && window.google.maps)) return;
+    const center = { lat: {{ map_center.lat }}, lng: {{ map_center.lng }} };
+    const m = new google.maps.Map(document.getElementById('map'), {
+      center, zoom: 15, mapTypeControl: false, streetViewControl: false, fullscreenControl: false
+    });
+    new google.maps.Marker({ map: m, position: center });
+  });
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}" async defer loading="async"></script>
+{% endif %}
+{% endblock %}

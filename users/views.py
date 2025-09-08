@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth.models import User
 from .forms import (
                     AddressForm, 
@@ -61,9 +62,13 @@ def profile_manage(request):
         elif 'save_address' in request.POST:
             address_form = AddressForm(request.POST, instance=address_instance)
             if address_form.is_valid():
-                address_obj = address_form.save(commit=False)
-                address_obj.profile = profile
-                address_obj.save()
+                address_obj = address_form.save()
+                if not profile.addresses.filter(pk=address_obj.pk).exists():
+                    profile.addresses.add(address_obj)
+                # Optionally ensure FK to RestaurantProfile is set to the user's restaurant_profile
+                if address_obj.profile_id != restaurant_profile.id:
+                    address_obj.profile = restaurant_profile
+                    address_obj.save(update_fields=['profile'])
                 messages.success(request, "Address updated!")
                 return redirect('profile')
             else:
@@ -76,23 +81,31 @@ def profile_manage(request):
         'r_form': r_form,
         'profile': profile,
         'restaurant_details': restaurant_profile,
+        'GOOGLE_MAPS_API_KEY': settings.GOOGLE_MAPS_API_KEY,
     })
 
 @login_required
 def address_edit(request, address_id):
     address = get_object_or_404(
-        Address, id=address_id,  profile__profile__user=request.user)
+        Address, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
-        form = AddressForm(user=request.user.profile, instance=address)
+        form = AddressForm(request.POST, instance=address)
         if form.is_valid():
-            address = form.save(commit=False)
-            address.profile = form.cleaned_data['profile']  # This is needed because we exclude 'profile'
-            address.save()
+            form.save()
             messages.success(request, "Address updated successfully.")
             return redirect('profile')
     else:
-        form = AddressForm(user=request.user.profile, instance=address)
-    return render(request, 'users/address_edit.html', {'form': form, 'address': address})
+        # Pre-fill address_search nicely for UX (optional)
+        initial = {}
+        if address.street or address.city or address.country:
+            parts = [p for p in [address.street, address.city, address.state, address.zipcode, address.country] if p]
+            initial['address_search'] = ", ".join(parts)
+        form = AddressForm(instance=address, initial=initial)
+    return render(
+        request,
+        'users/address_edit.html',
+        {'form': form, 'address': address, 'GOOGLE_MAPS_API_KEY': settings.GOOGLE_MAPS_API_KEY}
+    )
 
 @login_required
 def address_delete(request, address_id):
@@ -111,22 +124,23 @@ def address_delete(request, address_id):
 @login_required
 def address_add_ajax(request):
     if request.method == "POST":
-        address_form = AddressForm(user=request.user)  # <-- FIXED
+        address_form = AddressForm(request.POST)  # <-- FIXED
         if address_form.is_valid():
             address = address_form.save()
-            # Link address to current user's restaurant profile
-            restaurant_profile = RestaurantProfile.objects.get(user=request.user)
+            address = address_form.save(commit=False)
+            restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=request.user)
             address.profile = restaurant_profile
-            restaurant_profile.address = address
-            restaurant_profile.save()
             address.save()
-            # refresh the profile object
-            address_form = AddressForm(instance=address)
+            try:
+                user_profile = request.user.profile
+                user_profile.addresses.add(address)
+            except Profile.DoesNotExist:
+                    pass
             address_list_html = render_to_string(
-                "users/partials/address_list.html",
-                {"address_form": address_form},
-                request=request
-            )
+                    "users/partials/address_list.html",
+                    {"addresses": request.user.profile.addresses.all()},
+                    request=request
+                )
             return JsonResponse({"address_list_html": address_list_html})
         else:
             errors = address_form.errors.as_ul()

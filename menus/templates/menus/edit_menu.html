@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Edit Menu: {{ menu.name }}</h2>
+            
+            <!-- Form Errors Display -->
+            {% if formset.non_form_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" id="menu-form" novalidate>
+                {% csrf_token %}
+                {{ formset.management_form }}
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle" id="menu-items-table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Name <span class="text-danger">*</span></th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Price (€) <span class="text-danger">*</span></th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Available</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="formset-tbody">
+                            {% for form in formset %}
+                            <tr class="formset-row" data-form-index="{{ forloop.counter0 }}">
+                                <!-- Hidden fields -->
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+                                
+                                <td>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.description.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ form.price }}
+                                    {% if form.price.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.price.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.category.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {{ form.is_available }}
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        {{ form.DELETE }}
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-row" 
+                                                title="Mark for deletion" 
+                                                aria-label="Delete item {{ form.name.value|default:'new item' }}">
+                                            <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <button type="button" id="add-row" class="btn btn-outline-primary">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add New Item
+                    </button>
+                    
+                    <div class="btn-group">
+                        <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success" id="save-btn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            <i class="fas fa-save" aria-hidden="true"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('menu-form');
+    const addRowBtn = document.getElementById('add-row');
+    const tbody = document.getElementById('formset-tbody');
+    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+    const saveBtn = document.getElementById('save-btn');
+    
+    let formCount = parseInt(totalFormsInput.value);
+    
+    // Empty form template (safely escaped)
+    const emptyFormTemplate = `{{ formset.empty_form.as_table|escapejs }}`;
+    
+    // Add new row functionality
+    addRowBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        addNewRow();
+    });
+    
+    // Delete row functionality
+    tbody.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-row')) {
+            e.preventDefault();
+            handleDeleteRow(e.target.closest('.formset-row'));
+        }
+    });
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        showLoadingState();
+        // Validate required fields
+        if (!validateForm()) {
+            e.preventDefault();
+            hideLoadingState();
+            showValidationErrors();
+        }
+    });
+    
+    function addNewRow() {
+        const newRow = document.createElement('tr');
+        newRow.className = 'formset-row';
+        newRow.dataset.formIndex = formCount;
+        
+        // Replace __prefix__ with actual form count
+        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
+        
+        // Convert table format to individual cells
+        newRow.innerHTML = convertTableRowToTd(newFormHtml);
+        
+        tbody.appendChild(newRow);
+        formCount++;
+        totalFormsInput.value = formCount;
+        
+        // Focus on the first input of the new row
+        const firstInput = newRow.querySelector('input[type="text"]');
+        if (firstInput) {
+            firstInput.focus();
+        }
+        
+        // Add animation
+        newRow.style.opacity = '0';
+        setTimeout(() => {
+            newRow.style.transition = 'opacity 0.3s ease';
+            newRow.style.opacity = '1';
+        }, 10);
+    }
+    
+    function handleDeleteRow(row) {
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+        
+        if (deleteCheckbox) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                deleteCheckbox.checked = true;
+                row.style.opacity = '0.5';
+                row.style.textDecoration = 'line-through';
+                
+                // Hide row after animation
+                setTimeout(() => {
+                    row.style.display = 'none';
+                }, 300);
+            }
+        } else {
+            // For new rows without ID, remove completely
+            if (confirm('Remove this new item?')) {
+                row.remove();
+                updateFormCount();
+            }
+        }
+    }
+    
+    function updateFormCount() {
+        const visibleRows = tbody.querySelectorAll('.formset-row:not([style*="display: none"])');
+        formCount = visibleRows.length;
+        totalFormsInput.value = formCount;
+    }
+    
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = form.querySelectorAll('input[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        return isValid;
+    }
+    
+    function showValidationErrors() {
+        const firstInvalidField = form.querySelector('.is-invalid');
+        if (firstInvalidField) {
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalidField.focus();
+        }
+    }
+    
+    function showLoadingState() {
+        const spinner = saveBtn.querySelector('.spinner-border');
+        const icon = saveBtn.querySelector('.fas');
+        
+        spinner.classList.remove('d-none');
+        icon.classList.add('d-none');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+    }
+    
+    function hideLoadingState() {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Save Changes';
+    }
+    
+    function convertTableRowToTd(tableRowHtml) {
+        // This is a simplified conversion - you might need to adjust based on your form structure
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = tableRowHtml;
+        
+        // Extract form fields and wrap them in appropriate td elements
+        // This would need to be customized based on your exact form structure
+        return tableRowHtml; // Placeholder - implement based on your needs
+    }
+    
+    // Auto-save functionality (optional)
+    let autoSaveTimeout;
+    form.addEventListener('input', function() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            // Implement auto-save logic here if needed
+            console.log('Auto-save triggered');
+        }, 2000);
+    });
+});
+</script>
+
+<style>
+.formset-row {
+    transition: all 0.3s ease;
+}
+
+.formset-row:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.invalid-feedback {
+    font-size: 0.875em;
+}
+
+.table-responsive {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9em;
+    }
+    
+    .btn-sm {
+        font-size: 0.8em;
+    }
+}
+</style>
+{% endblock %}

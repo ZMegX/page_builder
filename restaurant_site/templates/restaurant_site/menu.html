@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.name }} — Menu{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0">{{ profile.name }} Menu</h3>
+    <a class="btn btn-outline-secondary btn-sm ms-auto" href="{% url 'restaurant_site:landing' slug=slug %}">
+    <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if menus %}
+    {% for menu in menus %}
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4">
+          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+            <i class="bi bi-journal-text me-2"></i> {{ menu.name }}
+          </h5>
+          {% if menu.description %}
+            <div class="small text-muted">{{ menu.description }}</div>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if menu.items.all %}
+            <div class="list-group list-group-flush">
+              {% for item in menu.items.all %}
+                <div class="list-group-item px-0">
+                  <div class="d-flex">
+                    <div class="flex-grow-1">
+                      <div class="fw-semibold">{{ item.name }}</div>
+                      {% if item.description %}<div class="small text-muted">{{ item.description }}</div>{% endif %}
+                      {% if item.category %}<div class="badge text-bg-light mt-1">{{ item.category }}</div>{% endif %}
+                    </div>
+                    {% if item.price is not None %}
+                      <div class="ms-3 fw-semibold">${{ item.price }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% empty %}
+                <div class="text-muted">No items yet.</div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-muted">No items yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-info">No active menus published yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

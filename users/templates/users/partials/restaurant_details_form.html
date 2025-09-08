@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% load static %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Restaurant Details</h5>
+    <div class="d-flex gap-2">
+      <button type="button" id="restaurantEditBtn" class="btn btn-outline-secondary btn-sm">Edit</button>
+      <button type="reset" id="restaurantCancelBtn" class="btn btn-outline-secondary btn-sm d-none" form="restaurantForm">Cancel</button>
+      <button type="submit" id="restaurantSaveBtn" class="btn btn-primary btn-sm d-none" form="restaurantForm" name="save_restaurant" value="1">Save</button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-3" role="alert">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form id="restaurantForm" method="post" action="{% url 'profile' %}" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <fieldset id="restaurantFieldset" disabled>
+        {% if r_form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ r_form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="{{ r_form.name.id_for_label }}" class="form-label">Restaurant Name</label>
+            <input
+              type="text"
+              name="{{ r_form.name.html_name }}"
+              id="{{ r_form.name.id_for_label }}"
+              value="{{ r_form.name.value|default_if_none:'' }}"
+              class="form-control{% if r_form.name.errors %} is-invalid{% endif %}"
+              placeholder="e.g., La Trattoria"
+            />
+            {% if r_form.name.errors %}
+              <div class="invalid-feedback">
+                {{ r_form.name.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label for="{{ r_form.cuisine_type.id_for_label }}" class="form-label">Cuisine Type</label>
+            <input
+              type="text"
+              name="{{ r_form.cuisine_type.html_name }}"
+              id="{{ r_form.cuisine_type.id_for_label }}"
+              value="{{ r_form.cuisine_type.value|default_if_none:'' }}"
+              class="form-control{% if r_form.cuisine_type.errors %} is-invalid{% endif %}"
+              placeholder="e.g., Italian"
+            />
+            {% if r_form.cuisine_type.errors %}
+              <div class="invalid-feedback">
+                {{ r_form.cuisine_type.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label for="{{ r_form.registration_number.id_for_label }}" class="form-label">Registration Number</label>
+            <input
+              type="text"
+              name="{{ r_form.registration_number.html_name }}"
+              id="{{ r_form.registration_number.id_for_label }}"
+              value="{{ r_form.registration_number.value|default_if_none:'' }}"
+              class="form-control{% if r_form.registration_number.errors %} is-invalid{% endif %}"
+              placeholder="Company/Business registration"
+            />
+            {% if r_form.registration_number.errors %}
+              <div class="invalid-feedback">
+                {{ r_form.registration_number.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label for="{{ r_form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+            <input
+              type="text"
+              name="{{ r_form.phone_number.html_name }}"
+              id="{{ r_form.phone_number.id_for_label }}"
+              value="{{ r_form.phone_number.value|default_if_none:'' }}"
+              class="form-control{% if r_form.phone_number.errors %} is-invalid{% endif %}"
+              placeholder="+1 555-555-5555"
+            />
+            {% if r_form.phone_number.errors %}
+              <div class="invalid-feedback">
+                {{ r_form.phone_number.errors|striptags }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Logo</label>
+            <div class="d-flex align-items-start gap-3">
+              <div class="border rounded d-flex align-items-center justify-content-center bg-light" style="width: 120px; height: 120px; overflow: hidden;">
+                {% if restaurant_details.logo %}
+                  <img id="restaurantLogoPreview" src="{{ restaurant_details.logo.url }}" alt="Logo preview" style="max-width: 100%; max-height: 100%;" />
+                {% else %}
+                  <img id="restaurantLogoPreview" src="" alt="Logo preview" style="display:none; max-width: 100%; max-height: 100%;" />
+                  <span class="text-muted small px-2">No logo</span>
+                {% endif %}
+              </div>
+              <div class="flex-grow-1">
+                <input
+                  type="file"
+                  name="{{ r_form.logo.html_name }}"
+                  id="restaurantLogoInput"
+                  accept="image/*"
+                  class="form-control{% if r_form.logo.errors %} is-invalid{% endif %}"
+                />
+                {% if r_form.logo.errors %}
+                  <div class="invalid-feedback">
+                    {{ r_form.logo.errors|striptags }}
+                  </div>
+                {% endif %}
+                <div class="form-text">PNG or JPG recommended. Square works best.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'js/restaurant_details.js' %}"></script>
