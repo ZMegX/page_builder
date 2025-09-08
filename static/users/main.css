@@ -339,3 +339,15 @@ body {
 .tooltip.bs-tooltip-top .arrow::before {
   border-top-color: #333;
 }
+/* nav bar extras */
+.navbar .dropdown-menu {
+  min-width: 240px;
+}
+.navbar .dropdown-item.active,
+.navbar .dropdown-item:active {
+  background: var(--bs-primary);
+  color: #fff;
+}
+.navbar .badge.bg-warning {
+  font-weight: 500;
+}
