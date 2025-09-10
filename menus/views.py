@@ -70,21 +70,29 @@ def create_menu(request):
     })
 
 @login_required
-def menu_detail(request, pk, int):
+def menu_detail(request, pk):
     menu = get_object_or_404(
-        Menu.objects.prefetch_related("items"),
-        Q(pk=pk) & (Q(owner=request.user) | Q(is_active=True)),
-        )
+        Menu.objects.prefetch_related("items").filter(
+        (Q(owner=request.user) | Q(is_active=True)),
+        ),
+        pk=pk
+    )
     
-    items_by_section = defaultdict
+    items_by_section = defaultdict(list)
     for item in menu.items.all():
-        section = item.get_section_display().append(item)  # Gets the human-readable version
+        # Use display label if available; fallback to raw value
+        if hasattr(item, "get_section_display"):
+            section_label = item.get_section_display()
+        else:
+            section_label = getattr(item, "section", "Uncategorized")
+        items_by_section[section_label].append(item)
 
     
     context = {
         'menu': menu,
         'items_by_section': dict(items_by_section),
-        'is_owner': menu.owner == request.user,
+        "sections_ordered": sorted(items_by_section.keys()),
+        'is_owner': menu.owner == request.user.id,
         'total_items': menu.items.count()
     }
     return render(request, "menus/menu_detail.html", context)
