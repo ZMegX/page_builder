@@ -259,25 +259,7 @@
 </div>
 
 <!-- Scripts -->
-<script>
-  // Simple logo preview
-  (function() {
-    const input = document.querySelector('input[type="file"][name="logo"]');
-    const img = document.getElementById('logoPreview');
-    const ph = document.getElementById('logoPlaceholder');
-    if (!input) return;
-    input.addEventListener('change', function() {
-      const f = this.files && this.files[0];
-      if (!f) return;
-      const url = URL.createObjectURL(f);
-      if (img) {
-        img.src = url;
-        img.classList.remove('d-none');
-      }
-      if (ph) ph.classList.add('d-none');
-    });
-  })();
-</script>
 <script src="{% static 'js/restaurant_profile.js' %}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places" async defer loading="async"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap" 
+async defer></script>
 {% endblock %}
