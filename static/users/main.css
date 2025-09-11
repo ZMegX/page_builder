@@ -242,11 +242,12 @@ body {
 }
 /* Sticky navbar with white background and black outline */
 .navbar {
+    display: flex;
     position: sticky;
     top: 0;
     z-index: 1050;
     background-color: #fff !important;
-    border: 2px solid #000;         /* Black outline */
+    border: 3px solid #000;  
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -277,6 +278,7 @@ body {
     text-shadow: none;
     border: none;
     outline: none;
+    text-align: center;
 }
 
 .navbar .nav-link:hover,
@@ -288,6 +290,18 @@ body {
 /* Optional: Style mobile nav toggle button for sticky effect */
 .navbar-toggler {
     z-index: 1060;
+}
+/* nav bar extras */
+.navbar .dropdown-menu {
+  min-width: 240px;
+}
+.navbar .dropdown-item.active,
+.navbar .dropdown-item:active {
+  background: var(--bs-primary);
+  color: #fff;
+}
+.navbar .badge.bg-warning {
+  font-weight: 500;
 }
 
 .fade-in-element {
@@ -339,15 +353,153 @@ body {
 .tooltip.bs-tooltip-top .arrow::before {
   border-top-color: #333;
 }
-/* nav bar extras */
-.navbar .dropdown-menu {
-  min-width: 240px;
+
+
+/* Alerts */
+.alert-stack {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1080;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  max-width: min(440px, calc(100vw - 2.5rem));
+  pointer-events: none; /* allow clicks only on alerts */
 }
-.navbar .dropdown-item.active,
-.navbar .dropdown-item:active {
-  background: var(--bs-primary);
-  color: #fff;
+
+/* Base modern alert styling */
+.alert-modern {
+  --alert-bg: var(--bs-body-bg);
+  --alert-border: 1px solid rgba(0,0,0,0.08);
+  --alert-shadow: 0 4px 18px -4px rgba(0,0,0,0.15), 0 2px 6px -1px rgba(0,0,0,0.08);
+  --alert-radius: 18px;
+  --alert-blur: 12px;
+  --alert-color: var(--bs-body-color);
+  backdrop-filter: blur(var(--alert-blur));
+  background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(255,255,255,0.65));
+  border: var(--alert-border);
+  box-shadow: var(--alert-shadow);
+  border-radius: var(--alert-radius);
+  padding: .95rem 1.1rem .95rem 1.1rem;
+  position: relative;
+  overflow: hidden;
+  pointer-events: auto;
+  transition: opacity .45s ease, transform .45s ease;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
 }
-.navbar .badge.bg-warning {
+
+[data-bs-theme="dark"] .alert-modern {
+  --alert-bg: rgba(30,33,38,0.75);
+  background: linear-gradient(155deg, rgba(40,44,52,0.78), rgba(26,28,32,0.72));
+  --alert-border: 1px solid rgba(255,255,255,0.08);
+  --alert-color: #f6f7f9;
+}
+
+.alert-modern .alert-content {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+}
+
+.alert-modern .alert-body {
+  flex: 1;
+  font-size: .935rem;
+  line-height: 1.35rem;
   font-weight: 500;
+}
+
+.alert-modern .btn-close {
+  margin-left: .5rem;
+  opacity: .55;
+  transition: opacity .25s;
+}
+
+.alert-modern .btn-close:hover,
+.alert-modern .btn-close:focus {
+  opacity: .9;
+}
+
+/* Variant tints (light, accessible contrast) */
+.alert-modern.alert-success {
+  --accent: #2e7d32;
+  background: linear-gradient(145deg, rgba(223,247,230,0.92), rgba(208,240,219,0.82));
+  color: #1d5e24;
+}
+.alert-modern.alert-danger {
+  --accent: #c62828;
+  background: linear-gradient(145deg, rgba(253,233,233,0.94), rgba(250,217,217,0.86));
+  color: #7d1d1d;
+}
+.alert-modern.alert-warning {
+  --accent: #ed6c02;
+  background: linear-gradient(145deg, rgba(255,245,225,0.95), rgba(255,235,205,0.88));
+  color: #6a3f00;
+}
+.alert-modern.alert-info {
+  --accent: #0277bd;
+  background: linear-gradient(145deg, rgba(230,245,255,0.95), rgba(214,236,250,0.9));
+  color: #08496d;
+}
+
+[data-bs-theme="dark"] .alert-modern.alert-success {
+  background: linear-gradient(155deg, rgba(34,61,41,0.85), rgba(30,54,37,0.78));
+  color: #a6e7b3;
+}
+[data-bs-theme="dark"] .alert-modern.alert-danger {
+  background: linear-gradient(155deg, rgba(64,28,28,0.85), rgba(54,20,20,0.78));
+  color: #f3b8b8;
+}
+[data-bs-theme="dark"] .alert-modern.alert-warning {
+  background: linear-gradient(155deg, rgba(77,52,19,0.85), rgba(66,44,14,0.78));
+  color: #f8d7a1;
+}
+[data-bs-theme="dark"] .alert-modern.alert-info {
+  background: linear-gradient(155deg, rgba(26,54,69,0.85), rgba(20,45,58,0.78));
+  color: #b2e4ff;
+}
+
+/* Progress bar */
+.alert-modern .alert-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent, #0d6efd), rgba(255,255,255,0.2));
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform linear;
+  pointer-events: none;
+  opacity: .75;
+}
+
+.prefers-reduced-motion .alert-progress {
+  display: none;
+}
+
+/* Entrance animation (override Bootstrap's default fade if you like) */
+.alert-modern.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert-modern.fade {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* While pausing */
+.alert-modern.is-paused .alert-progress {
+  transition: none;
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .alert-modern {
+    transition: none;
+    transform: none !important;
+  }
 }

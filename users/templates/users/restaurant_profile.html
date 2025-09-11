@@ -78,29 +78,46 @@
           </div>
         </div>
       </div>
-
       <!-- Address (full width below) -->
       <div class="col-12">
         <div class="card shadow-sm border-0 rounded-4 h-100">
-          <div class="card-header bg-white border-bottom-0 rounded-top-4">
+          <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex align-items-center">
             <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
               <i class="bi bi-geo-alt me-2"></i> Business Address
             </h5>
             <button type="submit" class="btn btn-outline-success btn-sm ms-auto" name="save_addr">
-                <i class="bi bi-save me-1"></i> Save Address
+              <i class="bi bi-save me-1"></i> Save Address
             </button>
           </div>
           <div class="card-body">
+
+            <!-- Subtle alert with current saved address -->
+            {% if addr_form.instance and addr_form.instance.pk %}
+              <div class="alert alert-light d-flex align-items-center gap-2 mb-3" role="alert">
+                <span class="fw-semibold">Current address:</span>
+                <span>
+                  {{ addr_form.instance.street }}{% if addr_form.instance.city %}, {{ addr_form.instance.city }}{% endif %}
+                  {% if addr_form.instance.state %}, {{ addr_form.instance.state }}{% endif %}
+                  {% if addr_form.instance.zipcode %}, {{ addr_form.instance.zipcode }}{% endif %}
+                  {% if addr_form.instance.country %}, {{ addr_form.instance.country }}{% endif %}
+                </span>
+              </div>
+            {% endif %}
+
+            <!-- Clean search bar for autocomplete (no icon, no extra markup) -->
             <div class="mb-3">
-              <label for="id_address" class="form-label">Restaurant Address</label>
+              <label for="{{ addr_form.address_search.id_for_label }}" class="form-label">Find or enter address</label>
               {{ addr_form.address_search|as_crispy_field }}
-              <div class="form-text">Pick from suggestions or drag the pin on the map.</div>
+              <div class="form-text">Type your address and pick from the suggestions.</div>
+              {% for error in addr_form.address_search.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
             </div>
 
-            {{ addr_form.street }}{{ addr_form.city }}{{ addr_form.state }}
-            {{ addr_form.country }}{{ addr_form.zipcode }}
+            <!-- Hidden fields for lat/lng -->
             {{ addr_form.latitude }}{{ addr_form.longitude }}
 
+            <!-- Map -->
             <div id="map" class="rounded shadow-sm mb-2" style="height: 320px;"></div>
 
             {% if addr_form.non_field_errors %}

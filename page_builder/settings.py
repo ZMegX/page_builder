@@ -44,7 +44,6 @@ ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost']
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
-    'page_builder_app_create_page.apps.PageBuilderAppCreatePageConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
