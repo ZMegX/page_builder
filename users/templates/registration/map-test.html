@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Maps Autocomplete Isolated Test</title>
+  <meta charset="utf-8" />
+  <style>
+    #map { height: 400px; width: 100%; margin-top: 1rem; }
+    #autocomplete { width: 60%; padding: 8px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Test Google Maps Autocomplete</h2>
+  <input id="autocomplete" type="text" placeholder="Type an address..." />
+  <input type="hidden" id="address" />
+  <input type="hidden" id="lat" />
+  <input type="hidden" id="lng" />
+  <div id="map"></div>
+  <!-- Reference your JS file -->
+  <script src="mapTest.js"></script>
+  <!-- Replace YOUR_API_KEY -->
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocompleteAndMap" async defer></script>
+</body>
+</html>

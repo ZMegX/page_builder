@@ -14,6 +14,9 @@ from .forms import (
                     )
 from .models import Profile, RestaurantProfile, Address
 
+def test_map(request):
+    return render(request, "registration/map-test.html")
+
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)

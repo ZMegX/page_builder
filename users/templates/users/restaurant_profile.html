@@ -104,29 +104,13 @@
               </div>
             {% endif %}
 
-            <!-- Clean search bar for autocomplete (no icon, no extra markup) -->
-            <div class="mb-3">
-              <label for="address-autocomplete" class="form-label">Find or enter address</label>
-              <gmpx-place-autocomplete id="address-autocomplete"></gmpx-place-autocomplete>
-              <input type="hidden" id="address-input-hidden" name="address_search" />
-              <div class="form-text">Type your address and pick from the suggestions.</div>
-              {% for error in addr_form.address_search.errors %}
-                <div class="invalid-feedback d-block">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- Hidden fields for lat/lng -->
-            {{ addr_form.latitude }}
-            {{ addr_form.longitude }}
-
-            <!-- Map -->
-            <div id="map" class="rounded shadow-sm mb-2" style="height: 320px;"></div>
-
-            {% if addr_form.non_field_errors %}
-              {% for e in addr_form.non_field_errors %}
-                <div class="invalid-feedback d-block">{{ e }}</div>
-              {% endfor %}
-            {% endif %}
+            <h2>Enter Restaurant Address</h2>
+            <input id="autocomplete" placeholder="Start typing address..." type="text" />
+            <!-- Hidden fields for storing selected address and coordinates -->
+            <input type="hidden" id="address" name="address" />
+            <input type="hidden" id="lat" name="lat" />
+            <input type="hidden" id="lng" name="lng" />
+            <div id="map"></div>
           </div>
         </div>
       </div>
@@ -276,8 +260,15 @@
     </div>
   </form>
 </div>
-
-<!-- Scripts -->
-<script src="{% static 'js/initMap.js' %}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap"></script>
 {% endblock %}
+{% block extra_js %}
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/restaurantAddressMap.js' %}"></script>
+<script src="{% static 'js/autoCompleteAddress.js' %}"></script>
+<script src="{% static 'js/displayMap.js' %}"></script>
+
+<script src="{% static 'js/initMap.js' %}"></script>
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&loading=async&geometry,places,autocomplete&callback=initMap">
+</script>{% endblock %}
