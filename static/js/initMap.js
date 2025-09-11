@@ -1,6 +1,6 @@
 window.initMap = function () {
   (function () {
-    // Simple formset add/remove
+    // --- Django Formset Logic ---
     function setupFormset(containerId, addBtnId, rowClass, removeBtnClass) {
       const container = document.getElementById(containerId);
       const addBtn = document.getElementById(addBtnId);
@@ -38,8 +38,8 @@ window.initMap = function () {
       setupFormset('hours-formset', 'add-hours-row', 'hours-form-row', 'remove-hours-row');
     });
 
-    // Google Maps + Places
-    let map, marker, geocoder, autocomplete;
+    // --- Google Maps + Places ---
+    let map, marker, geocoder;
 
     function q(id) { return document.getElementById(id); }
     function setVal(el, v) { if (el) el.value = v ?? ''; }
@@ -81,8 +81,6 @@ window.initMap = function () {
       geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           const place = results[0];
-          const input = q('id_address');
-          if (input) input.value = place.formatted_address || input.value;
           fillComponents(place);
         }
       });
@@ -91,7 +89,6 @@ window.initMap = function () {
     window.addEventListener('load', function () {
       if (!(window.google && window.google.maps)) return;
 
-      const addrInput = q('id_address');
       const lat = parseFloat(q('id_latitude')?.value || '');
       const lng = parseFloat(q('id_longitude')?.value || '');
       const hasCoords = !isNaN(lat) && !isNaN(lng);
@@ -114,25 +111,33 @@ window.initMap = function () {
         reverseGeocode(pos);
       });
 
-      map.addEventListener?.('click', (e) => {
-        // for older versions fallback use google.maps.event.addListener
-      });
-
       google.maps.event.addListener(map, 'click', (e) => {
         setPos(e.latLng);
         reverseGeocode(e.latLng);
       });
 
-      if (addrInput) {
-        const options = { fields: ['address_components', 'geometry', 'formatted_address'] };
-        autocomplete = new google.maps.places.Autocomplete(addrInput, options);
-        autocomplete.addListener('place_changed', () => {
-          const place = autocomplete.getPlace();
-          if (!place || !place.geometry || !place.geometry.location) return;
-          addrInput.value = place.formatted_address || addrInput.value;
-          fillComponents(place);
-          setPos(place.geometry.location);
-          map.setZoom(16);
+      // --- Place Autocomplete Integration ---
+      const autocompleteElement = document.getElementById('address-autocomplete');
+      const addressInputHidden = document.getElementById('address-input-hidden');
+      const latInput = document.getElementById('id_latitude');
+      const lngInput = document.getElementById('id_longitude');
+
+      if (autocompleteElement) {
+        autocompleteElement.addEventListener('gmpx-placechange', (event) => {
+          const place = event.detail;
+          if (place) {
+            addressInputHidden.value = place.formatted_address || '';
+            if (place.geometry && place.geometry.location) {
+              latInput.value = place.geometry.location.lat;
+              lngInput.value = place.geometry.location.lng;
+              setPos(new google.maps.LatLng(
+                place.geometry.location.lat,
+                place.geometry.location.lng
+              ));
+              map.setZoom(16);
+            }
+            fillComponents(place);
+          }
         });
       }
     });
