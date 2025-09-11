@@ -106,8 +106,9 @@
 
             <!-- Clean search bar for autocomplete (no icon, no extra markup) -->
             <div class="mb-3">
-              <label for="{{ addr_form.address_search.id_for_label }}" class="form-label">Find or enter address</label>
-              {{ addr_form.address_search|as_crispy_field }}
+              <label for="address-autocomplete" class="form-label">Find or enter address</label>
+              <gmpx-place-autocomplete id="address-autocomplete"></gmpx-place-autocomplete>
+              <input type="hidden" id="address-input-hidden" name="address_search" />
               <div class="form-text">Type your address and pick from the suggestions.</div>
               {% for error in addr_form.address_search.errors %}
                 <div class="invalid-feedback d-block">{{ error }}</div>
@@ -115,7 +116,8 @@
             </div>
 
             <!-- Hidden fields for lat/lng -->
-            {{ addr_form.latitude }}{{ addr_form.longitude }}
+            {{ addr_form.latitude }}
+            {{ addr_form.longitude }}
 
             <!-- Map -->
             <div id="map" class="rounded shadow-sm mb-2" style="height: 320px;"></div>
@@ -276,7 +278,6 @@
 </div>
 
 <!-- Scripts -->
-<script src="{% static 'js/restaurant_profile.js' %}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap" 
-async defer></script>
+<script src="{% static 'js/initMap.js' %}"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap"></script>
 {% endblock %}

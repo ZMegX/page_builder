@@ -3,15 +3,13 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
 
-from .models import RestaurantProfile
+from .models import RestaurantProfile, Address
 from .restaurant_forms import (
     RestaurantProfileForm,
     AddressForm,
     SocialLinkFormSet,
     OpeningHourFormSet,
 )
-
-
 
 @login_required
 def restaurant_profile(request):
@@ -57,7 +55,7 @@ def restaurant_profile(request):
         elif 'save_addr' in request.POST:
             rp_form, addr_form, social_fs, hours_fs = make_forms(bound='addr')
             if addr_form.is_valid():
-                addr = addr_form.save(commit=False)
+                addr = addr_form.save()
                 addr.profile = rp
                 addr.save()
                 messages.success(request, "Address saved.")
