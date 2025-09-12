@@ -20,6 +20,7 @@ urlpatterns = [
     path("", include('menus.urls', namespace='menus')),
     path("", include("restaurant_site.urls", namespace="restaurant_site")),
     path("", include("menus.public_urls")),
+    
 
 ]
 

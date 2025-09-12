@@ -39,3 +39,14 @@
 
 .card { border-radius: 1rem; }
 .rounded-top-4 { border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important; }
+
+#map {
+        height: 400px;
+        width: 100%;
+        margin-top: 16px;
+}
+#autocomplete {
+        width: 50%;
+        padding: 8px;
+        font-size: 1rem;
+}

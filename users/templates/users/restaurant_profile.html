@@ -261,14 +261,3 @@
   </form>
 </div>
 {% endblock %}
-{% block extra_js %}
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{% static 'js/restaurantAddressMap.js' %}"></script>
-<script src="{% static 'js/autoCompleteAddress.js' %}"></script>
-<script src="{% static 'js/displayMap.js' %}"></script>
-
-<script src="{% static 'js/initMap.js' %}"></script>
-<script async
-    src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&loading=async&geometry,places,autocomplete&callback=initMap">
-</script>{% endblock %}

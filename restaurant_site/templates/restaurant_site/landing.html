@@ -38,6 +38,7 @@
               {% if address.state %}, {{ address.state }}{% endif %}
               {% if address.zipcode %}, {{ address.zipcode }}{% endif %}
               {% if address.country %}, {{ address.country }}{% endif %}
+              <div id="map" style="height: 300px; width: 100%;"></div>
               <div>
                 <a class="small" target="_blank" rel="noopener"
                    href="https://www.google.com/maps/search/?api=1&query={{ address.street|urlencode }}%2C+{{ address.city|urlencode }}%2C+{{ address.country|urlencode }}">
@@ -105,18 +106,25 @@
     </div>
   </div>
 </div>
-
-{% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
-<script>
-  window.addEventListener('load', function() {
-    if (!(window.google && window.google.maps)) return;
-    const center = { lat: {{ map_center.lat }}, lng: {{ map_center.lng }} };
-    const m = new google.maps.Map(document.getElementById('map'), {
-      center, zoom: 15, mapTypeControl: false, streetViewControl: false, fullscreenControl: false
-    });
-    new google.maps.Marker({ map: m, position: center });
-  });
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}" async defer loading="async"></script>
+{% if address %}
+  <div class="mb-2">
+    <i class="bi bi-geo-alt me-1"></i>
+    {{ address.street }}{% if address.city %}, {{ address.city }}{% endif %}
+    {% if address.state %}, {{ address.state }}{% endif %}
+    {% if address.zipcode %}, {{ address.zipcode }}{% endif %}
+    {% if address.country %}, {{ address.country }}{% endif %}
+    <div>
+      <iframe
+        width="100%"
+        height="300"
+        frameborder="0" style="border:0"
+        src="https://www.google.com/maps/embed/v1/place?key=GOOGLE_MAPS_API_KEY
+        &q={{ address.street | urlencode }}{% if address.city %},+{{ address.city | urlencode }}{% endif %}{% if address.state %},+{{ address.state | urlencode }}{% endif %}{% if address.zipcode %},+{{ address.zipcode | urlencode }}{% endif %}{% if address.country %},+{{ address.country | urlencode }}{% endif %}"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
 {% endif %}
+
+
 {% endblock %}
