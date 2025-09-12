@@ -12,7 +12,8 @@ from .forms import (
                     ProfileUpdateForm,
                     RestaurantDetailsForm,
                     )
-from .models import Profile, RestaurantProfile, Address
+from .models import Profile, RestaurantProfile
+from locations.models import UserAddress
 
 
 def register(request):
@@ -88,7 +89,7 @@ def profile_manage(request):
 @login_required
 def address_edit(request, address_id):
     address = get_object_or_404(
-        Address, id=address_id, profile__profile__user=request.user)
+        UserAddress, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
         form = AddressForm(request.POST, instance=address)
         if form.is_valid():
@@ -110,7 +111,7 @@ def address_edit(request, address_id):
 
 @login_required
 def address_delete(request, address_id):
-    address = get_object_or_404(Address, id=address_id, profile__profile__user=request.user)
+    address = get_object_or_404(UserAddress, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
         # Remove the address from the profile, but not from other profiles
         profile = request.user.profile

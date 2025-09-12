@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
-from users.models import Profile, Address, RestaurantProfile
+from users.models import Profile, RestaurantProfile
+from locations.models import UserAddress
 
 # Profile Create/Edit Form
 class ProfileForm(forms.ModelForm):
@@ -29,49 +30,9 @@ ProfileUpdateForm = ProfileForm
 
 # Address Create/Edit Form
 class AddressForm(forms.ModelForm):
-    # Visible search input for Google Places Autocomplete (non-model)
-    address_search = forms.CharField(
-        required=False,
-        label='Restaurant Address',
-        widget=forms.TextInput(attrs={
-            'id': 'id_address',
-            'class': 'form-control',
-            'placeholder': 'Start typing address...',
-            'autocomplete': 'off'
-        })
-    )
-
     class Meta:
-        model = Address
-        fields = [
-            'address_search',  # non-model field to render the search input
-            'street',
-            'city',
-            'state',
-            'country',
-            'zipcode',
-            'latitude',
-            'longitude',
-        ]
-        widgets = {
-            # Keep components hidden; JS fills them
-            'street': forms.HiddenInput(attrs={'id': 'id_street'}),
-            'city': forms.HiddenInput(attrs={'id': 'id_city'}),
-            'state': forms.HiddenInput(attrs={'id': 'id_state'}),
-            'country': forms.HiddenInput(attrs={'id': 'id_country'}),
-            'zipcode': forms.HiddenInput(attrs={'id': 'id_zipcode'}),
-            'latitude': forms.HiddenInput(attrs={'id': 'id_latitude'}),
-            'longitude': forms.HiddenInput(attrs={'id': 'id_longitude'}),
-        }
-
-    def clean(self):
-        cleaned = super().clean()
-        street = cleaned.get('street')
-        city = cleaned.get('city')
-        country = cleaned.get('country')
-        if not street or not city or not country:
-            raise forms.ValidationError("Please select a full address to populate street, city, and country.")
-        return cleaned
+        model = UserAddress
+        fields = ['formatted_address', 'latitude', 'longitude']
 
 
 class RestaurantDetailsForm(forms.ModelForm):

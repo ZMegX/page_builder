@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = "restaurant_site"
+app_name = "webpage_restaurant_site"
 
 urlpatterns = [
     path("r/<slug:slug>/", views.landing, name="landing"),

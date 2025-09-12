@@ -76,7 +76,7 @@ def restaurant_landing(request, slug):
         "profile": profile,
         "address": address,
         "status": status,
-        "GOOGLE_MAPS_API_KEY": getattr(settings, "GOOGLE_MAPS_API_KEY", ""),
+        "GOOGLE_MAPS_API_KEY": getattr(settings, "GOOGLE_MAPS_API_KEY"),
         "map_center": {"lat": lat, "lng": lng},
         "profile_slug": _slug_fallback(profile),
     }
@@ -102,4 +102,4 @@ def restaurant_menu(request, slug):
 def landing(request, slug):
     owner = get_object_or_404(User, username=slug)
     profile = getattr(owner, "restaurant_profile", None)
-    return render(request, "restaurant_site/landing.html", {"owner": owner, "profile": profile, "slug": owner.username})
+    return render(request, "webpage_restaurant_site/landing.html", {"owner": owner, "profile": profile, "slug": owner.username})

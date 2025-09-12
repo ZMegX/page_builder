@@ -3,8 +3,9 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 
-from .models import Address, Profile, RestaurantProfile
+from .models import Profile, RestaurantProfile
 from .forms import AddressForm
+from locations.models import UserAddress
 
 
 @login_required
@@ -13,7 +14,7 @@ def address_get_ajax(request, address_id):
     Return JSON for an address owned by the current user, to prefill the modal for editing.
     """
     address = get_object_or_404(
-        Address,
+        UserAddress,
         id=address_id,
         profile__profile__user=request.user  # ownership check via RestaurantProfile -> Profile -> User
     )
@@ -40,7 +41,7 @@ def address_update_ajax(request, address_id):
         return JsonResponse({"error": "Invalid request"}, status=400)
 
     address = get_object_or_404(
-        Address,
+        UserAddress,
         id=address_id,
         profile__profile__user=request.user
     )

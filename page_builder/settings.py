@@ -18,6 +18,9 @@ import dj_database_url
 load_dotenv()  # This will load variables from .env into environment
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
@@ -56,8 +59,9 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'widget_tweaks',
     'menus',
-    'restaurant_site'
-    
+    'webpage_restaurant_site',
+    'locations',
+    'rest_framework',
     
 ]
 
@@ -165,4 +169,4 @@ LOGOUT_REDIRECT_URL = 'home'
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")

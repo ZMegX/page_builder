@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.conf import settings
 
-from .models import RestaurantProfile, Address
+from .models import RestaurantProfile
 from .restaurant_forms import (
     RestaurantProfileForm,
     AddressForm,

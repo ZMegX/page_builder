@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import RestaurantProfile, Address, SocialLink, OpeningHour
+from .models import RestaurantProfile, SocialLink, OpeningHour
+from locations.models import UserAddress
 
 DAYS_OF_WEEK = [
     ("Monday", "Monday"),
@@ -25,11 +26,12 @@ class RestaurantProfileForm(forms.ModelForm):
         }
 
 class AddressForm(forms.ModelForm):
+    # This is the visible search box for the user. It is NOT part of the model.
     address_search = forms.CharField(
-        required=False,
+        required=True, # Make it required to ensure an address is chosen
         label="Restaurant Address",
         widget=forms.TextInput(attrs={
-            "id": "id_address",
+            "id": "id_address_search", # Give it a unique ID
             "class": "form-control",
             "placeholder": "Start typing an address...",
             "autocomplete": "off"
@@ -37,28 +39,33 @@ class AddressForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Address
+        model = UserAddress
+        # These are the fields that will be saved to the database.
+        # They match the fields on your UserAddress model.
         fields = [
-            "address_search",
-            "street", "city", "state", "country", "zipcode",
-            "latitude", "longitude",
+            "formatted_address", 
+            "latitude", 
+            "longitude",
         ]
+        # These fields will be hidden and populated by JavaScript.
         widgets = {
-            "street": forms.HiddenInput(attrs={"id": "id_street"}),
-            "city": forms.HiddenInput(attrs={"id": "id_city"}),
-            "state": forms.HiddenInput(attrs={"id": "id_state"}),
-            "country": forms.HiddenInput(attrs={"id": "id_country"}),
-            "zipcode": forms.HiddenInput(attrs={"id": "id_zipcode"}),
+            "formatted_address": forms.HiddenInput(attrs={"id": "id_formatted_address"}),
             "latitude": forms.HiddenInput(attrs={"id": "id_latitude"}),
             "longitude": forms.HiddenInput(attrs={"id": "id_longitude"}),
         }
 
-    def clean(self):
-        cleaned = super().clean()
-        if not cleaned.get("street") or not cleaned.get("city") or not cleaned.get("country"):
-            raise forms.ValidationError("Please select a full address from the suggestions (street, city, country).")
-        return cleaned
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add the 'address_search' field to the form's fields.
+        self.fields['address_search'] = self.address_search
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # Ensure that the hidden fields were populated by the JavaScript.
+        if not cleaned_data.get("formatted_address") or not cleaned_data.get("latitude"):
+            raise forms.ValidationError("Please select a valid address from the suggestions.")
+        return cleaned_data
+    
 class SocialLinkForm(forms.ModelForm):
     class Meta:
         model = SocialLink

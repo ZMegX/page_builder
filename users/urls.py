@@ -28,6 +28,5 @@ urlpatterns = [
     path('address/<int:address_id>/delete/', views.address_delete, name='address_delete'),
     path('address/<int:address_id>/update/ajax/', ajax_views.address_update_ajax, name='address_update_ajax'),
     path('address/<int:address_id>/json/', ajax_views.address_get_ajax, name='address_get_ajax'),
-    path('map-test/', views.test_map, name='map-test'),
     path("address/add/ajax/", views.address_add_ajax, name="address_add_ajax"),
 ]
