@@ -118,8 +118,6 @@ async function initMap() {
       return;
     }
 
-    // ✅ THE FIX IS HERE:
-    // The key is now 'formatted_address' to match the Django model and view.
     const data = {
       formatted_address: selectedPlace.formattedAddress,
       latitude: selectedPlace.location.lat(),
@@ -165,3 +163,8 @@ async function initMap() {
 document.addEventListener('DOMContentLoaded', initMap);
 </script>
 {% endblock %}
+
+<!-- 
+Source code :
+https://jsfiddle.net/u43pj69g/
+https://console.cloud.google.com/google/maps-apis/discover/autocomplete?project=stone-plating-470717-q2 -->

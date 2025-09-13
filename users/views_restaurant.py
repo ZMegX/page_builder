@@ -8,72 +8,46 @@ from .restaurant_forms import (
     RestaurantProfileForm,
     SocialLinkFormSet,
     OpeningHourFormSet,
+    RestaurantProfileForm,
 )
+from locations.models import UserAddress
+
 
 @login_required
 def restaurant_profile(request):
     Profile.objects.get_or_create(user=request.user)
     rp, _ = RestaurantProfile.objects.get_or_create(user=request.user)
 
-    def make_forms(bound=None):
-        """
-        bound can be: 'rp', 'addr', 'social', 'hours', 'all', or None
-        Only the specified section is bound to POST; others are unbound to avoid showing their errors.
-        """
-        bind_rp = request.POST if bound in ('rp', 'all') else None
-        bind_social = request.POST if bound in ('social', 'all') else None
-        bind_hours = request.POST if bound in ('hours', 'all') else None
-
-        rp_form = RestaurantProfileForm(bind_rp, request.FILES if bind_rp is not None else None, instance=rp)
-        social_fs = SocialLinkFormSet(bind_social, instance=rp, prefix="social")
-        hours_fs = OpeningHourFormSet(bind_hours, instance=rp, prefix="hours")
-        
-        return rp_form, social_fs, hours_fs
-
     if request.method == "POST":
-        # Which section was submitted?
-        if 'save_rp' in request.POST:
-            rp_form, addr_form, social_fs, hours_fs = make_forms(bound='rp')
-            if rp_form.is_valid():
-                rp_form.save()
-                messages.success(request, "Restaurant details saved.")
-                return redirect("restaurant_profile")
-            else:
-                messages.error(request, "Please fix the errors in Restaurant Details.")
+        # All forms are bound to the same POST data.
+        rp_form = RestaurantProfileForm(request.POST, request.FILES, instance=rp)
+        social_fs = SocialLinkFormSet(request.POST, instance=rp, prefix="social")
+        hours_fs = OpeningHourFormSet(request.POST, instance=rp, prefix="hours")
 
-        elif 'save_social' in request.POST:
-            rp_form, addr_form, social_fs, hours_fs = make_forms(bound='social')
-            if social_fs.is_valid():
-                social_fs.save()
-                messages.success(request, "Social links saved.")
-                return redirect("restaurant_profile")
-            else:
-                messages.error(request, "Please fix the errors in Social Links.")
-
-        elif 'save_hours' in request.POST:
-            rp_form, addr_form, social_fs, hours_fs = make_forms(bound='hours')
-            if hours_fs.is_valid():
-                hours_fs.save()
-                messages.success(request, "Opening hours saved.")
-                return redirect("restaurant_profile")
-            else:
-                messages.error(request, "Please fix the errors in Opening Hours.")
+        # Validate all forms together.
+        if rp_form.is_valid() and social_fs.is_valid() and hours_fs.is_valid():
+            rp_form.save()
+            social_fs.save()
+            hours_fs.save()
+            messages.success(request, "Your profile has been saved successfully.")
+            return redirect("restaurant_profile")
         else:
-            # Fallback if no specific button is identified
-            rp_form, social_fs, hours_fs = make_forms()
-            messages.warning(request, "Could not process the form. Please try again.")
+            # If any form is invalid, show an error.
+            messages.error(request, "Please correct the errors below.")
     else:
-        # For a GET request, just show the unbound forms.
-        rp_form, social_fs, hours_fs = make_forms()
+        # On a GET request, create unbound instances of the forms.
+        rp_form = RestaurantProfileForm(instance=rp)
+        social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+        hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
 
-    # The list of saved addresses is now fetched for display purposes only.
-        saved_addresses = rp.addresses.all()
-    
+    # Fetch the saved addresses for display in the template.
+    saved_addresses = UserAddress.objects.filter(restaurant_profile=rp)
 
-    return render(request, "users/restaurant_profile.html", {
+    context = {
         "rp_form": rp_form,
-        "saved_addresses": saved_addresses,
         "social_fs": social_fs,
         "hours_fs": hours_fs,
-        "GOOGLE_MAPS_API_KEY": getattr(settings, "GOOGLE_MAPS_API_KEY", ""),
-    })
+        "saved_addresses": saved_addresses,
+        "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY,
+    }
+    return render(request, "users/restaurant_profile.html", context)

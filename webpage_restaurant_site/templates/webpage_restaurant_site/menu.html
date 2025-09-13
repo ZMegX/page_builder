@@ -3,12 +3,16 @@
 
 {% block content %}
 <div class="container py-4">
-  <div class="d-flex align-items-center mb-3">
-    <h3 class="mb-0">{{ profile.name }} Menu</h3>
-    <a class="btn btn-outline-secondary btn-sm ms-auto" href="{% url 'restaurant_site:landing' slug=slug %}">
-    <i class="bi bi-arrow-left"></i> Back
-    </a>
+  <div class="text-center mb-4">
+    <!-- ✅ The restaurant name is now a link back to the landing page -->
+    <h1 class="display-5">
+      <a href="{% url 'webpage_restaurant_site:landing' slug=slug %}" class="text-decoration-none text-dark">
+        {{ profile.name }}
+      </a>
+    </h1>
+    <p class="lead text-muted">Our Menu</p>
   </div>
+
 
   {% if menus %}
     {% for menu in menus %}
