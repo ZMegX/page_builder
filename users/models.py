@@ -2,19 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
 
-class Address(models.Model):
-    profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='addresses', null=True, blank=True, )
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100, blank=True, null=True)
-    country = models.CharField(max_length=100)
-    zipcode = models.CharField(max_length=20, blank=True, null=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.street}, {self.city}, {self.country}"
-
 class SocialLink(models.Model):
     profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='social_links')
     name = models.CharField(max_length=50)   # e.g., 'Instagram'
@@ -36,7 +23,6 @@ class OpeningHour(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = CloudinaryField('Profile picture', blank=True, null=True)
-    addresses = models.ManyToManyField(Address, blank=True, related_name='profiles')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

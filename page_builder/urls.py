@@ -18,8 +18,9 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
     path("", include('menus.urls', namespace='menus')),
-    path("", include("restaurant_site.urls", namespace="restaurant_site")),
+    path('r/', include('webpage_restaurant_site.urls')),
     path("", include("menus.public_urls")),
+    path('locations/', include('locations.urls')),
 
 ]
 

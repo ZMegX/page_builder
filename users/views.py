@@ -12,7 +12,9 @@ from .forms import (
                     ProfileUpdateForm,
                     RestaurantDetailsForm,
                     )
-from .models import Profile, RestaurantProfile, Address
+from .models import Profile, RestaurantProfile
+from locations.models import UserAddress
+
 
 def register(request):
     if request.method == 'POST':
@@ -27,67 +29,44 @@ def register(request):
 
 @login_required
 def profile_manage(request):
-    user = request.user
-    profile, _ = Profile.objects.get_or_create(user=user)
-    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=user)  # use user, not profile
-    address_instance = profile.addresses.first()
-
-    # Default forms: all initialized with their instances for GET or after non-matching POST
-    u_form = UserUpdateForm(instance=user)
-    p_form = ProfileUpdateForm(instance=profile)
-    address_form = AddressForm(instance=address_instance)
-    r_form = RestaurantDetailsForm(instance=restaurant_profile)
+    """
+    Manages the user's personal profile information (username, email, picture).
+    Restaurant-related details are managed in the restaurant_profile view.
+    """
+    profile, _ = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        # Save User/Profile info
-        if 'save_profile' in request.POST:
-            u_form = UserUpdateForm(request.POST, instance=user)
-            p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
-            if u_form.is_valid() and p_form.is_valid():
-                u_form.save()
-                p_form.save()
-                messages.success(request, "Profile info updated!")
-                return redirect('profile')
-            else:
-                messages.error(request, "Please correct the errors in your profile info.")
-        
-        elif 'save_restaurant' in request.POST:
-            r_form = RestaurantDetailsForm(request.POST, instance=restaurant_profile)
-            if r_form.is_valid():
-                r_form.save()
-                messages.success(request, "Restaurant details updated!")
-            else:
-                messages.error(request, "Please correct the errors in the restaurant details form.")
-            # Save Address
-        elif 'save_address' in request.POST:
-            address_form = AddressForm(request.POST, instance=address_instance)
-            if address_form.is_valid():
-                address_obj = address_form.save()
-                if not profile.addresses.filter(pk=address_obj.pk).exists():
-                    profile.addresses.add(address_obj)
-                # Optionally ensure FK to RestaurantProfile is set to the user's restaurant_profile
-                if address_obj.profile_id != restaurant_profile.id:
-                    address_obj.profile = restaurant_profile
-                    address_obj.save(update_fields=['profile'])
-                messages.success(request, "Address updated!")
-                return redirect('profile')
-            else:
-                messages.error(request, "Please correct the errors in your address.")
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
 
-    return render(request, 'users/profile.html', {
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, "Your profile has been updated successfully!")
+            return redirect('profile')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=profile)
+
+    # Fetch restaurant details for display purposes only.
+    try:
+        restaurant_details = RestaurantProfile.objects.get(user=request.user)
+    except RestaurantProfile.DoesNotExist:
+        restaurant_details = None
+
+    context = {
         'u_form': u_form,
         'p_form': p_form,
-        'address_form': address_form,
-        'r_form': r_form,
-        'profile': profile,
-        'restaurant_details': restaurant_profile,
-        'GOOGLE_MAPS_API_KEY': settings.GOOGLE_MAPS_API_KEY,
-    })
+        'restaurant_details': restaurant_details,
+    }
+    return render(request, 'users/profile.html', context)
 
 @login_required
 def address_edit(request, address_id):
     address = get_object_or_404(
-        Address, id=address_id, profile__profile__user=request.user)
+        UserAddress, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
         form = AddressForm(request.POST, instance=address)
         if form.is_valid():
@@ -109,7 +88,7 @@ def address_edit(request, address_id):
 
 @login_required
 def address_delete(request, address_id):
-    address = get_object_or_404(Address, id=address_id, profile__profile__user=request.user)
+    address = get_object_or_404(UserAddress, id=address_id, profile__profile__user=request.user)
     if request.method == 'POST':
         # Remove the address from the profile, but not from other profiles
         profile = request.user.profile

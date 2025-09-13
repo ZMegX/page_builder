@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ profile.name }} — Restaurant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Left Column: Restaurant Details -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex align-items-center">
+          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+            <i class="bi bi-shop me-2"></i> {{ profile.name }}
+          </h5>
+          {% if status.open_now %}
+            <span class="badge text-bg-success ms-auto">Open now</span>
+          {% else %}
+            <span class="badge text-bg-secondary ms-auto">Closed</span>
+          {% endif %}
+        </div>
+        <div class="card-body d-flex flex-column">
+          {% if profile.logo %}
+            <div class="mb-4 text-center">
+                <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm" style="max-height: 250px; border: 5px solid #fff;" alt="{{ profile.name }} logo">
+            </div>
+          {% endif %}
+          
+          <div class="d-grid gap-2 mb-4">
+            <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-primary btn-lg">
+              <i class="bi bi-book-fill me-2"></i> View Menu
+            </a>
+          </div>
+
+          {% if profile.cuisine_type %}
+            <div class="mb-3">
+              <i class="bi bi-egg-fried me-2 text-muted"></i>
+              <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+            </div>
+          {% endif %}
+          
+          {% if profile.phone_number %}
+            <div class="mb-3">
+              <i class="bi bi-telephone me-2 text-muted"></i>
+              <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+            </div>
+          {% endif %}
+
+          {% if status.today_hours %}
+            <div class="mb-3">
+              <i class="bi bi-clock me-2 text-muted"></i>
+              <strong>Today's hours:</strong>
+              {% for oh in status.today_hours %}
+                {{ oh.open_time|time:"g:i A" }}–{{ oh.close_time|time:"g:i A" }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if address.formatted_address %}
+            <div class="mb-3">
+                <i class="bi bi-geo-alt me-2 text-muted"></i>
+                <strong>Address:</strong> {{ address.formatted_address }}
+                <div>
+                    <a class="small" target="_blank" rel="noopener"
+                       href="https://www.google.com/maps/search/?api=1&query={{ address.formatted_address|urlencode }}">
+                       Get directions
+                    </a>
+                </div>
+            </div>
+          {% endif %}
+
+          {% if profile.social_links.all %}
+            <div class="mt-auto pt-3">
+              <strong>Follow us:</strong>
+              <div class="d-flex gap-2 mt-2 flex-wrap">
+                {% for sl in profile.social_links.all %}
+                  <a class="btn btn-sm btn-outline-secondary" href="{{ sl.url }}" target="_blank" rel="noopener">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Map -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4">
+          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
+            <i class="bi bi-map me-2"></i> Location
+          </h5>
+        </div>
+        <div class="card-body p-2">
+          {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+            <!-- The map will be rendered here by the script below -->
+            <div id="map" class="rounded w-100 h-100"></div>
+          {% else %}
+            <div class="p-5 h-100 d-flex justify-content-center align-items-center text-center text-muted">
+              <div>
+                <i class="bi bi-geo-alt" style="font-size: 2.5rem;"></i>
+                <div class="mt-2">No address has been set for this restaurant.</div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+<script>
+  // This function will be called by the Google Maps API script
+  function initMap() {
+    // The location of the restaurant
+    const location = { lat: {{ map_center.lat }}, lng: {{ map_center.lng }} };
+    
+    // The map, centered at the restaurant's location
+    const map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 15,
+      center: location,
+      mapTypeControl: false,
+      streetViewControl: false,
+    });
+    
+    // The marker, positioned at the restaurant's location
+    const marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      title: "{{ profile.name|escapejs }}"
+    });
+  }
+</script>
+<!-- Async script to load the Google Maps API and call initMap -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMap">
+</script>
+{% endif %}
+{% endblock %}

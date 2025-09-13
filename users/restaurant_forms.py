@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import RestaurantProfile, Address, SocialLink, OpeningHour
+from .models import RestaurantProfile, SocialLink, OpeningHour
 
 DAYS_OF_WEEK = [
     ("Monday", "Monday"),
@@ -23,42 +23,7 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
         }
-
-class AddressForm(forms.ModelForm):
-    address_search = forms.CharField(
-        required=False,
-        label="Restaurant Address",
-        widget=forms.TextInput(attrs={
-            "id": "id_address",
-            "class": "form-control",
-            "placeholder": "Start typing an address...",
-            "autocomplete": "off"
-        })
-    )
-
-    class Meta:
-        model = Address
-        fields = [
-            "address_search",
-            "street", "city", "state", "country", "zipcode",
-            "latitude", "longitude",
-        ]
-        widgets = {
-            "street": forms.HiddenInput(attrs={"id": "id_street"}),
-            "city": forms.HiddenInput(attrs={"id": "id_city"}),
-            "state": forms.HiddenInput(attrs={"id": "id_state"}),
-            "country": forms.HiddenInput(attrs={"id": "id_country"}),
-            "zipcode": forms.HiddenInput(attrs={"id": "id_zipcode"}),
-            "latitude": forms.HiddenInput(attrs={"id": "id_latitude"}),
-            "longitude": forms.HiddenInput(attrs={"id": "id_longitude"}),
-        }
-
-    def clean(self):
-        cleaned = super().clean()
-        if not cleaned.get("street") or not cleaned.get("city") or not cleaned.get("country"):
-            raise forms.ValidationError("Please select a full address from the suggestions (street, city, country).")
-        return cleaned
-
+    
 class SocialLinkForm(forms.ModelForm):
     class Meta:
         model = SocialLink
@@ -99,6 +64,7 @@ OpeningHourFormSet = inlineformset_factory(
     parent_model=RestaurantProfile,
     model=OpeningHour,
     form=OpeningHourForm,
-    extra=1,
-    can_delete=True,
+    extra=7,
+    max_num=7,
+    can_delete=False,
 )
