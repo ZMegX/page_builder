@@ -1,115 +1,167 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}Manage Delivery Addresses{% endblock %}
 
 {% block content %}
+<!--
+ This script loads the Google Maps Extended Component Library.
+ It's a module, so it's best placed before the components are used.
+-->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/@googlemaps/extended-component-library/0.6.11/index.min.js"></script>
+
 <div class="container">
-    <div class="card shadow-sm border-0 rounded-4">
+    <!-- This component loads the main Google Maps API using your key -->
+    <gmpx-api-loader key="{{ GOOGLE_MAPS_API_KEY }}"></gmpx-api-loader>
+
+    <!-- The gmp-map component replaces the old <div id="map"> -->
+    <gmp-map center="43.6532,-79.3832" zoom="11" map-id="DEMO_MAP_ID" style="height: 500px;">
+      
+      <!-- This div is placed as a control inside the map -->
+      <div slot="control-block-start-inline-start" class="card shadow-sm border-0 rounded-4 m-2" style="max-width: 450px;">
         <div class="card-header bg-white border-bottom-0 rounded-top-4">
-            <h4 class="mb-0 py-2 fs-4 text-primary-emphasis">
-                <i class="bi bi-geo-alt-fill me-2"></i> Add a New Delivery Address
+            <h4 class="mb-0 py-2 fs-5 text-primary-emphasis">
+                <i class="bi bi-geo-alt-fill me-2"></i> Add New Address
             </h4>
         </div>
         <div class="card-body">
-            <p class="card-text">Start typing an address in the box below. Select a valid location from the dropdown to save it.</p>
-            <div id="address-form" class="d-flex gap-3">
-                <input id="autocomplete" class="form-control form-control-lg" placeholder="Start typing your delivery address..." type="text" />
-                <button id="save-address" class="btn btn-primary btn-lg" style="white-space: nowrap;">Save Address</button>
+            <p class="card-text small">Start typing and select a valid location.</p>
+            
+            <!-- This is the new autocomplete component -->
+            <gmpx-place-picker id="place-picker" for-map="map" placeholder="Enter an address"></gmpx-place-picker>
+            
+            <div class="d-flex justify-content-end mt-3">
+                <button id="save-address" class="btn btn-primary">Save Address</button>
             </div>
             <div id="feedback-message" class="mt-2" style="min-height: 24px;"></div>
         </div>
+      </div>
+
+      <!-- The marker that will be moved on the map -->
+      <gmp-advanced-marker id="marker"></gmp-advanced-marker>
+    </gmp-map>
+
+    <!-- This hidden div holds the content for the popup InfoWindow -->
+    <div id="infowindow-content" style="display: none;">
+      <span id="place-name" class="title" style="font-weight: bold;"></span><br />
+      <span id="place-address"></span>
     </div>
 
-    <hr class="my-4">
-
-    <h4 class="mb-3 fs-4 text-primary-emphasis">
-        <i class="bi bi-pin-map-fill me-2"></i> Your Saved Locations
-    </h4>
-    <div id="map"
-        data-api-key="{{ GOOGLE_MAPS_API_KEY }}"
-        data-api-url="{% url 'locations:address-list-create' %}">
-    </div>
 </div>
 {% endblock %}
-
-
 {% block extra_js %}
 <script>
-  // Log a message to the console as soon as this script block starts
-  console.log("extra_js block started. The map div should exist now.");
+// --- HELPER FUNCTION to get CSRF token from cookie ---
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 
-  // Let's try to find the map div right away
-  const mapDiv = document.getElementById("map");
 
-  // Check if we found it
-  if (mapDiv) {
-    console.log("SUCCESS: Found the <div id='map'> element.", mapDiv);
-  } else {
-    console.error("FAILURE: Could NOT find the <div id='map'> element. It is null.");
-  }
+async function initMap() {
+  await customElements.whenDefined('gmp-map');
 
-  // Only proceed if mapDiv was actually found
-  if (mapDiv) {
-    (async function() {
-      console.log("Starting async function to load Google Maps.");
-      
-      const apiKey = mapDiv.dataset.apiKey;
-      if (!apiKey) {
-          console.error("ERROR: API key is missing from data-api-key attribute!");
-          return; // Stop if no key
-      }
+  const mapComponent = document.querySelector("gmp-map");
+  const placePicker = document.getElementById("place-picker");
+  const marker = document.getElementById("marker");
+  
+  const saveButton = document.getElementById("save-address");
+  const feedbackMessage = document.getElementById("feedback-message");
 
-      // Bootstrap loader code
-      (g => {
-        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
-        b = b[c] || (b[c] = {});
-        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
-          u = () => h || (h = new Promise(async (f, n) => {
-            await (a = m.createElement("script"));
-            e.set("libraries", [...r] + "");
-            for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-            e.set("callback", c + ".maps." + q);
-            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-            d[q] = f;
-            a.onerror = () => h = n(Error(p + " could not load."));
-            a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-            m.head.append(a)
-          }));
-        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-      })({
-        key: apiKey,
-        v: "weekly",
+  const infoWindowContent = document.getElementById("infowindow-content");
+  const infoWindow = new google.maps.InfoWindow({
+      content: infoWindowContent,
+      disableAutoPan: true,
+  });
+
+  let selectedPlace = null;
+
+  placePicker.addEventListener('gmpx-placechange', () => {
+    const place = placePicker.value;
+    selectedPlace = place;
+
+    if (!place?.location) {
+      infoWindow.close();
+      marker.position = null;
+      return;
+    }
+
+    const innerMap = mapComponent.innerMap;
+
+    if (place.viewport) {
+      innerMap.fitBounds(place.viewport);
+    } else {
+      innerMap.setCenter(place.location);
+      innerMap.setZoom(17);
+    }
+
+    marker.position = place.location;
+    infoWindowContent.querySelector("#place-name").textContent = place.displayName;
+    infoWindowContent.querySelector("#place-address").textContent = place.formattedAddress;
+    infoWindow.open(innerMap, marker);
+  });
+
+  saveButton.addEventListener("click", async () => {
+    if (!selectedPlace || !selectedPlace.location) {
+      feedbackMessage.innerHTML = '<span class="text-danger">Please select a valid address from the dropdown first.</span>';
+      return;
+    }
+
+    // ✅ THE FIX IS HERE:
+    // The key is now 'formatted_address' to match the Django model and view.
+    const data = {
+      formatted_address: selectedPlace.formattedAddress,
+      latitude: selectedPlace.location.lat(),
+      longitude: selectedPlace.location.lng()
+    };
+    
+    try {
+      const response = await fetch("{% url 'locations:address-list-create' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify(data)
       });
 
-      async function initMap() {
-        console.log("initMap: Loading libraries...");
-        const { Map } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-        const { Place } = await google.maps.importLibrary("places");
-        console.log("initMap: Libraries loaded.");
+      if (response.ok) {
+        feedbackMessage.innerHTML = '<span class="text-success">Address saved successfully! Page will now reload.</span>';
+        setTimeout(() => window.location.reload(), 2000); // Reload to show the new address
+      } else {
+        const contentType = response.headers.get("content-type");
+        let errorMsg = `Server Error: ${response.status}. Please check the server logs.`;
 
-        const position = { lat: -34.397, lng: 150.644 };
-
-        const map = new google.maps.Map(document.getElementById("map"), {
-          center: position,
-          zoom: 8,
-          mapId: "DEMO_MAP_ID",
-        });
-        console.log("initMap: Map initialized.");
-
-        const marker = new AdvancedMarkerElement({ map: map, position: position });
-        console.log("initMap: Marker created.");
-        
-        const autocompleteInput = document.getElementById("autocomplete");
-        const autocomplete = new Autocomplete(autocompleteInput, { fields: ["address_components", "geometry", "icon", "name"] });
-        console.log("initMap: Autocomplete initialized.");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            const errorData = await response.json();
+            console.error("Server validation error (JSON):", errorData);
+            errorMsg = Object.values(errorData).flat().join(' ');
+        } else {
+            const errorText = await response.text();
+            console.error("Server error (Non-JSON):", errorText);
+            // Display the plain text error from the server, like "Address already exists."
+            errorMsg = errorText;
+        }
+        feedbackMessage.innerHTML = `<span class="text-danger">${errorMsg}</span>`;
       }
+    } catch (error) {
+      console.error("Network or script error:", error);
+      feedbackMessage.innerHTML = '<span class="text-danger">A network error occurred. Could not reach the server.</span>';
+    }
+  });
+}
 
-      initMap();
-
-    })();
-  }
+document.addEventListener('DOMContentLoaded', initMap);
 </script>
 {% endblock %}

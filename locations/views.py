@@ -44,7 +44,9 @@ def address_list_create(request):
     elif request.method == 'POST':
         try:
             data = json.loads(request.body)
-            if UserAddress.objects.filter(RestaurantProfile=profile, formatted_address=data['formatted_address']).exists():
+            if UserAddress.objects.filter(
+                restaurant_profile=profile,
+                formatted_address=data['formatted_address']).exists():
                 return HttpResponseBadRequest('Address already exists.')
             
             address = UserAddress.objects.create(
