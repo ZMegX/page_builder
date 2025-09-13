@@ -510,7 +510,23 @@ body {
         border-radius: 0.5rem;
         border: 1px solid #dee2e6;
     }
-    .container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+.container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
     }
+
+#map {
+      height: 100%;
+}
+/* Style for the card that will contain the autocomplete input */
+#place-autocomplete-card {
+  background-color: #fff;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+        /* The new widget creates its own input, so we can't style it directly with an ID */
+gmp-place-autocomplete input {
+  width: 300px; /* Adjust width as needed */
+  }
