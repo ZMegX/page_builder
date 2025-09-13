@@ -35,7 +35,7 @@ class MenuForm(forms.ModelForm):
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["section", "name", "price", "ingredients"]
+        fields = ["section", "name", "price", "ingredients", "image"]
         widgets = {
             'section': forms.Select(attrs={
                 'class': 'form-select'
@@ -62,7 +62,8 @@ class MenuItemForm(forms.ModelForm):
             'section': 'Category',
             'name': 'Item Name',
             'price': 'Price ($)',
-            'ingredients': 'Ingredients'
+            'ingredients': 'Ingredients',
+            'image': 'Item Image'
         }
 
     def clean_price(self):

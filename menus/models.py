@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 class Menu(models.Model):
@@ -17,6 +18,7 @@ class Menu(models.Model):
     is_active = models.BooleanField(default=True)
     owner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -39,6 +41,14 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     ingredients = models.TextField(max_length=200, default="Fresh ingredients", help_text="List main ingredients")
     is_available = models.BooleanField(default=True, help_text="Whether this item is currently available for ordering")
+    image = CloudinaryField(
+        'Menu Item Image',
+        null=True,
+        blank=True,
+        help_text="Optional image for the menu item."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} - ${self.price}"
