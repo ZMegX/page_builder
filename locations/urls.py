@@ -1,6 +1,9 @@
 from django.urls import path
 from .views import address_list_create, map_view
 
+
+app_name = 'locations'
+
 urlpatterns = [
     path('api/addresses/', address_list_create, name='address-list-create'),
     path('', map_view, name='map_view'),

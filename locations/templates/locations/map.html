@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Manage Delivery Addresses{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-bottom-0 rounded-top-4">
+            <h4 class="mb-0 py-2 fs-4 text-primary-emphasis">
+                <i class="bi bi-geo-alt-fill me-2"></i> Add a New Delivery Address
+            </h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text">Start typing an address in the box below. Select a valid location from the dropdown to save it.</p>
+            <div id="address-form" class="d-flex gap-3">
+                <input id="autocomplete" class="form-control form-control-lg" placeholder="Start typing your delivery address..." type="text" />
+                <button id="save-address" class="btn btn-primary btn-lg" style="white-space: nowrap;">Save Address</button>
+            </div>
+            <div id="feedback-message" class="mt-2" style="min-height: 24px;"></div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <h4 class="mb-3 fs-4 text-primary-emphasis">
+        <i class="bi bi-pin-map-fill me-2"></i> Your Saved Locations
+    </h4>
+    <div id="map"
+        data-api-key="{{ GOOGLE_MAPS_API_KEY }}"
+        data-api-url="{% url 'locations:address-list-create' %}">
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+  <script src="{% static 'js/map.js' %}"></script>
+{% endblock %}

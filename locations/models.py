@@ -7,7 +7,7 @@ class UserAddress(models.Model):
     restaurant_profile = models.ForeignKey(
             'users.RestaurantProfile', 
             on_delete=models.CASCADE, 
-            related_name="delivery_addresses"
+            related_name="addresses"
         )    
     formatted_address = models.CharField(max_length=255, help_text="The full, formatted address returned by Google.")
     latitude = models.FloatField()
@@ -16,5 +16,3 @@ class UserAddress(models.Model):
     def __str__(self):
         return self.formatted_address
 
-    class Meta:
-        verbose_name_plural = "Addresses"

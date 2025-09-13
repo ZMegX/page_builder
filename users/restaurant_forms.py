@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
 from .models import RestaurantProfile, SocialLink, OpeningHour
-from locations.models import UserAddress
 
 DAYS_OF_WEEK = [
     ("Monday", "Monday"),
@@ -24,47 +23,6 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
         }
-
-class AddressForm(forms.ModelForm):
-    # This is the visible search box for the user. It is NOT part of the model.
-    address_search = forms.CharField(
-        required=True, # Make it required to ensure an address is chosen
-        label="Restaurant Address",
-        widget=forms.TextInput(attrs={
-            "id": "id_address_search", # Give it a unique ID
-            "class": "form-control",
-            "placeholder": "Start typing an address...",
-            "autocomplete": "off"
-        })
-    )
-
-    class Meta:
-        model = UserAddress
-        # These are the fields that will be saved to the database.
-        # They match the fields on your UserAddress model.
-        fields = [
-            "formatted_address", 
-            "latitude", 
-            "longitude",
-        ]
-        # These fields will be hidden and populated by JavaScript.
-        widgets = {
-            "formatted_address": forms.HiddenInput(attrs={"id": "id_formatted_address"}),
-            "latitude": forms.HiddenInput(attrs={"id": "id_latitude"}),
-            "longitude": forms.HiddenInput(attrs={"id": "id_longitude"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Add the 'address_search' field to the form's fields.
-        self.fields['address_search'] = self.address_search
-
-    def clean(self):
-        cleaned_data = super().clean()
-        # Ensure that the hidden fields were populated by the JavaScript.
-        if not cleaned_data.get("formatted_address") or not cleaned_data.get("latitude"):
-            raise forms.ValidationError("Please select a valid address from the suggestions.")
-        return cleaned_data
     
 class SocialLinkForm(forms.ModelForm):
     class Meta:
@@ -106,6 +64,7 @@ OpeningHourFormSet = inlineformset_factory(
     parent_model=RestaurantProfile,
     model=OpeningHour,
     form=OpeningHourForm,
-    extra=1,
-    can_delete=True,
+    extra=7,
+    max_num=7,
+    can_delete=False,
 )

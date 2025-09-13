@@ -15,7 +15,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-load_dotenv()  # This will load variables from .env into environment
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(os.path.join(BASE_DIR, '.env'))
@@ -28,8 +27,8 @@ CLOUDINARY_STORAGE = {
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -42,7 +41,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost', '127.0.0.1']
 
-
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 # Application definition
 
 INSTALLED_APPS = [
@@ -94,10 +93,6 @@ TEMPLATES = [
         },
     },
 ]
-TEMPLATES[0]["OPTIONS"]["context_processors"] += [
-    "users.context_processors.google_maps_key",
-]
-WSGI_APPLICATION = 'page_builder.wsgi.application'
 
 
 # Database
@@ -166,7 +161,3 @@ DEFAULT_FROM_EMAIL = 'Webmaster <picardomegan@gmail.com>'
 
 LOGOUT_REDIRECT_URL = 'home'
 
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
-
-GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")

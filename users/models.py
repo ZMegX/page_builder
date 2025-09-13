@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
-from locations.models import UserAddress
 
 class SocialLink(models.Model):
     profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='social_links')
@@ -24,7 +23,6 @@ class OpeningHour(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = CloudinaryField('Profile picture', blank=True, null=True)
-    addresses = models.ManyToManyField(UserAddress, blank=True, related_name='profiles')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

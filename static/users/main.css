@@ -503,3 +503,14 @@ body {
     transform: none !important;
   }
 }
+
+#map {
+        height: 500px;
+        width: 100%;
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+    .container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
