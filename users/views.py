@@ -15,6 +15,8 @@ from .forms import (
 from .models import Profile, RestaurantProfile
 from locations.models import UserAddress
 
+def documentation(request):
+    return render(request, 'users/docs.html')
 
 def register(request):
     if request.method == 'POST':

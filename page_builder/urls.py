@@ -21,6 +21,7 @@ urlpatterns = [
     path('r/', include('webpage_restaurant_site.urls')),
     path("", include("menus.public_urls")),
     path('locations/', include('locations.urls')),
+    path('docs/', user_views.documentation, name='docs')
 
 ]
 
