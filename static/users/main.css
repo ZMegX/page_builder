@@ -365,7 +365,7 @@ body {
   flex-direction: column;
   gap: .75rem;
   max-width: min(440px, calc(100vw - 2.5rem));
-  pointer-events: none; /* allow clicks only on alerts */
+  pointer-events: none;
 }
 
 /* Base modern alert styling */
@@ -472,7 +472,7 @@ body {
   transform-origin: left center;
   transform: scaleX(1);
   transition: transform linear;
-  pointer-events: none;
+  pointer-events: auto;
   opacity: .75;
 }
 
@@ -505,7 +505,7 @@ body {
 }
 
 #map {
-        height: 500px;
+        height: 350px;
         width: 100%;
         border-radius: 0.5rem;
         border: 1px solid #dee2e6;
@@ -515,9 +515,6 @@ body {
   padding-bottom: 2rem;
     }
 
-#map {
-      height: 100%;
-}
 /* Style for the card that will contain the autocomplete input */
 #place-autocomplete-card {
   background-color: #fff;
