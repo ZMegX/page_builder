@@ -6,6 +6,73 @@
 
 {% block content %}
 <div class="container py-4">
+  <!-- Jumbotron-style Restaurant Overview -->
+  <div class="card shadow-lg border-0 rounded-4 mb-5 bg-light">
+    <div class="card-body d-flex flex-column flex-md-row align-items-center">
+      {% if profile.logo %}
+        <div class="mb-3 mb-md-0 me-md-4 text-center">
+          <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm" style="max-height: 120px; border: 4px solid #fff;" alt="{{ profile.name }} logo">
+        </div>
+      {% endif %}
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center mb-2">
+          <h1 class="display-6 mb-0 me-3">
+            <a href="{% url 'webpage_restaurant_site:landing' slug=slug %}" class="text-decoration-none text-dark">
+              {{ profile.name }}
+            </a>
+          </h1>
+          {% if status.open_now %}
+            <span class="badge bg-success ms-2">Open now</span>
+          {% else %}
+            <span class="badge bg-secondary ms-2">Closed</span>
+          {% endif %}
+        </div>
+        {% if profile.cuisine_type %}
+          <div class="mb-1">
+            <i class="bi bi-egg-fried me-2 text-muted"></i>
+            <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+          </div>
+        {% endif %}
+        {% if profile.phone_number %}
+          <div class="mb-1">
+            <i class="bi bi-telephone me-2 text-muted"></i>
+            <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+          </div>
+        {% endif %}
+        {% if address.formatted_address %}
+          <div class="mb-1">
+            <i class="bi bi-geo-alt me-2 text-muted"></i>
+            <strong>Address:</strong> {{ address.formatted_address }}
+            <a class="small ms-2" target="_blank" rel="noopener"
+               href="https://www.google.com/maps/search/?api=1&query={{ address.formatted_address|urlencode }}">
+              Get directions
+            </a>
+          </div>
+        {% endif %}
+        {% if status.today_hours %}
+          <div class="mb-1">
+            <i class="bi bi-clock me-2 text-muted"></i>
+            <strong>Today's hours:</strong>
+            {% for oh in status.today_hours %}
+              {{ oh.open_time|time:"g:i A" }}–{{ oh.close_time|time:"g:i A" }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if profile.social_links.all %}
+          <div class="mt-2">
+            <strong>Follow us:</strong>
+            <span class="ms-2">
+              {% for sl in profile.social_links.all %}
+                <a class="btn btn-sm btn-outline-secondary me-1 mb-1" href="{{ sl.url }}" target="_blank" rel="noopener">
+                  <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                </a>
+              {% endfor %}
+            </span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
   <div class="text-center mb-4">
     <h1 class="display-5">
       <a href="{% url 'webpage_restaurant_site:landing' slug=slug %}" class="text-decoration-none text-dark">
