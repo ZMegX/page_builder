@@ -5,6 +5,7 @@ from django.utils import timezone
 from users.models import RestaurantProfile, User
 from menus.models import Menu
 from locations.models import UserAddress
+from django.db.models import Q
 
 def _get_profile(slug: str) -> RestaurantProfile:
     """
@@ -102,3 +103,4 @@ def restaurant_menu(request, slug):
             "slug": _slug_fallback(profile) if profile else "",
         },   
     )
+

@@ -12,11 +12,34 @@ from .forms import (
                     ProfileUpdateForm,
                     RestaurantDetailsForm,
                     )
-from .models import Profile, RestaurantProfile
+from .models import Profile, RestaurantProfile, SocialLink, OpeningHour
 from locations.models import UserAddress
+from django.db.models import Q
+from django.forms import modelformset_factory
 
 def documentation(request):
     return render(request, 'users/docs.html')
+
+def why_choose_us(request):
+    return render(request, 'users/why_choose_us.html')
+
+def browse_restaurants(request):
+    q = request.GET.get('q', '')
+    restaurants = RestaurantProfile.objects.all()
+    if q:
+        restaurants = restaurants.filter(
+            Q(name__icontains=q) | 
+            Q(cuisine_type__icontains=q) |
+            Q(addresses__formatted_address__icontains=q)
+        ).distinct()
+        
+        
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    return render(request, 'browse_restaurants.html', {
+        'restaurants': restaurants,
+        'GOOGLE_MAPS_API_KEY': key,  # Or use settings
+    })
 
 def register(request):
     if request.method == 'POST':
@@ -41,17 +64,23 @@ def profile_manage(request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
 
-        if u_form.is_valid() and p_form.is_valid():
+        u_valid = u_form.is_valid()
+        p_valid = p_form.is_valid()
+
+        if u_valid:
             u_form.save()
+            messages.success(request, "Your user info has been updated successfully!")
+        if p_valid:
             p_form.save()
-            messages.success(request, "Your profile has been updated successfully!")
+            messages.success(request, "Your profile info has been updated successfully!")
+
+        if u_valid or p_valid:
             return redirect('profile')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=profile)
-
     # Fetch restaurant details for display purposes only.
     try:
         restaurant_details = RestaurantProfile.objects.get(user=request.user)
@@ -127,3 +156,35 @@ def address_add_ajax(request):
             errors = address_form.errors.as_ul()
             return JsonResponse({"errors": errors}, status=400)
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def restaurant_profile_manage(request):
+    rp_form, _ = RestaurantProfile.objects.get_or_create(user=request.user)
+    SocialLinkFormSet = modelformset_factory(SocialLink, fields=('name', 'url'), extra=1, can_delete=True)
+    OpeningHourFormSet = modelformset_factory(OpeningHour, fields=('day_of_week', 'open_time', 'close_time'), extra=1, can_delete=True)
+
+    if request.method == 'POST':
+        rp_form = RestaurantDetailsForm(request.POST, request.FILES, instance=restaurant_profile)
+        social_fs = SocialLinkFormSet(request.POST, queryset=restaurant_profile.social_links.all())
+        hours_fs = OpeningHourFormSet(request.POST, queryset=restaurant_profile.opening_hours.all())
+
+        valid = rp_form.is_valid() and social_fs.is_valid() and hours_fs.is_valid()
+        if valid:
+            rp_form.save()
+            social_fs.save()
+            hours_fs.save()
+            messages.success(request, "Your restaurant profile has been updated!")
+            return redirect('restaurant_profile_manage')
+    else:
+        rp_form = RestaurantDetailsForm(instance=restaurant_profile)
+        social_fs = SocialLinkFormSet(queryset=restaurant_profile.social_links.all())
+        hours_fs = OpeningHourFormSet(queryset=restaurant_profile.opening_hours.all())
+
+    context = {
+        'rp_form': rp_form,
+        'social_fs': social_fs,
+        'hours_fs': hours_fs,
+        'saved_addresses': restaurant_profile.addresses.all(),
+        'GOOGLE_MAPS_API_KEY': getattr(settings, "GOOGLE_MAPS_API_KEY", ""),
+    }
+    return render(request, 'users/restaurant_profile.html', context)

@@ -29,4 +29,7 @@ urlpatterns = [
     path('address/<int:address_id>/update/ajax/', ajax_views.address_update_ajax, name='address_update_ajax'),
     path('address/<int:address_id>/json/', ajax_views.address_get_ajax, name='address_get_ajax'),
     path("address/add/ajax/", views.address_add_ajax, name="address_add_ajax"),
+    path('why-choose-us/', views.why_choose_us, name='why_choose_us'),
+    path('restaurants/', views.browse_restaurants, name='browse_restaurants'),
+    path('docs/', views.documentation, name='docs'),
 ]

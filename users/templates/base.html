@@ -28,6 +28,11 @@
         <!-- Main Nav -->
         <div class="collapse navbar-collapse" id="mainNav">
           <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'browse_restaurants' %}active{% endif %}" href="{% url 'webpage_restaurant_site:browse_restaurants' %}">
+                <i class="bi bi-shop me-1"></i>Browse Restaurants
+              </a>
+            </li>
             {% if user.is_authenticated %}
               {% with has_restaurant=user.profile.restaurant_details %}
                 {% if has_restaurant %}
@@ -151,6 +156,8 @@
                 <li class="nav-item"><a class="nav-link px-2" href="{% url 'register' %}">Register</a></li>
               {% endif %}
               <li class="nav-item"><a class="nav-link px-2" href="{% url 'docs' %}">Docs</a></li>
+              <li class="nav-item"><a class="nav-link px-2" href="{% url 'why_choose_us' %}"></a></li>
+              <li><a href="{% url 'webpage_restaurant_site:browse_restaurants' %}">Browse Restaurants</a></li>
             </ul>
           </div>
         </div>
