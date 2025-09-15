@@ -1,20 +1,25 @@
-from collections import defaultdict
-from django.db.models import Q
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.db.models import Q, Count, Min, Max, Avg
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
-from django.db.models import Avg  # Add this import
 from .models import Menu, MenuItem
 from users.models import RestaurantProfile, Profile
 from .forms import MenuForm, MenuItemFormSet, MenuItemForm
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Min, Max, Q, Avg
 
 User = get_user_model()
+# --- Helper Functions ---
+
+def get_user_menu(pk, user):
+    """Fetch a menu by pk and owner."""
+    return get_object_or_404(Menu, pk=pk, owner=user)
 
 @login_required
 def get_restaurant_profile_card(request):
@@ -28,75 +33,68 @@ def get_restaurant_profile_card(request):
     
     return JsonResponse({'card_html': card_html})
 
-@login_required
-def create_menu(request):
-    user = request.user
-    profile, _ = Profile.objects.get_or_create(user=user)
-    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=user)
-    
-    if request.method == "POST":
-        form = MenuForm(request.POST, request.FILES)  # Added request.FILES for photo upload
-        formset = MenuItemFormSet(request.POST)
-        
-        if form.is_valid() and formset.is_valid():
-            try:
-                with transaction.atomic():  # Ensure data consistency
-                    menu = form.save(commit=False)
-                    menu.owner = request.user
-                    menu.save()
-                    
-                    formset.instance = menu
-                    formset.save()
-                    
-                messages.success(request, f'Menu "{menu.name}" created successfully!')
-                return redirect("menus:menu_detail", menu_id=menu.id)
-            except Exception as e:
-                messages.error(request, 'An error occurred while saving the menu. Please try again.')
-        else:
-            # Add specific error messages
-            if form.errors:
-                messages.error(request, 'Please correct the menu information errors.')
-            if formset.errors:
-                messages.error(request, 'Please correct the menu items errors.')
-    else:
-        form = MenuForm()
-        formset = MenuItemFormSet()
-    
-    return render(request, "menus/create_menu.html", {
-        "form": form, 
-        "formset": formset,
-        "title": "Create New Menu",
-        "restaurant_profile": restaurant_profile,
-        "profile": profile
-    })
+class MenuCreateView(LoginRequiredMixin, CreateView):
+    model = Menu
+    form_class = MenuForm
+    template_name = "menus/create_menu.html"
+    success_url = reverse_lazy("menus:menu_list")  # Or use a detail view if you want to redirect to the new menu
 
-@login_required
-def menu_detail(request, pk):
-    menu = get_object_or_404(
-        Menu.objects.prefetch_related("items").filter(
-        (Q(owner=request.user) | Q(is_active=True)),
-        ),
-        pk=pk
-    )
+    def form_valid(self, form):
+        menu = form.save(commit=False)
+        menu.owner = self.request.user
+        menu.save()
+        # If you want to handle MenuItemFormSet, you need to do it here
+        formset = MenuItemFormSet(self.request.POST, instance=menu)
+        if formset.is_valid():
+            formset.save()
+        else:
+            return self.form_invalid(form)
+        messages.success(self.request, f'Menu "{menu.name}" created successfully!')
+        return super().form_valid(form)
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context["restaurant_profile"], _ = RestaurantProfile.objects.get_or_create(user=user)
+        context["profile"], _ = Profile.objects.get_or_create(user=user)
+        if self.request.method == "POST":
+            context["formset"] = MenuItemFormSet(self.request.POST)
+        else:
+            context["formset"] = MenuItemFormSet()
+        context["title"] = "Create New Menu"
+        return context
+    
+    
+class MenuDetailView(LoginRequiredMixin, DetailView):
+    model = Menu
+    template_name = "menus/menu_detail.html"
+    context_object_name = "menu"
+
+    def get_queryset(self):
+        # Only allow owner or active menus
+        user = self.request.user
+        return Menu.objects.prefetch_related("items").filter(
+            Q(owner=user) | Q(is_active=True)
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        menu = self.object
+        items_by_section = group_items_by_section(menu.items.all())
+        context['items_by_section'] = items_by_section
+        context['sections_ordered'] = sorted(items_by_section.keys())
+        context['is_owner'] = menu.owner == self.request.user
+        context['total_items'] = menu.items.count()
+        return context
+
+# Helper function needed for MenuDetailView and public_menu_detail
+def group_items_by_section(items):
+    from collections import defaultdict
     items_by_section = defaultdict(list)
-    for item in menu.items.all():
-        # Use display label if available; fallback to raw value
-        if hasattr(item, "get_section_display"):
-            section_label = item.get_section_display()
-        else:
-            section_label = getattr(item, "section", "Uncategorized")
+    for item in items:
+        section_label = item.get_section_display() if hasattr(item, "get_section_display") else getattr(item, "section", "Uncategorized")
         items_by_section[section_label].append(item)
-
-    
-    context = {
-        'menu': menu,
-        'items_by_section': dict(items_by_section),
-        "sections_ordered": sorted(items_by_section.keys()),
-        'is_owner': menu.owner == request.user.id,
-        'total_items': menu.items.count()
-    }
-    return render(request, "menus/menu_detail.html", context)
+    return dict(items_by_section)
 
 def public_menu_detail(request, slug: str, pk: int):
     # public endpoint: slug = owner's username
@@ -108,9 +106,7 @@ def public_menu_detail(request, slug: str, pk: int):
         is_active=True,
     )
 
-    items_by_section = defaultdict(list)
-    for item in menu.items.all():
-        items_by_section[item.get_section_display()].append(item)
+    items_by_section = group_items_by_section(menu.items.all())
 
     context = {
         "menu": menu,
@@ -121,107 +117,84 @@ def public_menu_detail(request, slug: str, pk: int):
     }
     return render(request, "restaurant_site/menu_detail.html", context)
 
-@login_required
-def edit_menu(request, pk):
-    menu = get_object_or_404(Menu, id=pk, owner=request.user)  # Ensure ownership
-    
-    if request.method == "POST":
-        form = MenuForm(request.POST, request.FILES, instance=menu)
-        formset = MenuItemFormSet(request.POST, instance=menu)
-        
-        if form.is_valid() and formset.is_valid():
-            try:
-                with transaction.atomic():
-                    form.save()
-                    formset.save()
-                    
-                messages.success(request, f'Menu "{menu.name}" updated successfully!')
-                return redirect("menus:menu_detail", menu_id=menu.id)
-            except Exception as e:
-                messages.error(request, 'An error occurred while updating the menu.')
+class MenuUpdateView(LoginRequiredMixin, UpdateView):
+    model = Menu
+    form_class = MenuForm
+    template_name = "menus/edit_menu.html"
+    context_object_name = "menu"
+
+    def get_queryset(self):
+        # Only allow the owner to edit
+        return Menu.objects.filter(owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        menu = self.object
+        if self.request.method == "POST":
+            context["formset"] = MenuItemFormSet(self.request.POST, instance=menu)
         else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = MenuForm(instance=menu)
-        formset = MenuItemFormSet(instance=menu)
-    
-    return render(request, "menus/edit_menu.html", {
-        "form": form,
-        "formset": formset,
-        "menu": menu,
-        "title": f"Edit {menu.name}"
-    })
+            context["formset"] = MenuItemFormSet(instance=menu)
+        context["title"] = f"Edit {menu.name}"
+        return context
 
-@login_required
-def menu_list(request):
-    """
-    Displays a list of menus owned by the logged-in user,
-    with performance optimizations and sorting capabilities.
-    """
+    def form_valid(self, form):
+        menu = form.save()
+        formset = MenuItemFormSet(self.request.POST, instance=menu)
+        if formset.is_valid():
+            formset.save()
+            messages.success(self.request, f'Menu "{menu.name}" updated successfully!')
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
     
-    # --- 1. Sorting Logic ---
-    # Get the sort option from the URL query parameter, default to 'updated_at_desc'
-    sort_option = request.GET.get('sort', 'updated_at_desc')
-    
-    # A mapping of safe sort options to their corresponding database fields
-    sort_map = {
-        'updated_at_desc': '-updated_at',
-        'updated_at_asc': 'updated_at',
-        'name_asc': 'name',
-        'name_desc': '-name',
-    }
-    
-    # Use the mapped value, with a safe default if the sort_option is invalid
-    order_by_field = sort_map.get(sort_option, '-updated_at')
+    def get_success_url(self):
+        return reverse_lazy("menus:menu_detail", kwargs={"pk": self.object.pk})
 
-    # --- 2. Main Query with Annotations (Performance Boost) ---
-    # This is the most important part. We fetch all menus and calculate stats
-    # in a single, efficient database query.
-    menus_queryset = (
-        Menu.objects.filter(owner=request.user)
-        .annotate(
+class MenuListView(LoginRequiredMixin, ListView):
+    model = Menu
+    template_name = "menus/menu_list.html"
+    context_object_name = "menus"
+
+    def get_queryset(self):
+        user = self.request.user
+        sort_option = self.request.GET.get('sort', '-updated_at')
+        sort_map = {
+            'updated_at_desc': '-updated_at',
+            'updated_at_asc': 'updated_at',
+            'name_asc': 'name',
+            'name_desc': '-name',
+        }
+        order_by_field = sort_map.get(sort_option, '-updated_at')
+        return Menu.objects.filter(owner=user).annotate(
             item_count=Count('items'),
-            # Note: The line below assumes your MenuItem model has an 'is_available' boolean field.
-            # If not, you can remove this line.
-            # available_item_count=Count('items', filter=Q(items__is_available=True)),
             min_price=Min('items__price'),
             max_price=Max('items__price')
-        )
-        .order_by(order_by_field)  # Apply the sorting
-    )
+        ).order_by(order_by_field)
 
-    # --- 3. Aggregate Stats for Dashboard Cards ---
-    # These stats are calculated from the queryset we just built.
-    active_menus_count = menus_queryset.filter(is_active=True).count()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['active_menus_count'] = self.get_queryset().filter(is_active=True).count()
+        context['total_items_count'] = MenuItem.objects.filter(menu__owner=user).count()
+        avg_price_result = MenuItem.objects.filter(menu__owner=user).aggregate(avg_price=Avg('price'))
+        context['average_price'] = avg_price_result['avg_price'] or 0
+        context['is_paginated'] = False
+        return context
     
-    # Calculate total items across all of the user's menus
-    total_items_count = MenuItem.objects.filter(menu__owner=request.user).count()
-    
-    # Calculate the average price across all items
-    avg_price_result = MenuItem.objects.filter(menu__owner=request.user).aggregate(avg_price=Avg('price'))
-    average_price = avg_price_result['avg_price'] or 0
+class MenuDeleteView(LoginRequiredMixin, DeleteView):
+    model = Menu
+    template_name = "menus/delete_menu.html"
+    context_object_name = "menu"
+    success_url = reverse_lazy("menus:menu_list")
 
-    # --- 4. Prepare Context for the Template ---
-    context = {
-        'menus': menus_queryset,
-        'active_menus_count': active_menus_count,
-        'total_items_count': total_items_count,
-        'average_price': average_price,
-        'is_paginated': False, # Add pagination logic here if needed in the future
-    }
-    
-    return render(request, 'menus/menu_list.html', context)
-@login_required
-def delete_menu(request, pk):
-    menu = get_object_or_404(Menu, id=pk, owner=request.user)
-    
-    if request.method == "POST":
-        menu_name = menu.name
-        menu.delete()
-        messages.success(request, f'Menu "{menu_name}" deleted successfully!')
-        return redirect("menus:menu_list")
-    
-    return render(request, "menus/delete_menu.html", {"menu": menu})
+    def get_queryset(self):
+        # Only allow the owner to delete
+        return Menu.objects.filter(owner=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        menu = self.get_object()
+        messages.success(request, f'Menu "{menu.name}" deleted successfully!')
+        return super().delete(request, *args, **kwargs)
 
 @login_required
 def toggle_menu_status(request, pk):
@@ -248,19 +221,7 @@ def toggle_menu_status(request, pk):
     # GET request - show confirmation page
     return render(request, "menus/toggle_menu_status.html", {"menu": menu})
 
-def menu_item_detail(request, item_id):
-    item = get_object_or_404(MenuItem, id=item_id)
-    
-    # Check if menu is active or user is owner
-    if not item.menu.is_active and item.menu.owner != request.user:
-        raise PermissionDenied("This menu item is not available.")
-    
-    context = {
-        'item': item,
-        'menu': item.menu,
-        'is_owner': item.menu.owner == request.user
-    }
-    return render(request, "menus/menu_item_detail.html", context)
+
 
 # Additional helper views for the menu_list template functionality
 
@@ -308,27 +269,6 @@ def menu_export(request, pk):
     messages.info(request, f'Export functionality for "{menu.name}" coming soon!')
     return redirect("menus:menu_detail", pk=menu.id)
 
-@login_required
-def add_menu_item(request, pk):  # Using pk to match your URL pattern
-    """Add a new item to a menu"""
-    menu = get_object_or_404(Menu, pk=pk, owner=request.user)
-    
-    if request.method == "POST":
-        form = MenuItemForm(request.POST)
-        if form.is_valid():
-            menu_item = form.save(commit=False)
-            menu_item.menu = menu
-            menu_item.save()
-            messages.success(request, f'Menu item "{menu_item.name}" added successfully!')
-            return redirect("menus:menu_detail", pk=menu.pk)
-    else:
-        form = MenuItemForm()
-    
-    return render(request, "menus/add_menu_item.html", {
-        "form": form,
-        "menu": menu,
-        "title": f"Add Item to {menu.name}"
-    })
 
 @login_required
 def my_menu(request):

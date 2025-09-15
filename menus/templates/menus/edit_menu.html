@@ -1,113 +1,54 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Edit Menu: {{ menu.name }}</h2>
-            <!-- Form Errors Display -->
-            {% if formset.non_form_errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ formset.non_form_errors }}
-                </div>
-            {% endif %}
-            <form method="post" id="menu-form" novalidate>
-                {% csrf_token %}
-                {{ formset.management_form }}
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle" id="menu-items-table">
-                        <thead class="table-dark">
-                            <tr>
-                                <th scope="col">Name <span class="text-danger">*</span></th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Price (€) <span class="text-danger">*</span></th>
-                                <th scope="col">Category</th>
-                                <th scope="col">Image</th>
-                                <th scope="col">Available</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="formset-tbody">
-                            {% for form in formset %}
-                            <tr class="formset-row" data-form-index="{{ forloop.counter0 }}">
-                                <!-- Hidden fields -->
-                                {% for hidden in form.hidden_fields %}
-                                    {{ hidden }}
-                                {% endfor %}
-                                
-                                <td>
-                                    {{ form.name }}
-                                    {% if form.name.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.name.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{ form.description }}
-                                    {% if form.description.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.description.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{ form.price }}
-                                    {% if form.price.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.price.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{ form.category }}
-                                    {% if form.category.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.category.errors.0 }}
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                <td> <!-- ✅ 2. Add cell for the image upload field -->
-                                    {{ form.image }}
-                                    {% if form.image.errors %}<div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>{% endif %}
-                                </td>
-                                    <td class="text-center">
-                                    {{ form.is_available }}
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        {{ form.DELETE }}
-                                        <button type="button" class="btn btn-outline-danger btn-sm delete-row" 
-                                                title="Mark for deletion" 
-                                                aria-label="Delete item {{ form.name.value|default:'new item' }}">
-                                            <i class="fas fa-trash" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <button type="button" id="add-row" class="btn btn-outline-primary">
-                        <i class="fas fa-plus" aria-hidden="true"></i> Add New Item
-                    </button>
-                    
-                    <div class="btn-group">
-                        <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-success" id="save-btn">
-                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                            <i class="fas fa-save" aria-hidden="true"></i> Save Changes
-                        </button>
-                    </div>
-                </div>
-            </form>
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Edit Menu: {{ menu.name }}</h2>
+    {% if formset.non_form_errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ formset.non_form_errors }}
         </div>
-    </div>
+    {% endif %}
+    <form method="post" id="menu-form" novalidate>
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+
+        <!-- Hidden initial formset rows for JS to process -->
+        <div id="initial-formset-rows" style="display:none;">
+            {% for form in formset %}
+            <div class="formset-row" data-form-index="{{ forloop.counter0 }}">
+                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                {{ form.name }}
+                {{ form.ingredients }}
+                {{ form.price }}
+                {{ form.section }}
+                {{ form.image }}
+                <div class="image-preview-wrapper">
+                    <img src="" alt="Preview" class="img-thumbnail d-none" style="max-width: 80px; max-height: 80px;" />
+                </div>
+                {{ form.is_available }}
+                {{ form.DELETE }}
+            </div>
+            {% endfor %}
+        </div>
+        <div id="sections-container">
+            <!-- Sections will be rendered here by JS -->
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button type="button" id="add-section" class="btn btn-outline-primary">
+                <i class="fas fa-layer-group"></i> Add Section
+            </button>
+            <div class="btn-group">
+                <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success" id="save-btn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <i class="fas fa-save" aria-hidden="true"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 <template id="empty-form-template">
     {{ formset.empty_form.as_p|escapejs }}
@@ -115,145 +56,161 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // =================================================================
-    // 1. Initialization
-    // =================================================================
+    // Modern Section & Card UI
     const form = document.getElementById('menu-form');
-    const addRowBtn = document.getElementById('add-row');
-    const tbody = document.getElementById('formset-tbody');
-    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+    const sectionsContainer = document.getElementById('sections-container');
+    const addSectionBtn = document.getElementById('add-section');
     const saveBtn = document.getElementById('save-btn');
     const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
 
-    // =================================================================
-    // 2. Row Management (My Improved Version)
-    // =================================================================
-    function addNewRow() {
-        let formCount = parseInt(totalFormsInput.value);
-        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
-        
-        const newRow = document.createElement('tr');
-        newRow.className = 'formset-row';
-        newRow.dataset.formIndex = formCount;
-
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newFormHtml;
-        
-        let cellsHtml = '';
-        tempDiv.querySelectorAll('p').forEach(p => {
-            cellsHtml += `<td>${p.innerHTML}</td>`;
+    // Parse initial forms into sections
+    function getInitialSections() {
+        const forms = Array.from(document.querySelectorAll('.formset-row'));
+        const sections = {};
+        forms.forEach(row => {
+            const sectionName = row.querySelector('select[name$="-section"]')?.value || 'Uncategorized';
+            if (!sections[sectionName]) sections[sectionName] = [];
+            sections[sectionName].push(row);
         });
-        
-        cellsHtml += `
-            <td class="text-center">
-                <button type="button" class="btn btn-outline-danger btn-sm remove-row-new" title="Remove item">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-
-        newRow.innerHTML = cellsHtml;
-        tbody.appendChild(newRow);
-        
-        totalFormsInput.value = formCount + 1;
-        
-        const firstInput = newRow.querySelector('input[type="text"]');
-        if (firstInput) firstInput.focus();
+        return sections;
     }
 
-    // =================================================================
-    // 3. Form Submission & Validation (Your Original Code - KEEP THIS)
-    // =================================================================
-    function validateForm() {
-        let isValid = true;
-        // Check all visible required inputs within the form
-        const requiredFields = form.querySelectorAll('tbody tr:not([style*="display: none"]) input[required]');
-        
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                field.classList.add('is-invalid');
-                isValid = false;
+    // Render sections and cards
+    function renderSections(sections) {
+        sectionsContainer.innerHTML = '';
+        Object.entries(sections).forEach(([section, items], idx) => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'menu-section mb-4 card';
+            sectionDiv.innerHTML = `
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">${section}</span>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rename-section" data-section="${section}"><i class="fas fa-edit"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-section" data-section="${section}"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 sortable-items" data-section="${section}"></div>
+                </div>
+            `;
+            const itemsRow = sectionDiv.querySelector('.sortable-items');
+            items.forEach(row => {
+                const card = document.createElement('div');
+                card.className = 'col-md-6 col-lg-4';
+                card.innerHTML = `<div class="card menu-item-card p-2 mb-2">${row.innerHTML}</div>`;
+                itemsRow.appendChild(card);
+            });
+            sectionsContainer.appendChild(sectionDiv);
+            // Enable drag-and-drop
+            Sortable.create(itemsRow, {
+                animation: 150,
+                handle: '.card',
+                draggable: '.col-md-6',
+            });
+        });
+    }
+
+    // Initial render
+    let sections = getInitialSections();
+    renderSections(sections);
+
+    // Add section
+    addSectionBtn.addEventListener('click', function() {
+        const sectionName = prompt('Enter new section name:');
+        if (sectionName && !sections[sectionName]) {
+            sections[sectionName] = [];
+            renderSections(sections);
+        }
+    });
+
+    // Rename/delete section
+    sectionsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.rename-section')) {
+            const section = e.target.closest('.rename-section').dataset.section;
+            const newName = prompt('Rename section:', section);
+            if (newName && newName !== section && !sections[newName]) {
+                sections[newName] = sections[section];
+                delete sections[section];
+                renderSections(sections);
+            }
+        } else if (e.target.closest('.delete-section')) {
+            const section = e.target.closest('.delete-section').dataset.section;
+            if (confirm(`Delete section "${section}" and all its items?`)) {
+                delete sections[section];
+                renderSections(sections);
+            }
+        }
+    });
+
+    // Image preview for each image input
+    document.querySelectorAll('input[type="file"][name$="-image"]').forEach(function(input) {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const previewWrapper = e.target.closest('td, .card').querySelector('.image-preview-wrapper');
+            const previewImg = previewWrapper.querySelector('img');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewImg.src = ev.target.result;
+                    previewImg.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
             } else {
-                field.classList.remove('is-invalid');
+                previewImg.src = '';
+                previewImg.classList.add('d-none');
             }
         });
-        
-        return isValid;
-    }
+    });
 
-    function showLoadingState() {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
-    }
-    
-    function hideLoadingState() {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Save Changes';
-    }
-
-    // =================================================================
-    // 4. Event Listeners
-    // =================================================================
-    
-    // Add new row
-    addRowBtn.addEventListener('click', addNewRow);
-
-    // Handle row deletion/removal
-    tbody.addEventListener('click', function(e) {
-        const deleteBtn = e.target.closest('.delete-row');
-        const removeBtn = e.target.closest('.remove-row-new');
-
-        if (deleteBtn) { // For existing forms, mark for deletion
-            const row = deleteBtn.closest('.formset-row');
-            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
-            if (deleteCheckbox) {
-                deleteCheckbox.checked = !deleteCheckbox.checked;
-                row.style.textDecoration = deleteCheckbox.checked ? 'line-through' : 'none';
-                row.style.opacity = deleteCheckbox.checked ? '0.6' : '1';
+    // Inline validation
+    form.addEventListener('input', function(e) {
+        if (e.target.matches('input, textarea, select')) {
+            if (e.target.required && !e.target.value.trim()) {
+                e.target.classList.add('is-invalid');
+            } else {
+                e.target.classList.remove('is-invalid');
             }
-        } else if (removeBtn) { // For new forms, just remove the row
-            removeBtn.closest('.formset-row').remove();
         }
     });
 
     // Handle form submission
     form.addEventListener('submit', function(e) {
-        if (!validateForm()) {
-            e.preventDefault(); // Stop submission if validation fails
-            alert('Please fill out all required fields (marked with *).');
-        } else {
-            showLoadingState(); // Show loading state on successful validation
-        }
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
     });
 });
 </script>
 {% endblock %}
 {% block extra_styles %}
 <style>
-.formset-row {
-    transition: all 0.3s ease;
+.menu-section.card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
-
-.formset-row:hover {
-    background-color: rgba(0, 123, 255, 0.1);
+.menu-item-card {
+    transition: box-shadow 0.2s;
+    border: 1px solid #e3e3e3;
 }
-
+.menu-item-card:hover {
+    box-shadow: 0 4px 16px rgba(0,123,255,0.12);
+    border-color: #007bff;
+}
 .invalid-feedback {
     font-size: 0.875em;
 }
-
-.table-responsive {
-    max-height: 60vh;
-    overflow-y: auto;
+.sortable-items {
+    min-height: 40px;
 }
-
+.btn-outline-primary, .btn-outline-secondary, .btn-outline-danger {
+    margin-right: 0.5em;
+}
 @media (max-width: 768px) {
-    .table-responsive {
-        font-size: 0.9em;
+    .menu-item-card {
+        font-size: 0.95em;
     }
-    
     .btn-sm {
         font-size: 0.8em;
     }
