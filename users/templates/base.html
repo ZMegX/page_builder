@@ -34,7 +34,7 @@
               </a>
             </li>
             {% if user.is_authenticated %}
-              {% with has_restaurant=user.profile.restaurant_details %}
+              {% with has_restaurant=user.id %}
                 {% if has_restaurant %}
                   <!-- Menus -->
                   <li class="nav-item dropdown">
