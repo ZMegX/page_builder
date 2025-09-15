@@ -1,14 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Restaurant Profile - Page Builder{% endblock %}
-{% load static crispy_forms_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'users/restaurant_profile.css' %}">
 {% block extra_css %}
 <style>
   #place-picker { width: 100%; }
+  .btn-save-custom {
+    color: #222 !important;
+    border: 1.5px solid #222 !important;
+    background: #fff !important;
+    border-radius: 0.6rem !important;
+    font-size: 1.12rem !important;
+    font-weight: 600;
+    width: 100%;
+    transition: color .2s, background .2s;
+  }
+  .btn-save-custom:hover, .btn-save-custom:focus {
+    color: #fff !important;
+    background: #222 !important;
+    border: 1.5px solid #222 !important;
+  }
 </style>
 {% endblock %}
 {% block content %}
 <div class="container py-4">
-  <form method="POST" enctype="multipart/form-data" autocomplete="off">
+  <!-- Top Save Button -->
+  <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body">
+  <button type="submit" form="restaurant-profile-form" class="btn btn-save-custom mt-3">
+        <i class="bi bi-save me-2"></i> Save All Profile Changes
+      </button>
+    </div>
+  </div>
+  <form id="restaurant-profile-form" method="POST" enctype="multipart/form-data" autocomplete="off">
     {% csrf_token %}
     <div class="row g-4">
       <!-- Restaurant Details -->
@@ -118,6 +143,7 @@
             <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-geo-alt me-2"></i> Delivery Addresses</h5>
           </div>
           <div class="card-body">
+            <script type="module" src="https://ajax.googleapis.com/ajax/libs/@googlemaps/extended-component-library/0.6.11/index.min.js"></script>
             <gmpx-api-loader key="{{ GOOGLE_MAPS_API_KEY }}"></gmpx-api-loader>
             <gmpx-place-picker id="place-picker" placeholder="Enter an address to add"></gmpx-place-picker>
             <div id="feedback-message" class="mt-2 small" style="min-height: 20px;"></div>

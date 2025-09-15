@@ -23,23 +23,6 @@ def documentation(request):
 def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
-def browse_restaurants(request):
-    q = request.GET.get('q', '')
-    restaurants = RestaurantProfile.objects.all()
-    if q:
-        restaurants = restaurants.filter(
-            Q(name__icontains=q) | 
-            Q(cuisine_type__icontains=q) |
-            Q(addresses__formatted_address__icontains=q)
-        ).distinct()
-        
-        
-    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
-
-    return render(request, 'browse_restaurants.html', {
-        'restaurants': restaurants,
-        'GOOGLE_MAPS_API_KEY': key,  # Or use settings
-    })
 
 def register(request):
     if request.method == 'POST':

@@ -2,7 +2,7 @@ from django.urls import path, include
 from users import views, ajax_views, views_restaurant
 from django.contrib.auth import views as auth_views
 from users.forms import CustomSetPasswordForm
-
+from users.views_restaurant import browse_restaurants
 urlpatterns = [
     path('register/', views.register, name='register'),
     path("accounts/", include("django.contrib.auth.urls")),
@@ -24,12 +24,7 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    path('address/<int:address_id>/edit/', views.address_edit, name='address_edit'),
-    path('address/<int:address_id>/delete/', views.address_delete, name='address_delete'),
-    path('address/<int:address_id>/update/ajax/', ajax_views.address_update_ajax, name='address_update_ajax'),
-    path('address/<int:address_id>/json/', ajax_views.address_get_ajax, name='address_get_ajax'),
-    path("address/add/ajax/", views.address_add_ajax, name="address_add_ajax"),
     path('why-choose-us/', views.why_choose_us, name='why_choose_us'),
-    path('restaurants/', views.browse_restaurants, name='browse_restaurants'),
+    path('restaurants/', browse_restaurants, name='browse_restaurants'),
     path('docs/', views.documentation, name='docs'),
 ]

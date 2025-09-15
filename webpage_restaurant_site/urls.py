@@ -1,5 +1,5 @@
 from django.urls import path
-from users.views import browse_restaurants 
+from users.views_restaurant import browse_restaurants 
 from . import views
 
 app_name = "webpage_restaurant_site"
