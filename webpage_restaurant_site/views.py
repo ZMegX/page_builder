@@ -5,6 +5,7 @@ from django.utils import timezone
 from users.models import RestaurantProfile, User
 from menus.models import Menu
 from locations.models import UserAddress
+from django.db.models import Q
 
 def _get_profile(slug: str) -> RestaurantProfile:
     """
@@ -12,12 +13,12 @@ def _get_profile(slug: str) -> RestaurantProfile:
     """
     qs = RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours")
     try:
-        return qs.get(user__username=slug)
+        return qs.get(slug=slug)
     except RestaurantProfile.DoesNotExist:
         try:
-            return qs.get(user__username=slug)
+            return qs.get(slug=slug)
         except RestaurantProfile.DoesNotExist:
-            return get_object_or_404(RestaurantProfile, pk=slug)
+            return qs.get(slug=slug)
 
 def _primary_address(profile: RestaurantProfile):
     """
@@ -102,3 +103,4 @@ def restaurant_menu(request, slug):
             "slug": _slug_fallback(profile) if profile else "",
         },   
     )
+

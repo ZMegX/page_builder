@@ -12,6 +12,7 @@ from .models import Menu, MenuItem
 from users.models import RestaurantProfile, Profile
 from .forms import MenuForm, MenuItemFormSet, MenuItemForm
 from django.contrib.auth import get_user_model
+from django.db.models import Count, Min, Max, Q, Avg
 
 User = get_user_model()
 
@@ -153,26 +154,63 @@ def edit_menu(request, pk):
 
 @login_required
 def menu_list(request):
-    """List all menus for the current user"""
-    # Fixed: Use consistent variable name
-    menus = Menu.objects.filter(owner=request.user).order_by('-created_at')
+    """
+    Displays a list of menus owned by the logged-in user,
+    with performance optimizations and sorting capabilities.
+    """
     
-    # Calculate statistics
-    active_menus_count = menus.filter(is_active=True).count()
-    total_items_count = sum(menu.items.count() for menu in menus)
+    # --- 1. Sorting Logic ---
+    # Get the sort option from the URL query parameter, default to 'updated_at_desc'
+    sort_option = request.GET.get('sort', 'updated_at_desc')
     
-    # Calculate average price across all menu items for this user
-    all_items = MenuItem.objects.filter(menu__in=menus)
-    average_price = all_items.aggregate(avg_price=Avg('price'))['avg_price'] or 0
+    # A mapping of safe sort options to their corresponding database fields
+    sort_map = {
+        'updated_at_desc': '-updated_at',
+        'updated_at_asc': 'updated_at',
+        'name_asc': 'name',
+        'name_desc': '-name',
+    }
     
+    # Use the mapped value, with a safe default if the sort_option is invalid
+    order_by_field = sort_map.get(sort_option, '-updated_at')
+
+    # --- 2. Main Query with Annotations (Performance Boost) ---
+    # This is the most important part. We fetch all menus and calculate stats
+    # in a single, efficient database query.
+    menus_queryset = (
+        Menu.objects.filter(owner=request.user)
+        .annotate(
+            item_count=Count('items'),
+            # Note: The line below assumes your MenuItem model has an 'is_available' boolean field.
+            # If not, you can remove this line.
+            # available_item_count=Count('items', filter=Q(items__is_available=True)),
+            min_price=Min('items__price'),
+            max_price=Max('items__price')
+        )
+        .order_by(order_by_field)  # Apply the sorting
+    )
+
+    # --- 3. Aggregate Stats for Dashboard Cards ---
+    # These stats are calculated from the queryset we just built.
+    active_menus_count = menus_queryset.filter(is_active=True).count()
+    
+    # Calculate total items across all of the user's menus
+    total_items_count = MenuItem.objects.filter(menu__owner=request.user).count()
+    
+    # Calculate the average price across all items
+    avg_price_result = MenuItem.objects.filter(menu__owner=request.user).aggregate(avg_price=Avg('price'))
+    average_price = avg_price_result['avg_price'] or 0
+
+    # --- 4. Prepare Context for the Template ---
     context = {
-        'menus': menus,  # Now this matches the variable name
+        'menus': menus_queryset,
         'active_menus_count': active_menus_count,
         'total_items_count': total_items_count,
         'average_price': average_price,
+        'is_paginated': False, # Add pagination logic here if needed in the future
     }
-    return render(request, "menus/menu_list.html", context)
-
+    
+    return render(request, 'menus/menu_list.html', context)
 @login_required
 def delete_menu(request, pk):
     menu = get_object_or_404(Menu, id=pk, owner=request.user)

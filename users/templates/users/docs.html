@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Documentation | Gastro Grid{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h1 class="mb-3">Project Documentation</h1>
+  <p class="lead">All resources, references, and documentation related to the development of Gastro Grid for my diploma.</p>
+</div>
+
+<section class="mb-5">
+  <h2 class="h4">📄 PDF Documents</h2>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <a href="{% static 'docs/requirements_specification.pdf' %}" target="_blank">
+        Requirements Specification (PDF)
+      </a>
+    </li>
+    <li class="list-group-item">
+      <a href="{% static 'docs/architecture_diagram.pdf' %}" target="_blank">
+        System Architecture Diagram (PDF)
+      </a>
+    </li>
+    <li class="list-group-item">
+      <a href="{% static 'docs/user_manual.pdf' %}" target="_blank">
+        User Manual (PDF)
+      </a>
+    </li>
+  </ul>
+</section>
+
+<section class="mb-5">
+  <h2 class="h4">🖼️ Screenshots & Visuals</h2>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <a href="{% static 'screenshots/login_page.png' %}" target="_blank">
+        <img src="{% static 'screenshots/login_page.png' %}" class="img-fluid rounded border" alt="Login Page Screenshot">
+        <div class="small text-center mt-1">Login Page</div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% static 'screenshots/menu_builder.png' %}" target="_blank">
+        <img src="{% static 'screenshots/menu_builder.png' %}" class="img-fluid rounded border" alt="Menu Builder Screenshot">
+        <div class="small text-center mt-1">Menu Builder</div>
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% static 'screenshots/public_menu.png' %}" target="_blank">
+        <img src="{% static 'screenshots/public_menu.png' %}" class="img-fluid rounded border" alt="Public Menu Screenshot">
+        <div class="small text-center mt-1">Public Menu</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="mb-5">
+  <h2 class="h4">🔗 References & Useful Links</h2>
+  <ul>
+    <li>
+      <a href="https://github.com/yourusername/gastro-grid" target="_blank" rel="noopener">
+        Project Source Code (GitHub)
+      </a>
+    </li>
+    <li>
+      <a href="https://docs.djangoproject.com/en/4.2/" target="_blank" rel="noopener">
+        Django Documentation
+      </a>
+    </li>
+    <li>
+      <a href="https://getbootstrap.com/docs/5.3/" target="_blank" rel="noopener">
+        Bootstrap 5 Documentation
+      </a>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="h4">📁 Other Files</h2>
+  <ul>
+    <li>
+      <a href="{% static 'docs/database_schema.sql' %}" target="_blank">
+        Database Schema (SQL)
+      </a>
+    </li>
+    <li>
+      <a href="{% static 'docs/test_plan.pdf' %}" target="_blank">
+        Test Plan (PDF)
+      </a>
+    </li>
+  </ul>
+</section>
+{% endblock %}

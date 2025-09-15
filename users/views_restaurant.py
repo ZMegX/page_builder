@@ -11,6 +11,7 @@ from .restaurant_forms import (
     RestaurantProfileForm,
 )
 from locations.models import UserAddress
+from django.db.models import Q
 
 
 @login_required
@@ -51,3 +52,21 @@ def restaurant_profile(request):
         "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY,
     }
     return render(request, "users/restaurant_profile.html", context)
+
+def browse_restaurants(request):
+    q = request.GET.get('q', '')
+    restaurants = RestaurantProfile.objects.prefetch_related('addresses')
+    if q:
+        restaurants = restaurants.filter(
+            Q(name__icontains=q) |
+            Q(cuisine_type__icontains=q) |
+            Q(registration_number__icontains=q) |
+            Q(phone_number__icontains=q) |
+            Q(slug__icontains=q) |
+            Q(addresses__formatted_address__icontains=q)
+        ).distinct()
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+    return render(request, 'browse_restaurants.html', {
+        'restaurants': restaurants,
+        'GOOGLE_MAPS_API_KEY': key,
+    })

@@ -27,8 +27,10 @@
           <div class="flex-grow-1">
             <h5 class="mb-1">{{ restaurant.name }}</h5>
             <div class="small text-muted mb-1">
-              <i class="bi bi-egg-fried me-1"></i>{{ restaurant.cuisine_type }} &nbsp;|&nbsp;
-              <i class="bi bi-geo-alt me-1"></i>{{ restaurant.address.formatted_address }}
+              <i class="bi bi-egg-fried me-1"></i>{{ restaurant.cuisine_type }}
+              {% if restaurant.addresses.first %}
+                &nbsp;|&nbsp;<i class="bi bi-geo-alt me-1"></i>{{ restaurant.addresses.first.formatted_address }}
+              {% endif %}
             </div>
             {% if restaurant.slug %}
               <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" class="btn btn-outline-dark btn-sm mt-1">
@@ -59,15 +61,22 @@
 <script>
   // Prepare restaurant data for JS
   const restaurants = [
-    {% for restaurant in restaurants %}
-      {
-        name: "{{ restaurant.name|escapejs }}",
-        lat: {{ restaurant.addresses.first.latitude|default:"null" }},
-        lng: {{ restaurant.addresses.first.longitude|default:"null" }},
-        url: "{% if restaurant.slug %}{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}{% else %}#{% endif %}",
-        address: "{{ restaurant.addresses.first.formatted_address|escapejs }}"
-      },
-    {% endfor %}
+{% for restaurant in restaurants %}
+  {
+    name: "{{ restaurant.name|escapejs }}",
+    {% if restaurant.addresses.first %}
+      lat: {{ restaurant.addresses.first.latitude|default_if_none:"null" }},
+      lng: {{ restaurant.addresses.first.longitude|default_if_none:"null" }},
+      address: "{{ restaurant.addresses.first.formatted_address|default_if_none:''|escapejs }}",
+    {% else %}
+      lat: null,
+      lng: null,
+      address: "",
+    {% endif %}
+    url: "{% if restaurant.slug %}{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}{% else %}#{% endif %}",
+    logo: "{{ restaurant.logo.url|default:'' }}"
+  }{% if not forloop.last %},{% endif %}
+{% endfor %}
   ];
 
   function initRestaurantsMap() {
@@ -92,7 +101,14 @@
         });
         bounds.extend(marker.getPosition());
         const infowindow = new google.maps.InfoWindow({
-          content: `<strong>${r.name}</strong><br>${r.address}<br>${r.url !== '#' ? `<a href="${r.url}">View Page</a>` : ''}`
+          content:` 
+          <div style="min-width:180px;max-width:240px;">
+            ${r.logo ? `<img src="${r.logo}" style="width:100%;max-height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;">` : ''}
+            <strong>${r.name}</strong><br>
+            ${r.address}<br>
+            ${r.url !== '#' ? `<a href="${r.url}" class="btn btn-sm btn-primary mt-2">View Page</a>` : ''}
+          </div>
+        `
         });
         marker.addListener('click', function() {
           infowindow.open(map, marker);

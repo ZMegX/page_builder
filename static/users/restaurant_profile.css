@@ -50,3 +50,9 @@
         padding: 8px;
         font-size: 1rem;
 }
+
+@media (max-width: 600px) {
+  #autocomplete {
+    width: 100%;
+  }
+}

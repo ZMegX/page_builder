@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Why Choose us{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+
+  <!-- Hero Section -->
+    <div class="row align-items-center text-center text-md-start mb-5 fade-in-element">    <div class="col-md-6">
+      <h1 class="fw-bold display-5">Build Stunning Restaurant Pages Easily</h1>
+      <p class="lead text-secondary">
+        Our page builder helps restaurant owners create modern, mobile-friendly websites in minutes.
+        No coding required.
+      </p>
+      <div class="mt-4">
+        <a href="{% url 'register' %}" class="btn btn-dark px-4 py-2 me-2">
+          <i class="bi bi-lightning-charge me-1"></i> Get Started
+        </a>
+        <a href="{% url 'login' %}" class="btn btn-outline-dark px-4 py-2">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Login
+        </a>
+      </div>
+    </div>
+    <div class="col-md-6 mt-4 mt-md-0">
+      <img src="/static/img/page_builder_mockup.png" 
+           class="img-fluid rounded-4 shadow" 
+           alt="Page Builder Preview">
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="row text-center my-5 fade-in-element">
+    <h2 class="fw-bold mb-4">Why Choose Our Page Builder?</h2>
+    
+    <div class="col-md-4 mb-4 feature-card">
+      <i class="bi bi-palette2 display-5 text-dark mb-3"></i>
+      <h5 class="fw-semibold">Customizable Designs</h5>
+      <p class="text-secondary">Choose from templates and easily adapt them to your brand.</p>
+    </div>
+
+    <div class="col-md-4 mb-4 feature-card">
+      <i class="bi bi-phone display-5 text-dark mb-3"></i>
+      <h5 class="fw-semibold">Mobile First</h5>
+      <p class="text-secondary">Your restaurant’s page looks great on any device.</p>
+    </div>
+
+    <div class="col-md-4 mb-4 feature-card">
+      <i class="bi bi-rocket-takeoff display-5 text-dark mb-3"></i>
+      <h5 class="fw-semibold">Fast & Easy</h5>
+      <p class="text-secondary">Create and launch your site in just a few clicks.</p>
+    </div>
+  </div>
+
+
+  <!-- How It Works -->
+  <div class="row align-items-center my-5 fade-in-element">
+    <div class="col-md-6 order-md-2">
+      <img src="/static/img/how_it_works.png" 
+           class="img-fluid rounded-4 shadow" 
+           alt="How it works">
+    </div>
+    <div class="col-md-6">
+      <h2 class="fw-bold mb-4">How It Works</h2>
+      <ol class="fs-5 text-secondary">
+        <li>Sign up and log in to your account.</li>
+        <li>Pick a template and customize with text, images, and menus.</li>
+        <li>Publish your site with one click.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="card text-center bg-dark text-white rounded-4 shadow p-5 mt-5 fade-in-element">
+    <h2 class="fw-bold mb-3">Ready to Build Your Page?</h2>
+    <p class="mb-4">Join hundreds of restaurants already using our platform.</p>
+    <a href="{% url 'register' %}" class="btn btn-light px-4 py-2 fw-semibold">
+      Get Started for Free
+    </a>
+  </div>
+
+</div>
+
+{% endblock %}
+{% load static %}
+{% block extra_js %}
+<script src="{% static 'js/fadein.js' %}"></script>
+{% endblock %}

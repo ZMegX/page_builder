@@ -1,10 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
+{% load cloudinary %} <!-- 1. Load the Cloudinary template tags -->
+
 {% block title %}{{ profile.name }} — Menu{% endblock %}
 
 {% block content %}
 <div class="container py-4">
+  <!-- Jumbotron-style Restaurant Overview -->
+  <div class="card shadow-lg border-0 rounded-4 mb-5 bg-light">
+    <div class="card-body d-flex flex-column flex-md-row align-items-center">
+      {% if profile.logo %}
+        <div class="mb-3 mb-md-0 me-md-4 text-center">
+          <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm" style="max-height: 120px; border: 4px solid #fff;" alt="{{ profile.name }} logo">
+        </div>
+      {% endif %}
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center mb-2">
+          <h1 class="display-6 mb-0 me-3">
+            <a href="{% url 'webpage_restaurant_site:landing' slug=slug %}" class="text-decoration-none text-dark">
+              {{ profile.name }}
+            </a>
+          </h1>
+          {% if status.open_now %}
+            <span class="badge bg-success ms-2">Open now</span>
+          {% else %}
+            <span class="badge bg-secondary ms-2">Closed</span>
+          {% endif %}
+        </div>
+        {% if profile.cuisine_type %}
+          <div class="mb-1">
+            <i class="bi bi-egg-fried me-2 text-muted"></i>
+            <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+          </div>
+        {% endif %}
+        {% if profile.phone_number %}
+          <div class="mb-1">
+            <i class="bi bi-telephone me-2 text-muted"></i>
+            <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+          </div>
+        {% endif %}
+        {% if address.formatted_address %}
+          <div class="mb-1">
+            <i class="bi bi-geo-alt me-2 text-muted"></i>
+            <strong>Address:</strong> {{ address.formatted_address }}
+            <a class="small ms-2" target="_blank" rel="noopener"
+               href="https://www.google.com/maps/search/?api=1&query={{ address.formatted_address|urlencode }}">
+              Get directions
+            </a>
+          </div>
+        {% endif %}
+        {% if status.today_hours %}
+          <div class="mb-1">
+            <i class="bi bi-clock me-2 text-muted"></i>
+            <strong>Today's hours:</strong>
+            {% for oh in status.today_hours %}
+              {{ oh.open_time|time:"g:i A" }}–{{ oh.close_time|time:"g:i A" }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if profile.social_links.all %}
+          <div class="mt-2">
+            <strong>Follow us:</strong>
+            <span class="ms-2">
+              {% for sl in profile.social_links.all %}
+                <a class="btn btn-sm btn-outline-secondary me-1 mb-1" href="{{ sl.url }}" target="_blank" rel="noopener">
+                  <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                </a>
+              {% endfor %}
+            </span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
   <div class="text-center mb-4">
-    <!-- ✅ The restaurant name is now a link back to the landing page -->
     <h1 class="display-5">
       <a href="{% url 'webpage_restaurant_site:landing' slug=slug %}" class="text-decoration-none text-dark">
         {{ profile.name }}
@@ -13,46 +82,50 @@
     <p class="lead text-muted">Our Menu</p>
   </div>
 
-
-  {% if menus %}
-    {% for menu in menus %}
-      <div class="card shadow-sm border-0 rounded-4 mb-4">
-        <div class="card-header bg-white border-bottom-0 rounded-top-4">
-          <h5 class="mb-0 py-2 fs-5 text-primary-emphasis">
-            <i class="bi bi-journal-text me-2"></i> {{ menu.name }}
-          </h5>
-          {% if menu.description %}
-            <div class="small text-muted">{{ menu.description }}</div>
-          {% endif %}
-        </div>
-        <div class="card-body">
-          {% if menu.items.all %}
-            <div class="list-group list-group-flush">
-              {% for item in menu.items.all %}
-                <div class="list-group-item px-0">
-                  <div class="d-flex">
-                    <div class="flex-grow-1">
-                      <div class="fw-semibold">{{ item.name }}</div>
-                      {% if item.description %}<div class="small text-muted">{{ item.description }}</div>{% endif %}
-                      {% if item.category %}<div class="badge text-bg-light mt-1">{{ item.category }}</div>{% endif %}
-                    </div>
-                    {% if item.price is not None %}
-                      <div class="ms-3 fw-semibold">${{ item.price }}</div>
-                    {% endif %}
-                  </div>
-                </div>
-              {% empty %}
-                <div class="text-muted">No items yet.</div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="text-muted">No items yet.</div>
-          {% endif %}
-        </div>
+  {% for menu in menus %}
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+      <div class="card-header bg-white border-bottom-0 rounded-top-4">
+        <h2 class="h4 mb-0 py-2 text-primary-emphasis">{{ menu.name }}</h2>
       </div>
-    {% endfor %}
-  {% else %}
-    <div class="alert alert-info">No active menus published yet.</div>
-  {% endif %}
+      <div class="list-group list-group-flush">
+        {% for item in menu.items.all %}
+          <div class="list-group-item">
+            <div class="row g-3 align-items-center">
+              <!-- 2. Check if the item has an image -->
+              {% if item.image %}
+                <!-- Image Column -->
+                <div class="col-md-3">
+                  <!-- 3. Use cloudinary_url to create a responsive image -->
+                  <img src="{% cloudinary_url item.image.public_id width=250 height=250 crop='fill' gravity='auto' %}"
+                       class="img-fluid rounded" alt="{{ item.name }}">
+                </div>
+                <!-- Details Column -->
+                <div class="col-md-9">
+              {% else %}
+                <!-- Full Width Details Column if no image -->
+                <div class="col-12">
+              {% endif %}
+                  <div class="d-flex justify-content-between">
+                    <h5 class="mb-1">{{ item.name }}</h5>
+                    <span class="text-muted fs-5">${{ item.price|floatformat:2 }}</span>
+                  </div>
+                  {% if item.description %}
+                    <p class="mb-1">{{ item.description }}</p>
+                  {% endif %}
+                </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="list-group-item">
+            <p class="text-muted my-2">This menu currently has no items.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="text-center p-5 bg-light rounded-4">
+      <p class="lead">No active menus found for this restaurant.</p>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}

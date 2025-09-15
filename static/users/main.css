@@ -1,3 +1,8 @@
+body { 
+  font-family: 'Nunito', Arial, sans-serif;
+  font-size: 1.12rem;
+}
+
 nav .navbar-profile-img {
     width: 32px;
     height: 32px;
@@ -315,6 +320,45 @@ body {
   transform: translateY(0);
 }
 
+/* Fade-in animation for sections */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1);
+}
+.fade-in-section.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Pulse animation for open/closed badge */
+.pulse-badge {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(40,167,69,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(40,167,69,0); }
+  100% { box-shadow: 0 0 0 0 rgba(40,167,69,0); }
+}
+
+/* Logo pop-in */
+.logo-animate {
+  animation: logoPop 1s cubic-bezier(.4,0,.2,1);
+}
+@keyframes logoPop {
+  0% { opacity: 0; transform: scale(0.8);}
+  100% { opacity: 1; transform: scale(1);}
+}
+
+/* Social link hover effect */
+.social-link-animate {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.social-link-animate:hover {
+  transform: translateY(-3px) scale(1.07);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
 /* Optional: stagger effect for feature cards */
 .feature-card {
   opacity: 0;
@@ -365,7 +409,7 @@ body {
   flex-direction: column;
   gap: .75rem;
   max-width: min(440px, calc(100vw - 2.5rem));
-  pointer-events: none; /* allow clicks only on alerts */
+  pointer-events: none;
 }
 
 /* Base modern alert styling */
@@ -472,7 +516,7 @@ body {
   transform-origin: left center;
   transform: scaleX(1);
   transition: transform linear;
-  pointer-events: none;
+  pointer-events: auto;
   opacity: .75;
 }
 
@@ -505,7 +549,7 @@ body {
 }
 
 #map {
-        height: 500px;
+        height: 350px;
         width: 100%;
         border-radius: 0.5rem;
         border: 1px solid #dee2e6;
@@ -515,9 +559,6 @@ body {
   padding-bottom: 2rem;
     }
 
-#map {
-      height: 100%;
-}
 /* Style for the card that will contain the autocomplete input */
 #place-autocomplete-card {
   background-color: #fff;

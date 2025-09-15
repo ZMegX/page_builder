@@ -52,7 +52,8 @@
           <th>Section</th>
           <th>Name</th>
           <th>Price</th>
-          <th>Ingredients</th> <!-- Changed from Description to Ingredients -->
+          <th>Ingredients</th>
+          <th>Image</th> 
           <th>Delete</th>
         </tr>
       </thead>
@@ -83,6 +84,11 @@
                 <div class="text-danger small">{{ form.ingredients.errors|striptags }}</div>
               {% endif %}
             </td>
+            <td> 
+              {{ form.image }}
+              {% if form.image.errors %}
+                <div class="text-danger small">{{ form.image.errors|striptags }}</div>
+              {% endif %}
             <td class="text-center">
               {% if form.instance.pk %}
                 {{ form.DELETE }}
@@ -166,6 +172,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <td>
           <textarea name="form-${idx}-ingredients" class="form-control" placeholder="List main ingredients..." rows="2" maxlength="200" id="id_form-${idx}-ingredients"></textarea>
         </td>
+        <td>
+          <input type="file" name="form-${idx}-image" class="form-control" id="id_form-${idx}-image">
+        </td>
         <td class="text-center">
           <button type="button" class="btn btn-danger btn-sm remove-row" title="Remove row">&times;</button>
         </td>
@@ -190,23 +199,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Remove row functionality for newly added rows
-  if (tableBody) {
-    tableBody.addEventListener('click', function(e) {
-      if(e.target.classList.contains('remove-row')) {
-        e.target.closest('tr').remove();
-        formIdx--;
-        
-        // Update total forms count
-        let totalFormsElement = getTotalFormsElement();
-        if (totalFormsElement) {
-          totalFormsElement.value = formIdx;
-        } else {
-          console.warn('Total forms element not found');
-        }
-      }
-    });
-  }
 
   // Bootstrap validation
   let form = document.getElementById('menuForm');

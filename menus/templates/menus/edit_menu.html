@@ -1,18 +1,16 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <h2 class="mb-4">Edit Menu: {{ menu.name }}</h2>
-            
             <!-- Form Errors Display -->
             {% if formset.non_form_errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ formset.non_form_errors }}
                 </div>
             {% endif %}
-
             <form method="post" id="menu-form" novalidate>
                 {% csrf_token %}
                 {{ formset.management_form }}
@@ -25,6 +23,7 @@
                                 <th scope="col">Description</th>
                                 <th scope="col">Price (€) <span class="text-danger">*</span></th>
                                 <th scope="col">Category</th>
+                                <th scope="col">Image</th>
                                 <th scope="col">Available</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -69,7 +68,11 @@
                                         </div>
                                     {% endif %}
                                 </td>
-                                <td class="text-center">
+                                <td> <!-- ✅ 2. Add cell for the image upload field -->
+                                    {{ form.image }}
+                                    {% if form.image.errors %}<div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>{% endif %}
+                                </td>
+                                    <td class="text-center">
                                     {{ form.is_available }}
                                 </td>
                                 <td class="text-center">
@@ -106,108 +109,67 @@
         </div>
     </div>
 </div>
+<template id="empty-form-template">
+    {{ formset.empty_form.as_p|escapejs }}
+</template>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // =================================================================
+    // 1. Initialization
+    // =================================================================
     const form = document.getElementById('menu-form');
     const addRowBtn = document.getElementById('add-row');
     const tbody = document.getElementById('formset-tbody');
     const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
     const saveBtn = document.getElementById('save-btn');
-    
-    let formCount = parseInt(totalFormsInput.value);
-    
-    // Empty form template (safely escaped)
-    const emptyFormTemplate = `{{ formset.empty_form.as_table|escapejs }}`;
-    
-    // Add new row functionality
-    addRowBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        addNewRow();
-    });
-    
-    // Delete row functionality
-    tbody.addEventListener('click', function(e) {
-        if (e.target.closest('.delete-row')) {
-            e.preventDefault();
-            handleDeleteRow(e.target.closest('.formset-row'));
-        }
-    });
-    
-    // Form submission with loading state
-    form.addEventListener('submit', function(e) {
-        showLoadingState();
-        // Validate required fields
-        if (!validateForm()) {
-            e.preventDefault();
-            hideLoadingState();
-            showValidationErrors();
-        }
-    });
-    
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+
+    // =================================================================
+    // 2. Row Management (My Improved Version)
+    // =================================================================
     function addNewRow() {
+        let formCount = parseInt(totalFormsInput.value);
+        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
+        
         const newRow = document.createElement('tr');
         newRow.className = 'formset-row';
         newRow.dataset.formIndex = formCount;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
         
-        // Replace __prefix__ with actual form count
-        let newFormHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
+        let cellsHtml = '';
+        tempDiv.querySelectorAll('p').forEach(p => {
+            cellsHtml += `<td>${p.innerHTML}</td>`;
+        });
         
-        // Convert table format to individual cells
-        newRow.innerHTML = convertTableRowToTd(newFormHtml);
-        
+        cellsHtml += `
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm remove-row-new" title="Remove item">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+
+        newRow.innerHTML = cellsHtml;
         tbody.appendChild(newRow);
-        formCount++;
-        totalFormsInput.value = formCount;
         
-        // Focus on the first input of the new row
+        totalFormsInput.value = formCount + 1;
+        
         const firstInput = newRow.querySelector('input[type="text"]');
-        if (firstInput) {
-            firstInput.focus();
-        }
-        
-        // Add animation
-        newRow.style.opacity = '0';
-        setTimeout(() => {
-            newRow.style.transition = 'opacity 0.3s ease';
-            newRow.style.opacity = '1';
-        }, 10);
+        if (firstInput) firstInput.focus();
     }
-    
-    function handleDeleteRow(row) {
-        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
-        
-        if (deleteCheckbox) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                deleteCheckbox.checked = true;
-                row.style.opacity = '0.5';
-                row.style.textDecoration = 'line-through';
-                
-                // Hide row after animation
-                setTimeout(() => {
-                    row.style.display = 'none';
-                }, 300);
-            }
-        } else {
-            // For new rows without ID, remove completely
-            if (confirm('Remove this new item?')) {
-                row.remove();
-                updateFormCount();
-            }
-        }
-    }
-    
-    function updateFormCount() {
-        const visibleRows = tbody.querySelectorAll('.formset-row:not([style*="display: none"])');
-        formCount = visibleRows.length;
-        totalFormsInput.value = formCount;
-    }
-    
+
+    // =================================================================
+    // 3. Form Submission & Validation (Your Original Code - KEEP THIS)
+    // =================================================================
     function validateForm() {
         let isValid = true;
-        const requiredFields = form.querySelectorAll('input[required]');
+        // Check all visible required inputs within the form
+        const requiredFields = form.querySelectorAll('tbody tr:not([style*="display: none"]) input[required]');
         
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
@@ -220,21 +182,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return isValid;
     }
-    
-    function showValidationErrors() {
-        const firstInvalidField = form.querySelector('.is-invalid');
-        if (firstInvalidField) {
-            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstInvalidField.focus();
-        }
-    }
-    
+
     function showLoadingState() {
-        const spinner = saveBtn.querySelector('.spinner-border');
-        const icon = saveBtn.querySelector('.fas');
-        
-        spinner.classList.remove('d-none');
-        icon.classList.add('d-none');
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
     }
@@ -243,29 +192,45 @@ document.addEventListener('DOMContentLoaded', function() {
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Save Changes';
     }
+
+    // =================================================================
+    // 4. Event Listeners
+    // =================================================================
     
-    function convertTableRowToTd(tableRowHtml) {
-        // This is a simplified conversion - you might need to adjust based on your form structure
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = tableRowHtml;
-        
-        // Extract form fields and wrap them in appropriate td elements
-        // This would need to be customized based on your exact form structure
-        return tableRowHtml; // Placeholder - implement based on your needs
-    }
-    
-    // Auto-save functionality (optional)
-    let autoSaveTimeout;
-    form.addEventListener('input', function() {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-            // Implement auto-save logic here if needed
-            console.log('Auto-save triggered');
-        }, 2000);
+    // Add new row
+    addRowBtn.addEventListener('click', addNewRow);
+
+    // Handle row deletion/removal
+    tbody.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row');
+        const removeBtn = e.target.closest('.remove-row-new');
+
+        if (deleteBtn) { // For existing forms, mark for deletion
+            const row = deleteBtn.closest('.formset-row');
+            const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = !deleteCheckbox.checked;
+                row.style.textDecoration = deleteCheckbox.checked ? 'line-through' : 'none';
+                row.style.opacity = deleteCheckbox.checked ? '0.6' : '1';
+            }
+        } else if (removeBtn) { // For new forms, just remove the row
+            removeBtn.closest('.formset-row').remove();
+        }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault(); // Stop submission if validation fails
+            alert('Please fill out all required fields (marked with *).');
+        } else {
+            showLoadingState(); // Show loading state on successful validation
+        }
     });
 });
 </script>
-
+{% endblock %}
+{% block extra_styles %}
 <style>
 .formset-row {
     transition: all 0.3s ease;

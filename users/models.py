@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
+from django.utils.text import slugify
+
 
 class SocialLink(models.Model):
     profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='social_links')
@@ -41,9 +43,14 @@ class RestaurantProfile(models.Model):
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-
+    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         if self.profile and self.profile.user:
             return f"{self.profile.user.username} Restaurant Details"
         return f"{self.name or 'Unnamed'} Restaurant"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
