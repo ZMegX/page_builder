@@ -13,7 +13,18 @@ from .models import Menu, MenuItem
 from users.models import RestaurantProfile, Profile
 from .forms import MenuForm, MenuItemFormSet, MenuItemForm
 from django.contrib.auth import get_user_model
+from rest_framework import viewsets
+from .models import Menu, MenuItem
+from .serializers import MenuSerializer, MenuItemSerializer
 
+class MenuViewSet(viewsets.ModelViewSet):
+    queryset = Menu.objects.all()
+    serializer_class = MenuSerializer
+
+class MenuItemViewSet(viewsets.ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    
 User = get_user_model()
 # --- Helper Functions ---
 

@@ -611,9 +611,10 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const menuId = this.dataset.menuId;
             const menuName = this.dataset.menuName;
-            
+
             menuNameElement.textContent = menuName;
-            deleteForm.action = `{% url 'menus:menu_delete' 0 %}`.replace('0', menuId);            
+            // Set the form action dynamically using menuId
+            deleteForm.action = `/menus/${menuId}/delete/`;
             deleteModal.show();
         });
     });

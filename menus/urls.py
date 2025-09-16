@@ -1,5 +1,5 @@
 from django.urls import path
-from menus.views import (
+from .views import (
     MenuListView,
     MenuDetailView,
     MenuCreateView,
@@ -8,8 +8,14 @@ from menus.views import (
 )
 from . import views
 from .views_menu_items import add_menu_item, menu_item_detail
+from rest_framework import routers
+from .views import MenuViewSet, MenuItemViewSet
 
 app_name = "menus"
+
+router = routers.DefaultRouter()
+router.register(r'api/menus', MenuViewSet)
+router.register(r'api/menu-items', MenuItemViewSet)
 
 urlpatterns = [
     path('menus/', MenuListView.as_view(), name='menu_list'),
@@ -24,4 +30,4 @@ urlpatterns = [
     path('menus/<int:pk>/', MenuDetailView.as_view(), name='menu_detail'),    
     path("my/", views.my_menu, name="my_menu"), 
 
-]
+] + router.urls

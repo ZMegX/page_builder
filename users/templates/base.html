@@ -134,6 +134,7 @@
     </header>
     <main class="container py-4">
         {% block content %}{% endblock %}
+
     </main>
     <footer class="bg-light border-top mt-5 py-4">
       <div class="container">
@@ -167,5 +168,6 @@
     <script src="{% static 'js/autoDismissAlerts.js' %}" defer></script>
 
     {% block extra_js %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
   </body>
 </html>
