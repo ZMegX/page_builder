@@ -9,8 +9,12 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<link rel="stylesheet" href="{% static 'react/css/main.css' %}">
-<script src="{% static 'react/js/main.js' %}"></script>
+<link rel="stylesheet" href="{% static 'react/static/css/main.084f601b.css' %}">
+<!-- Passing username to JS for authentication purposes -->
+<script>
+  window.userId = {{ user.id|default:"null" }};
+</script>
+<script src="{% static 'react/static/js/main.f8a9436b.js' %}"></script>
 {% endblock %}
 {% block extra_styles %}
 <style>
