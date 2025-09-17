@@ -47,8 +47,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
     })
       .then(res => res.json())
       .then(data => {
-        setForm(f => ({ ...f, image: data.secure_url }));
-      });
+        setForm(f => ({ ...f, image: data.secure_url }));      });
   }
 
   function handleChange(e) {

@@ -52,5 +52,13 @@ class RestaurantProfile(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base = self.name
+            if not base:
+                if self.profile and self.profile.user:
+                    base = self.profile.user.username
+                elif self.user and self.user.username:
+                    base = self.user.username
+                else:
+                    base = str(self.pk or '')
+            self.slug = slugify(base)
         super().save(*args, **kwargs)

@@ -3,6 +3,22 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, Button } from 'react-bootstrap';
 import MenuItemModal from './MenuItemModal';
 
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
 function MenuEditor() {
   const [menus, setMenus] = React.useState([]);
   const [selectedMenuId, setSelectedMenuId] = React.useState(null);
@@ -31,12 +47,17 @@ React.useEffect(() => {
   const [editingItem, setEditingItem] = React.useState(null);
 
   function handleSave(item) {
+    // Always include menu field in payload
+    const payload = { ...item, menu: selectedMenuId };
     if (item.id) {
       // Edit
       fetch(`/api/menu-items/${item.id}/`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(payload),
       })
         .then(res => res.json())
         .then(updated => setItems(items.map(i => i.id === updated.id ? updated : i)));
@@ -44,8 +65,11 @@ React.useEffect(() => {
       // Create
       fetch('/api/menu-items/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(payload),
       })
         .then(res => res.json())
         .then(created => setItems([...items, created]));
@@ -54,7 +78,10 @@ React.useEffect(() => {
   }
 
   function handleDelete(id) {
-    fetch(`/api/menu-items/${id}/`, { method: 'DELETE' })
+    fetch(`/api/menu-items/${id}/`, { 
+      method: 'DELETE',
+      headers: { 'X-CSRFToken': csrftoken },
+     })
       .then(() => setItems(items.filter(i => i.id !== id)));
   }
 
@@ -95,16 +122,17 @@ React.useEffect(() => {
                 <Draggable key={item.id} draggableId={item.id} index={idx}>
                   {(provided) => (
                     <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="mb-2">
-                      {/* Card-style image preview above Card.Body */}
-                      {item.image && (
+                      {/* Improved Cloudinary image logic */}
+                      {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
                         <div className="card-img-top" style={{ textAlign: 'center', marginTop: '12px' }}>
                           <img
                             src={item.image}
                             alt={item.name}
                             style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
+                            onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
                           />
                         </div>
-                      )}
+                      ) : null}
                       <Card.Body>
                         <Card.Title>{item.name}</Card.Title>
                         <Card.Text>Section: {item.section} | Price: ${item.price}</Card.Text>

@@ -8,5 +8,5 @@ urlpatterns = [
     path('restaurants/', browse_restaurants, name='browse_restaurants'), 
     path("<slug:slug>/", views.restaurant_landing, name="landing"),
     path("<slug:slug>/menu/", views.restaurant_menu, name="menu"),
-
+    path('r/<str:username>/', views.redirect_to_restaurant_slug, name='redirect_to_restaurant_slug')
 ]
