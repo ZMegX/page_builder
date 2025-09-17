@@ -7,7 +7,8 @@ function MenuEditor() {
   const [menus, setMenus] = React.useState([]);
   const [selectedMenuId, setSelectedMenuId] = React.useState(null);
   const [items, setItems] = React.useState([]);
-  
+  const selectedMenu = menus.find(m => m.id === selectedMenuId);
+
   React.useEffect(() => {
   fetch('http://localhost:8000/api/menus/')
     .then(res => res.json())
@@ -67,6 +68,13 @@ React.useEffect(() => {
 
   return (
     <>
+      {selectedMenu && selectedMenu.photo && (
+        <img
+          src={`https://res.cloudinary.com/dgmvyic4g/${selectedMenu.photo}`}
+          alt={selectedMenu.name}
+          style={{ width: '200px', marginBottom: '16px', objectFit: 'cover', borderRadius: '8px' }}
+        />
+      )}
       <select value={selectedMenuId || ''} onChange={e => setSelectedMenuId(Number(e.target.value))}>
         {menus.map(menu => (
           <option key={menu.id} value={menu.id}>{menu.name}</option>
@@ -87,6 +95,16 @@ React.useEffect(() => {
                 <Draggable key={item.id} draggableId={item.id} index={idx}>
                   {(provided) => (
                     <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="mb-2">
+                      {/* Card-style image preview above Card.Body */}
+                      {item.image && (
+                        <div className="card-img-top" style={{ textAlign: 'center', marginTop: '12px' }}>
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
+                          />
+                        </div>
+                      )}
                       <Card.Body>
                         <Card.Title>{item.name}</Card.Title>
                         <Card.Text>Section: {item.section} | Price: ${item.price}</Card.Text>

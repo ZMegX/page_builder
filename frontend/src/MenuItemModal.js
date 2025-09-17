@@ -8,6 +8,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
     price: '',
     ingredients: '',
     is_available: true,
+    image: '',
   });
 
   useEffect(() => {
@@ -18,6 +19,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
         price: item.price || '',
         ingredients: item.ingredients || '',
         is_available: item.is_available !== undefined ? item.is_available : true,
+        image: item.image || '',
       });
     } else {
       setForm({
@@ -26,9 +28,28 @@ function MenuItemModal({ show, item, onSave, onClose }) {
         price: '',
         ingredients: '',
         is_available: true,
+        image: '',
       });
     }
   }, [item, show]);
+
+  function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'react_upload_menuItem'); 
+
+    fetch('https://api.cloudinary.com/v1_1/dgmvyic4g/image/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(res => res.json())
+      .then(data => {
+        setForm(f => ({ ...f, image: data.secure_url }));
+      });
+  }
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -52,6 +73,12 @@ function MenuItemModal({ show, item, onSave, onClose }) {
           <Modal.Title>{item ? 'Edit Item' : 'Create Item'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {/* Card-style image preview above form fields */}
+          {form.image && (
+            <div className="card-img-top mb-3" style={{ textAlign: 'center' }}>
+              <img src={form.image} alt="Menu Item" style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }} />
+            </div>
+          )}
           <Form.Group className="mb-3">
             <Form.Label>Name</Form.Label>
             <Form.Control name="name" value={form.name} onChange={handleChange} required />
@@ -73,6 +100,10 @@ function MenuItemModal({ show, item, onSave, onClose }) {
           <Form.Group className="mb-3">
             <Form.Label>Ingredients</Form.Label>
             <Form.Control name="ingredients" value={form.ingredients} onChange={handleChange} />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Image</Form.Label>
+            <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Check
