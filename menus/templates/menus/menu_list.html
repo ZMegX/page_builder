@@ -1,680 +1,77 @@
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block title %}My Menus - {{ restaurant.name }}{% endblock %}
 
+
 {% block extra_css %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-    .menu-card {
-        transition: all 0.3s ease;
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        overflow: hidden;
-        height: 100%;
-    }
-    
-    .menu-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        border-color: #007bff;
-    }
-    
-    .menu-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1.5rem;
-        position: relative;
-    }
-    
-    .menu-card-header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f, #4d9de0);
-    }
-    
-    .menu-stats {
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin-top: 1rem;
-    }
-    
-    .stat-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .stat-icon {
-        width: 20px;
-        margin-right: 0.5rem;
-    }
-    
-    .menu-actions {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-top: 1px solid #e9ecef;
-    }
-    
-    .btn-action {
-        margin: 0.25rem;
-        border-radius: 20px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-    
-    .btn-action:hover {
-        transform: scale(1.05);
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        color: #6c757d;
-    }
-    
-    .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    .search-container {
-        background: white;
-        border-radius: 50px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-    
-    .search-input {
-        border: none;
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
-    }
-    
-    .search-input:focus {
-        box-shadow: none;
-        outline: none;
-    }
-    
-    .filter-tabs {
-        background: white;
-        border-radius: 12px;
-        padding: 0.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .filter-tab {
-        border: none;
-        background: transparent;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        color: #6c757d;
-        font-weight: 500;
-    }
-    
-    .filter-tab.active {
-        background: #007bff;
-        color: white;
-        box-shadow: 0 2px 8px rgba(0,123,255,0.3);
-    }
-    
-    .page-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 2rem;
-        border-radius: 0 0 20px 20px;
-    }
-    
-    .fade-in {
-        animation: fadeIn 0.5s ease-in;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .status-badge {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .status-active {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .status-inactive {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    @media (max-width: 768px) {
-        .menu-card-header {
-            padding: 1rem;
-        }
-        
-        .btn-action {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-        
-        .filter-tabs {
-            margin-bottom: 1rem;
-        }
-        
-        .filter-tab {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-        }
-    }
+  .minimal-card {
+    border-radius: 10px;
+  }
+  .minimal-items {
+    font-size: 0.95em;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="mb-2">
-                    <i class="fas fa-utensils me-3"></i>
-                    My Menus
-                </h1>
-                <p class="lead mb-0">Manage your restaurant menus and items</p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <a href="{% url 'menus:menu_create' %}" class="btn btn-light btn-lg">
-                    <i class="fas fa-plus me-2"></i>Create New Menu
-                </a>
-            </div>
-        </div>
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <input type="text" class="form-control" placeholder="Search menus...">
     </div>
-</div>
-
-<div class="container">
-    <!-- Search and Filter Section -->
-     <div class="col-lg-4 d-flex justify-content-end">
-        <div class="me-2">
-            <div class="row mb-4">
-                <div class="col-lg-8">
-                    <div class="search-container">
-                        <div class="input-group">
-                            <input type="text" 
-                                class="form-control search-input" 
-                                id="menuSearch" 
-                                placeholder="Search menus by name or description..."
-                                aria-label="Search menus">
-                            <button class="btn btn-primary" type="button" id="searchBtn">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="filter-tabs">
-                        <button class="filter-tab active" data-filter="all">
-                            <i class="fas fa-list me-2"></i>All
-                        </button>
-                        <button class="filter-tab" data-filter="active">
-                            <i class="fas fa-check-circle me-2"></i>Active
-                        </button>
-                        <button class="filter-tab" data-filter="inactive">
-                            <i class="fas fa-pause-circle me-2"></i>Inactive
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Overview -->
-    {% if menus %}
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="text-primary mb-2">
-                        <i class="fas fa-book-open fa-2x"></i>
-                    </div>
-                    <h4 class="mb-1">{{ menus|length }}</h4>
-                    <p class="text-muted mb-0">Total Menus</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="text-success mb-2">
-                        <i class="fas fa-check-circle fa-2x"></i>
-                    </div>
-                    <h4 class="mb-1">{{ active_menus_count }}</h4>
-                    <p class="text-muted mb-0">Active Menus</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="text-info mb-2">
-                        <i class="fas fa-utensils fa-2x"></i>
-                    </div>
-                    <h4 class="mb-1">{{ total_items_count }}</h4>
-                    <p class="text-muted mb-0">Total Items</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card border-0 h-100">
-                <div class="card-body text-center">
-                    <div class="text-warning mb-2">
-                        <i class="fas fa-euro-sign fa-2x"></i>
-                    </div>
-                    <h4 class="mb-1">€{{ average_price|floatformat:2 }}</h4>
-                    <p class="text-muted mb-0">Avg. Price</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Menus Grid -->
-    <div class="row" id="menusContainer">
-        {% for menu in menus %}
-        <div class="col-lg-4 col-md-6 mb-4 menu-item fade-in" 
-             data-menu-name="{{ menu.name|lower }}" 
-             data-menu-status="{% if menu.is_active %}active{% else %}inactive{% endif %}">
-            <div class="card menu-card">
-                <div class="menu-card-header">
-                    <div class="status-badge {% if menu.is_active %}status-active{% else %}status-inactive{% endif %}">
-                        {% if menu.is_active %}Active{% else %}Inactive{% endif %}
-                    </div>
-                    
-                    <h5 class="card-title mb-2">
-                        <i class="fas fa-utensils me-2"></i>
-                        {{ menu.name }}
-                    </h5>
-                    
-                    {% if menu.description %}
-                    <p class="card-text mb-0 opacity-75">
-                        {{ menu.description|truncatechars:100 }}
-                    </p>
-                    {% endif %}
-                    
-                    <div class="menu-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-list stat-icon"></i>
-                            <span>{{ menu.items.count }} items</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-eye stat-icon"></i>
-                            <span>{{ menu.items.filter.is_available.count }} available</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-clock stat-icon"></i>
-                            <span>Updated {{ menu.updated_at|timesince }} ago</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card-body">
-                    <div class="row text-center">
-                        {% if menu.items.all %}
-                            <div class="col-6">
-                                <div class="text-success">
-                                    <i class="fas fa-euro-sign"></i>
-                                    <strong>{{ menu.items.aggregate.price__min|floatformat:2 }}</strong>
-                                </div>
-                                <small class="text-muted">Min Price</small>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-info">
-                                    <i class="fas fa-euro-sign"></i>
-                                    <strong>{{ menu.items.aggregate.price__max|floatformat:2 }}</strong>
-                                </div>
-                                <small class="text-muted">Max Price</small>
-                            </div>
-                        {% else %}
-                            <div class="col-12">
-                                <div class="text-muted">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    No items yet
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Proposed new menu-actions block -->
-                <div class="menu-actions">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Main Action Button -->
-                        <a href="{% url 'menus:edit_menu' menu.pk %}" 
-                        class="btn btn-primary btn-action flex-grow-1 me-2">
-                            <i class="fas fa-edit me-2"></i>Edit & View Items
-                        </a>
-
-                        <!-- "More Actions" Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary btn-action" type="button" id="dropdownMenuButton-{{ menu.pk }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton-{{ menu.pk }}">
-                                <!-- Activate/Deactivate Action -->
-                                <li>
-                                    <form method="post" action="{% url 'menus:menu_toggle_status' menu.pk %}" class="d-inline w-100">
-                                        {% csrf_token %}
-                                        {% if menu.is_active %}
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-pause me-2"></i>Deactivate
-                                        </button>
-                                        {% else %}
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-play me-2"></i>Activate
-                                        </button>
-                                        {% endif %}
-                                    </form>
-                                </li>
-                                <!-- Other Quick Actions -->
-                                <li><a class="dropdown-item" href="{% url 'menus:menu_duplicate' menu.pk %}"><i class="fas fa-copy me-2"></i>Duplicate</a></li>
-                                <li><a class="dropdown-item" href="{% url 'menus:menu_export' menu.pk %}"><i class="fas fa-download me-2"></i>Export</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <!-- Delete Action -->
-                                <li>
-                                    <button type="button" class="dropdown-item text-danger delete-menu-btn" data-menu-id="{{ menu.pk }}" data-menu-name="{{ menu.name }}">
-                                        <i class="fas fa-trash me-2"></i>Delete
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <h3>No Menus Yet</h3>
-                <p class="lead">Start by creating your first menu to showcase your delicious offerings.</p>
-                <a href="{% url 'menus:menu_create' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus me-2"></i>Create Your First Menu
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    {% if is_paginated %}
-    <nav aria-label="Menu pagination" class="mt-5">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1" aria-label="First">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
-                </li>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
+  </div>
+  <div class="row">
+    {% for menu in menus %}
+    <div class="col-md-6 col-lg-4 mb-3">
+      <div class="card shadow-sm border-0 minimal-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">{{ menu.name }}</h5>
+            <span class="badge {% if menu.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+              {% if menu.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+          </div>
+          <p class="text-muted mb-2 minimal-items">
+            {{ menu.items.count }} items
+            <span class="d-block mt-2">
+              {% for item in menu.items.all|slice:":3" %}
+                {% if item.image %}
+                  <img src="{% cloudinary_url item.image.public_id width=40 height=40 crop='fill' gravity='auto' %}" alt="{{ item.name }}" class="img-fluid rounded me-1" style="max-width:40px; max-height:40px;">
                 {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteMenuModal" tabindex="-1" aria-labelledby="deleteMenuModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteMenuModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the menu <strong id="menuNameToDelete"></strong>?</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-warning me-2"></i>
-                    <strong>Warning:</strong> This action cannot be undone. All menu items will also be deleted.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteMenuForm" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash me-2"></i>Delete Menu
-                    </button>
-                </form>
+              {% endfor %}
+              {% if menu.items.count > 3 %}
+                <span class="text-muted small">+{{ menu.items.count|add:"-3" }} more</span>
+              {% endif %}
+            </span>
+          </p>
+            <div class="d-flex gap-2">
+              <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-outline-secondary btn-sm">View</a>
+              <a href="{% url 'menus:edit_menu' menu.pk %}" class="btn btn-outline-primary btn-sm flex-grow-1">Edit</a>
+              <form method="post" action="{% url 'menus:menu_toggle_status' menu.pk %}">
+                {% csrf_token %}
+                {% if menu.is_active %}
+                  <button type="submit" class="btn btn-outline-warning btn-sm">Deactivate</button>
+                {% else %}
+                  <button type="submit" class="btn btn-outline-success btn-sm">Activate</button>
+                {% endif %}
+              </form>
+              <form method="post" action="{% url 'menus:delete_menu' menu.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+              </form>
             </div>
         </div>
+      </div>
     </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <p class="lead mb-4">No menus yet. Create your first menu to get started.</p>
+      <a href="{% url 'menus:menu_create' %}" class="btn btn-primary">Create Menu</a>
+    </div>
+    {% endfor %}
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
-    const searchInput = document.getElementById('menuSearch');
-    const searchBtn = document.getElementById('searchBtn');
-    const menuItems = document.querySelectorAll('.menu-item');
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    
-    let currentFilter = 'all';
-    
-    // Search function
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        
-        menuItems.forEach(item => {
-            const menuName = item.dataset.menuName;
-            const menuStatus = item.dataset.menuStatus;
-            
-            const matchesSearch = menuName.includes(searchTerm);
-            const matchesFilter = currentFilter === 'all' || menuStatus === currentFilter;
-            
-            if (matchesSearch && matchesFilter) {
-                item.style.display = 'block';
-                item.classList.add('fade-in');
-            } else {
-                item.style.display = 'none';
-                item.classList.remove('fade-in');
-            }
-        });
-        
-        // Show/hide empty state
-        const visibleMenus = document.querySelectorAll('.menu-item[style="display: block"], .menu-item:not([style*="display: none"])');
-        updateEmptyState(visibleMenus.length === 0 && searchTerm !== '');
-    }
-    
-    // Filter function
-    function applyFilter(filter) {
-        currentFilter = filter;
-        
-        // Update active tab
-        filterTabs.forEach(tab => {
-            tab.classList.remove('active');
-        });
-        document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
-        
-        performSearch();
-    }
-    
-    // Update empty state
-    function updateEmptyState(show) {
-        let emptyState = document.querySelector('.search-empty-state');
-        
-        if (show && !emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.className = 'col-12 search-empty-state';
-            emptyState.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h3>No Menus Found</h3>
-                    <p>Try adjusting your search terms or filters.</p>
-                    <button class="btn btn-outline-primary" onclick="clearSearch()">
-                        <i class="fas fa-times me-2"></i>Clear Search
-                    </button>
-                </div>
-            `;
-            document.getElementById('menusContainer').appendChild(emptyState);
-        } else if (!show && emptyState) {
-            emptyState.remove();
-        }
-    }
-    
-    // Clear search
-    window.clearSearch = function() {
-        searchInput.value = '';
-        currentFilter = 'all';
-        filterTabs.forEach(tab => tab.classList.remove('active'));
-        document.querySelector('[data-filter="all"]').classList.add('active');
-        performSearch();
-    };
-    
-    // Event listeners
-    searchInput.addEventListener('input', performSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            performSearch();
-        }
-    });
-    
-    searchBtn.addEventListener('click', performSearch);
-    
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            applyFilter(this.dataset.filter);
-        });
-    });
-    
-    // Delete menu functionality
-    const deleteButtons = document.querySelectorAll('.delete-menu-btn');
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteMenuModal'));
-    const deleteForm = document.getElementById('deleteMenuForm');
-    const menuNameElement = document.getElementById('menuNameToDelete');
-    
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const menuId = this.dataset.menuId;
-            const menuName = this.dataset.menuName;
-
-            menuNameElement.textContent = menuName;
-            // Set the form action dynamically using menuId
-            deleteForm.action = `/menus/${menuId}/delete/`;
-            deleteModal.show();
-        });
-    });
-    
-    // Auto-refresh stats (optional)
-    setInterval(function() {
-        // You can implement auto-refresh of stats here if needed
-        // fetch('/api/menu-stats/').then(response => response.json()).then(data => {
-        //     // Update stats display
-        // });
-    }, 30000); // Refresh every 30 seconds
-    
-    // Smooth scroll for pagination
-    document.querySelectorAll('.pagination a').forEach(link => {
-        link.addEventListener('click', function(e) {
-            // Add smooth scrolling to top when changing pages
-            setTimeout(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }, 100);
-        });
-    });
-    
-    // Toast notifications for actions
-    function showToast(message, type = 'success') {
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed`;
-        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-check-circle me-2"></i>${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        
-        // Remove from DOM after hiding
-        toast.addEventListener('hidden.bs.toast', () => {
-            toast.remove();
-        });
-    }
-    
-    // Show success message if present in URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    const successMessage = urlParams.get('success');
-    if (successMessage) {
-        showToast(decodeURIComponent(successMessage));
-        // Clean URL without reload
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-});
-</script>
 {% endblock %}

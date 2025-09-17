@@ -64,6 +64,7 @@
               </a>
             {% else %}
               <span class="btn btn-secondary btn-lg w-100 disabled">No menu available</span>
+              {% endif %}
           </div>
           {% if profile.social_links.all %}
             <section class="mt-auto pt-3 fade-in-section">
@@ -97,7 +98,6 @@
     </div>
   </div>
 </div>
-{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -107,7 +107,7 @@
   // This function will be called by the Google Maps API script
   function initMap() {
     // The location of the restaurant
-    const location = { lat: {{ map_center.lat }}, lng: {{ map_center.lng }} };
+    const location = { lat: parseFloat("{{ map_center.lat }}"), lng: parseFloat("{{ map_center.lng }}") };
     
     // The map, centered at the restaurant's location
     const map = new google.maps.Map(document.getElementById("map"), {

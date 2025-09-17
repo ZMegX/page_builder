@@ -94,61 +94,91 @@ React.useEffect(() => {
   }
 
   return (
-    <>
-      {selectedMenu && selectedMenu.photo && (
-        <img
-          src={`https://res.cloudinary.com/dgmvyic4g/${selectedMenu.photo}`}
-          alt={selectedMenu.name}
-          style={{ width: '200px', marginBottom: '16px', objectFit: 'cover', borderRadius: '8px' }}
-        />
-      )}
-      <select value={selectedMenuId || ''} onChange={e => setSelectedMenuId(Number(e.target.value))}>
-        {menus.map(menu => (
-          <option key={menu.id} value={menu.id}>{menu.name}</option>
-        ))}
-      </select>
-      <Button onClick={() => { setEditingItem(null); setShowModal(true); }} className="mb-3">Create Item</Button>
-      <MenuItemModal
-        show={showModal}
-        item={editingItem}
-        onSave={handleSave}
-        onClose={() => setShowModal(false)}
-      />
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="menu">
-          {(provided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {items.map((item, idx) => (
-                <Draggable key={item.id} draggableId={item.id} index={idx}>
-                  {(provided) => (
-                    <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="mb-2">
-                      {/* Improved Cloudinary image logic */}
-                      {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
-                        <div className="card-img-top" style={{ textAlign: 'center', marginTop: '12px' }}>
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }}
-                            onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
-                          />
-                        </div>
-                      ) : null}
-                      <Card.Body>
-                        <Card.Title>{item.name}</Card.Title>
-                        <Card.Text>Section: {item.section} | Price: ${item.price}</Card.Text>
-                        <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)}>Delete</Button>
-                        <Button onClick={() => { setEditingItem(item); setShowModal(true); }} className="ms-2">Edit</Button>
-                      </Card.Body>
-                    </Card>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
+    <div className="container py-4" style={{ maxWidth: '900px' }}>
+      {/* Header Card */}
+      <div className="card mb-4 shadow-sm border-0" style={{ borderRadius: '16px' }}>
+        <div className="card-body">
+          <div className="row align-items-center">
+            <div className="col-md-8">
+              <div className="d-flex align-items-center mb-3">
+                <h2 className="me-3 mb-0">{selectedMenu ? selectedMenu.name : 'Menu'}</h2>
+                {selectedMenu && (
+                  <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>{selectedMenu.is_active ? 'Active' : 'Inactive'}</span>
+                )}
+              </div>
+              <div className="d-flex gap-2 mb-2">
+                <select value={selectedMenuId || ''} onChange={e => setSelectedMenuId(Number(e.target.value))} className="form-select" style={{ maxWidth: '260px', fontSize: '1.1em', borderRadius: '8px' }}>
+                  {menus.map(menu => (
+                    <option key={menu.id} value={menu.id}>{menu.name}</option>
+                  ))}
+                </select>
+                <Button onClick={() => { setEditingItem(null); setShowModal(true); }} className="mb-0" style={{ fontWeight: 500, fontSize: '1em', borderRadius: '8px' }}>Create Item</Button>
+              </div>
+              {selectedMenu && selectedMenu.items && (
+                <div className="mb-2 text-muted" style={{ fontSize: '1em' }}>{selectedMenu.items.length} items</div>
+              )}
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </>
+            <div className="col-md-4 text-center">
+              {selectedMenu && selectedMenu.photo && (
+                <img
+                  src={`https://res.cloudinary.com/dgmvyic4g/${selectedMenu.photo}`}
+                  alt={selectedMenu.name}
+                  className="img-fluid rounded shadow"
+                  style={{ maxHeight: '160px', objectFit: 'cover', borderRadius: '12px' }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Items Card */}
+      <div className="card shadow-sm border-0" style={{ borderRadius: '16px' }}>
+        <div className="card-body">
+          <MenuItemModal
+            show={showModal}
+            item={editingItem}
+            onSave={handleSave}
+            onClose={() => setShowModal(false)}
+          />
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="menu" direction="horizontal">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'flex', flexWrap: 'wrap', gap: '18px', minHeight: '120px' }}>
+                  {items.map((item, idx) => (
+                    <Draggable key={item.id} draggableId={item.id} index={idx}>
+                      {(provided) => (
+                        <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={{ minWidth: '220px', maxWidth: '260px', flex: '1 1 220px', marginBottom: '0', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '10px', border: '1px solid #e3e3e3', background: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
+                            <div className="card-img-top" style={{ textAlign: 'center', marginTop: '12px' }}>
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                style={{ maxWidth: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}
+                                onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
+                              />
+                            </div>
+                          ) : null}
+                          <Card.Body style={{ padding: '14px 12px 10px 12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Card.Title style={{ fontWeight: 600, fontSize: '1.08em', marginBottom: '6px' }}>{item.name}</Card.Title>
+                            <Card.Text style={{ fontSize: '0.98em', color: '#555', marginBottom: '8px' }}>Section: <span style={{ fontWeight: 500 }}>{item.section}</span> | Price: <span style={{ color: '#007bff', fontWeight: 600 }}>${item.price}</span></Card.Text>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
+                              <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)} style={{ borderRadius: '6px', fontWeight: 500 }}>Delete</Button>
+                              <Button onClick={() => { setEditingItem(item); setShowModal(true); }} size="sm" style={{ borderRadius: '6px', fontWeight: 500, background: '#f8f9fa', color: '#007bff', border: '1px solid #007bff' }}>Edit</Button>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+      </div>
+    </div>
   );
 }
 
