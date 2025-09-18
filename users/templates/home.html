@@ -16,10 +16,18 @@
     </div>
   </form>
   <div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-12 mb-4">
+      <div class="card shadow-sm rounded-4">
+        <div class="card-body p-2">
+          <h2 class="h5">All Restaurants on Map</h2>
+          <div id="restaurants-map" style="height: 320px; width: 100%; position:sticky;" class="rounded"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
       <h2 class="h5 mb-3">Restaurant List ({{ restaurants|length }})</h2>
       {% for restaurant in restaurants %}
-  <div class="card mb-4 shadow-sm rounded-4">
+      <div class="card mb-4 shadow-sm rounded-4">
         <div class="row g-0">
           {% if restaurant.logo %}
             <div class="col-md-4 d-flex align-items-center justify-content-center">
@@ -55,14 +63,6 @@
       {% empty %}
       <div class="alert alert-warning">No restaurants found.</div>
       {% endfor %}
-    </div>
-    <div class="col-lg-5 mt-4 mt-lg-0">
-      <div class="card shadow-sm rounded-4">
-        <div class="card-body p-2">
-          <h2 class="h5 mb-3">All Restaurants on Map</h2>
-          <div id="restaurants-map" style="height: 500px; width: 100%; position:sticky; top:80px;" class="rounded"></div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
