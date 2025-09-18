@@ -4,6 +4,7 @@ from django.contrib.auth import views as auth_views
 from users.forms import CustomSetPasswordForm
 from users.views_restaurant import browse_restaurants
 urlpatterns = [
+    path('', views.home, name='home'),
     path('register/', views.register, name='register'),
     path("accounts/", include("django.contrib.auth.urls")),
     path('profile/', views.profile_manage, name='profile'),

@@ -10,8 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Home page
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
-
+path('', user_views.home, name='home'),
     # Registration flow
     path('register/', user_views.register, name='register'),
     # Django's built-in authentication URLs (login, logout, password management)

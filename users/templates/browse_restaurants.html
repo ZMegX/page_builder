@@ -60,30 +60,26 @@
 {% block extra_js %}
 <script>
   // Prepare restaurant data for JS
-  const restaurants = [
-{% for restaurant in restaurants %}
-  {
-    name: "{{ restaurant.name|escapejs }}",
-    {% if restaurant.addresses.first %}
-      lat: {{ restaurant.addresses.first.latitude|default_if_none:"null" }},
-      lng: {{ restaurant.addresses.first.longitude|default_if_none:"null" }},
-      address: "{{ restaurant.addresses.first.formatted_address|default_if_none:''|escapejs }}",
-    {% else %}
-      lat: null,
-      lng: null,
-      address: "",
-    {% endif %}
-    url: "{% if restaurant.slug %}{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}{% else %}#{% endif %}",
-    logo: "{{ restaurant.logo.url|default:'' }}"
-  }{% if not forloop.last %},{% endif %}
-{% endfor %}
+  const addresses = [
+    {% for restaurant in restaurants %}
+      {% for address in restaurant.addresses.all %}
+        {
+          name: "{{ restaurant.name|escapejs }}",
+          lat: {{ address.latitude|default_if_none:"null" }},
+          lng: {{ address.longitude|default_if_none:"null" }},
+          address: "{{ address.formatted_address|default_if_none:''|escapejs }}",
+          url: "{% if restaurant.slug %}{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}{% else %}#{% endif %}",
+          logo: "{{ restaurant.logo.url|default:'' }}"
+        }{% if not forloop.last or not forloop.parentloop.last %},{% endif %}
+      {% endfor %}
+    {% endfor %}
   ];
 
   function initRestaurantsMap() {
-    if (!restaurants.length) return;
+    if (!addresses.length) return;
     const map = new google.maps.Map(document.getElementById('restaurants-map'), {
       zoom: 12,
-      center: {lat: restaurants[0].lat || 48.8566, lng: restaurants[0].lng || 2.3522},
+      center: {lat: addresses[0].lat || 48.8566, lng: addresses[0].lng || 2.3522},
       mapTypeControl: false,
       streetViewControl: false,
     });
@@ -91,7 +87,7 @@
     const bounds = new google.maps.LatLngBounds();
     let hasMarker = false;
 
-    restaurants.forEach(r => {
+    addresses.forEach(r => {
       if (r.lat && r.lng) {
         hasMarker = true;
         const marker = new google.maps.Marker({

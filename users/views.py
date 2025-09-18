@@ -1,3 +1,5 @@
+from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -23,6 +25,31 @@ def documentation(request):
 def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
+def home(request):
+    q = request.GET.get('q', '')
+    restaurants = RestaurantProfile.objects.prefetch_related('addresses')
+    if q:
+        restaurants = restaurants.filter(
+            Q(name__icontains=q) |
+            Q(cuisine_type__icontains=q) |
+            Q(registration_number__icontains=q) |
+            Q(phone_number__icontains=q) |
+            Q(slug__icontains=q) |
+            Q(addresses__formatted_address__icontains=q)
+        ).distinct()
+    print("--- DEBUG: home view entered ---")
+    print(f"Search query: '{q}'")
+    print(f"Restaurant count: {restaurants.count()}")
+    for r in restaurants:
+        print(f"- {r.name} | Cuisine: {r.cuisine_type} | Slug: {r.slug} | Addresses: {r.addresses.count()}")
+        for addr in r.addresses.all():
+            print(f"  Address: {addr.formatted_address} | lat={addr.latitude} | lng={addr.longitude}")
+    print("--- DEBUG: END ---")
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+    return render(request, 'home.html', {
+        'restaurants': restaurants,
+        'GOOGLE_MAPS_API_KEY': key,
+    })
 
 def register(request):
     if request.method == 'POST':
@@ -142,7 +169,7 @@ def address_add_ajax(request):
 
 @login_required
 def restaurant_profile_manage(request):
-    rp_form, _ = RestaurantProfile.objects.get_or_create(user=request.user)
+    restaurant_profile, _ = RestaurantProfile.objects.get_or_create(user=request.user)
     SocialLinkFormSet = modelformset_factory(SocialLink, fields=('name', 'url'), extra=1, can_delete=True)
     OpeningHourFormSet = modelformset_factory(OpeningHour, fields=('day_of_week', 'open_time', 'close_time'), extra=1, can_delete=True)
 
