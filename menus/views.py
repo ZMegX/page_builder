@@ -73,6 +73,10 @@ class MenuCreateView(LoginRequiredMixin, CreateView):
         else:
             context["formset"] = MenuItemFormSet()
         context["title"] = "Create New Menu"
+        # Add quick stats for the sidebar
+        user_menus_count = Menu.objects.filter(owner=user).count()
+        context["user_menus_count"] = user_menus_count
+        # Optionally add more stats here (active_menus_count, total_items_count, etc.)
         return context
     
     
