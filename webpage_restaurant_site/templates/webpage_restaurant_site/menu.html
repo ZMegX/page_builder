@@ -4,88 +4,74 @@
 {% block title %}{{ profile.name }} — Menu{% endblock %}
 {% block extra_css %}
 <style>
-  .menu-guest-container {
-    max-width: 480px;
-    margin: 0 auto;
-    padding-top: 48px;
-  }
-  .menu-guest-card {
-    border-radius: 1.2rem;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  .menu-modern-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
     background: #fff;
     padding: 2.5rem 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     border: none;
+    transition: box-shadow 0.2s;
   }
-  .menu-guest-header {
-    text-align: center;
-    margin-bottom: 2rem;
+  .menu-modern-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
   }
-  .menu-guest-logo {
-    max-width: 120px;
-    max-height: 120px;
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  }
-  .menu-guest-title {
-    font-size: 2rem;
+  .menu-modern-section-title {
+    font-size: 1.4rem;
     font-weight: 700;
     color: #222;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    margin-top: 2.5rem;
+    letter-spacing: 0.01em;
   }
-  .menu-guest-badge {
-    font-size: 1rem;
-    border-radius: 1rem;
-    padding: 0.3rem 1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-  .menu-guest-section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #007bff;
-    margin-bottom: 1rem;
-    margin-top: 2rem;
-  }
-  .menu-guest-item {
+  .menu-modern-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f2f2f2;
+    background: #fafbfc;
+    border-radius: 1rem;
+    transition: box-shadow 0.2s;
   }
-  .menu-guest-item:last-child {
+  .menu-modern-item:last-child {
     border-bottom: none;
   }
-  .menu-guest-item-img {
-    width: 60px;
-    height: 60px;
+  .menu-modern-item-img {
+    width: 90px;
+    height: 90px;
     object-fit: cover;
-    border-radius: 0.7rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     background: #f8f9fa;
+    flex-shrink: 0;
   }
-  .menu-guest-item-info {
+  .menu-modern-item-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
-  .menu-guest-item-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.2rem;
+  .menu-modern-item-name {
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
     color: #222;
+    letter-spacing: 0.01em;
   }
-  .menu-guest-item-desc {
-    font-size: 0.98rem;
+  .menu-modern-item-desc {
+    font-size: 1.02rem;
     color: #555;
     margin-bottom: 0.2rem;
+    line-height: 1.5;
   }
-  .menu-guest-item-price {
-    font-size: 1.08rem;
+  .menu-modern-item-price {
+    font-size: 1.15rem;
     font-weight: 700;
-    color: #007bff;
-    margin-left: 0.5rem;
+    color: #00c46a;
+    margin-top: 0.2rem;
+    align-self: flex-end;
   }
   /* Map container style */
   #menu-map {
@@ -180,47 +166,22 @@
     </div>
   </div>
   <!-- Menu Items Section -->
-  <div class="menu-guest-card">
+  <div class="menu-modern-card">
     {% for menu in menus %}
-      <div class="menu-guest-section-title">{{ menu.name }}</div>
+      <div class="menu-modern-section-title">{{ menu.name }}</div>
       {% for item in menu.items.all %}
-        <div class="menu-guest-item">
-          {% if item.image %}
-            <img src="{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}" class="menu-guest-item-img" alt="{{ item.name }}">
-          {% else %}
-            <img src="{% static 'default_profile_pic.png' %}" class="menu-guest-item-img" alt="No image" style="object-fit:cover;">
-          {% endif %}
-          <div class="menu-guest-item-info">
-            <div class="menu-guest-item-name">{{ item.name }}</div>
+        <div class="menu-modern-item">
+          <img
+            src="{% if item.image %}{% cloudinary_url item.image.public_id width=90 height=90 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
+            class="menu-modern-item-img"
+            alt="{{ item.name }}">
+          <div class="menu-modern-item-info">
+            <div class="menu-modern-item-name">{{ item.name }}</div>
             {% if item.description %}
-              <div class="menu-guest-item-desc">{{ item.description }}</div>
+              <div class="menu-modern-item-desc">{{ item.description }}</div>
             {% endif %}
+            <div class="menu-modern-item-price">${{ item.price|floatformat:2 }}</div>
           </div>
-          <div class="menu-guest-item-price">${{ item.price|floatformat:2 }}</div>
-        </div>
-      {% empty %}
-        <div class="text-muted text-center mb-3">This menu currently has no items.</div>
-      {% endfor %}
-    {% empty %}
-      <div class="text-muted text-center mb-3">No active menus found for this restaurant.</div>
-    {% endfor %}
-  </div>
-  <!-- Menu Items Section -->
-  <div class="menu-guest-card">
-    {% for menu in menus %}
-      <div class="menu-guest-section-title">{{ menu.name }}</div>
-      {% for item in menu.items.all %}
-        <div class="menu-guest-item">
-          {% if item.image %}
-            <img src="{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}" class="menu-guest-item-img" alt="{{ item.name }}">
-          {% endif %}
-          <div class="menu-guest-item-info">
-            <div class="menu-guest-item-name">{{ item.name }}</div>
-            {% if item.description %}
-              <div class="menu-guest-item-desc">{{ item.description }}</div>
-            {% endif %}
-          </div>
-          <div class="menu-guest-item-price">${{ item.price|floatformat:2 }}</div>
         </div>
       {% empty %}
         <div class="text-muted text-center mb-3">This menu currently has no items.</div>
