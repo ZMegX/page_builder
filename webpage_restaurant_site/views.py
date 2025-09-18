@@ -100,12 +100,20 @@ def restaurant_menu(request, slug):
              .prefetch_related("items")
              .order_by("name"))
 
-    return render(request, 
-        "webpage_restaurant_site/menu.html", 
-        {
-            "profile": profile,
-            "menus": menus,
-            "slug": _slug_fallback(profile) if profile else "",
-        },   
-    )
+    address = _primary_address(profile)
+    status = _opening_status(profile)
+    lat = float(address.latitude) if address and hasattr(address, 'latitude') and address.latitude is not None else None
+    lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    context = {
+        "profile": profile,
+        "menus": menus,
+        "slug": _slug_fallback(profile) if profile else "",
+        "address": address,
+        "status": status,
+        "GOOGLE_MAPS_API_KEY": key,
+        "map_center": {"lat": lat, "lng": lng},
+    }
+    return render(request, "webpage_restaurant_site/menu.html", context)
 
