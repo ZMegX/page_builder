@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
+from django.conf import settings
 
 
 class SocialLink(models.Model):
@@ -62,3 +63,19 @@ class RestaurantProfile(models.Model):
                     base = str(self.pk or '')
             self.slug = slugify(base)
         super().save(*args, **kwargs)
+
+
+class Review(models.Model):
+    restaurant = models.ForeignKey(RestaurantProfile, related_name="reviews", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    reviewer_name = models.CharField(max_length=100, blank=True)  # For anonymous reviews
+    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    comment = models.TextField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=True)  # For moderation, if needed
+
+    def __str__(self):
+        return f"Review for {self.restaurant.name}: {self.rating} stars"
+
+    class Meta:
+        ordering = ['-created_at']

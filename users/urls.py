@@ -2,7 +2,7 @@ from django.urls import path, include
 from users import views, ajax_views, views_restaurant
 from django.contrib.auth import views as auth_views
 from users.forms import CustomSetPasswordForm
-from users.views_restaurant import browse_restaurants
+from users.views_restaurant import browse_restaurants, leave_review, restaurant_reviews
 urlpatterns = [
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
@@ -28,4 +28,7 @@ urlpatterns = [
     path('why-choose-us/', views.why_choose_us, name='why_choose_us'),
     path('restaurants/', browse_restaurants, name='browse_restaurants'),
     path('docs/', views.documentation, name='docs'),
+    path('review/<int:restaurant_pk>/', leave_review, name='leave_review'),
+    # users/urls.py
+    path('restaurant/<int:restaurant_pk>/reviews/', restaurant_reviews, name='restaurant_reviews'),
 ]

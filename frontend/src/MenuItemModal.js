@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
 function MenuItemModal({ show, item, onSave, onClose }) {
+  const SECTION_CHOICES = [
+    { value: 'breakfast', label: 'Breakfast' },
+    { value: 'lunch', label: 'Lunch' },
+    { value: 'dinner', label: 'Dinner' },
+    { value: 'dessert', label: 'Dessert' },
+    { value: 'drinks', label: 'Drinks' },
+    { value: 'appetizers', label: 'Appetizers' },
+    { value: 'sides', label: 'Sides' },
+    { value: 'specials', label: 'Specials' },
+    { value: 'vegan', label: 'Vegan' },
+    { value: 'gluten_free', label: 'Gluten Free' },
+    { value: 'kids', label: "Kids' Menu" },
+    { value: 'hot_drinks', label: 'Hot Drinks' }
+  ];
   const [form, setForm] = useState({
     name: '',
     section: 'breakfast',
@@ -84,12 +98,10 @@ function MenuItemModal({ show, item, onSave, onClose }) {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Section</Form.Label>
-            <Form.Select name="section" value={form.section} onChange={handleChange}>
-              <option value="breakfast">Breakfast</option>
-              <option value="lunch">Lunch</option>
-              <option value="dinner">Dinner</option>
-              <option value="dessert">Dessert</option>
-              <option value="drinks">Drinks</option>
+             <Form.Select name="section" value={form.section} onChange={handleChange}>
+              {SECTION_CHOICES.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">

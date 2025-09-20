@@ -24,31 +24,36 @@ function MenuEditor() {
   const [selectedMenuId, setSelectedMenuId] = React.useState(null);
   const [items, setItems] = React.useState([]);
   const selectedMenu = menus.find(m => m.id === selectedMenuId);
+  const [menuName, setMenuName] = React.useState(selectedMenu ? selectedMenu.name : '');
 
   React.useEffect(() => {
-  fetch('http://localhost:8000/api/menus/')
-    .then(res => res.json())
-    .then(data => {
-      const userMenus = data.filter(menu => menu.owner === window.userId);
-      setMenus(userMenus);
-      if (userMenus.length > 0) {
-        setSelectedMenuId(userMenus[0].id);
-        setItems(userMenus[0].items);
-      }
-    });
-}, []);
+    fetch('http://localhost:8000/api/menus/')
+      .then(res => res.json())
+      .then(data => {
+        const userMenus = data.filter(menu => menu.owner === window.userId);
+        setMenus(userMenus);
+        if (userMenus.length > 0) {
+          setSelectedMenuId(userMenus[0].id);
+          setItems(userMenus[0].items);
+        }
+      });
+  }, []);
 
-React.useEffect(() => {
-  const menu = menus.find(m => m.id === selectedMenuId);
-  setItems(menu ? menu.items : []);
-}, [selectedMenuId, menus]);
+  React.useEffect(() => {
+    const menu = menus.find(m => m.id === selectedMenuId);
+    setItems(menu ? menu.items : []);
+  }, [selectedMenuId, menus]);
+
+  React.useEffect(() => {
+  setMenuName(selectedMenu ? selectedMenu.name : '');
+}, [selectedMenu]);
 
   const [showModal, setShowModal] = React.useState(false);
   const [editingItem, setEditingItem] = React.useState(null);
 
   function handleSave(item) {
-    // Always include menu field in payload
     const payload = { ...item, menu: selectedMenuId };
+    console.log('Saving item:', payload);
     if (item.id) {
       // Edit
       fetch(`/api/menu-items/${item.id}/`, {
@@ -59,8 +64,15 @@ React.useEffect(() => {
         },
         body: JSON.stringify(payload),
       })
-        .then(res => res.json())
-        .then(updated => setItems(items.map(i => i.id === updated.id ? updated : i)));
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to save');
+          return res.json();
+        })
+        .then(updated => {
+          setItems(items.map(i => i.id === updated.id ? updated : i));
+          setShowModal(false);
+        })
+        .catch(err => alert('error saving item: ' + err.message));
     } else {
       // Create
       fetch('/api/menu-items/', {
@@ -71,17 +83,23 @@ React.useEffect(() => {
         },
         body: JSON.stringify(payload),
       })
-        .then(res => res.json())
-        .then(created => setItems([...items, created]));
+        .then(res => {
+          if (!res.ok) throw new Error('failed to create');
+          return res.json();
+        })
+        .then(created => {
+          setItems([...items, created]);
+          setShowModal(false);
+        })
+        .catch(err => alert('Error creating item: ' + err.message));
     }
-    setShowModal(false);
   }
 
   function handleDelete(id) {
     fetch(`/api/menu-items/${id}/`, { 
       method: 'DELETE',
       headers: { 'X-CSRFToken': csrftoken },
-     })
+    })
       .then(() => setItems(items.filter(i => i.id !== id)));
   }
 
@@ -93,6 +111,26 @@ React.useEffect(() => {
     setItems(newItems);
   }
 
+  function handleMenuNameSave() {
+  if (!selectedMenu) return;
+  fetch(`/api/menus/${selectedMenu.id}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken,
+    },
+    body: JSON.stringify({ ...selectedMenu, name: menuName }),
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to save menu name');
+      return res.json();
+    })
+    .then(updated => {
+      setMenus(menus.map(m => m.id === updated.id ? updated : m));
+    })
+    .catch(err => alert('Error saving menu name: ' + err.message));
+}
+
   return (
     <div className="container py-4" style={{ maxWidth: '900px' }}>
       {/* Header Card */}
@@ -101,7 +139,27 @@ React.useEffect(() => {
           <div className="row align-items-center">
             <div className="col-md-8">
               <div className="d-flex align-items-center mb-3">
-                <h2 className="me-3 mb-0">{selectedMenu ? selectedMenu.name : 'Menu'}</h2>
+                <input
+                  type="text"
+                  value={menuName}
+                  onChange={e => setMenuName(e.target.value)}
+                  className="form-control"
+                  style={{ fontWeight: 700, fontSize: '1.3em', maxWidth: '320px', marginRight: '1em' }}
+                />
+                {selectedMenu && (
+                  <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                    {selectedMenu.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                )}
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  style={{ marginLeft: '1em' }}
+                  onClick={handleMenuNameSave}
+                >
+                  Save Name
+                </Button>
+              </div>
                 {selectedMenu && (
                   <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>{selectedMenu.is_active ? 'Active' : 'Inactive'}</span>
                 )}
@@ -130,7 +188,6 @@ React.useEffect(() => {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Menu Items Card */}
       <div className="card shadow-sm border-0" style={{ borderRadius: '16px' }}>
