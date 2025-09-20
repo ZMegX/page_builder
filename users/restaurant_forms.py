@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from .models import RestaurantProfile, SocialLink, OpeningHour
+from users.models import Review
 
 DAYS_OF_WEEK = [
     ("Monday", "Monday"),
@@ -68,3 +69,13 @@ OpeningHourFormSet = inlineformset_factory(
     max_num=7,
     can_delete=False,
 )
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment', 'reviewer_name']
+        widgets = {
+            'rating': forms.RadioSelect(choices=[(i, f"{i} Stars") for i in range(1, 6)]),
+            'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your review...'}),
+            'reviewer_name': forms.TextInput(attrs={'placeholder': 'Your name (optional)'}),
+        }

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2>Reviews for {{ restaurant.name }}</h2>
+  {% for review in reviews %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <strong>{{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}</strong>
+        <span class="badge bg-warning">{{ review.rating }}★</span>
+        <p>{{ review.comment }}</p>
+        <small class="text-muted">{{ review.created_at|date:"SHORT_DATE_FORMAT" }}</small>
+      </div>
+    </div>
+  {% empty %}
+    <p>No reviews yet for this restaurant.</p>
+  {% endfor %}
+</div>
+{% endblock %}

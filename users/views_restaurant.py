@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.conf import settings
 
@@ -9,9 +9,12 @@ from .restaurant_forms import (
     SocialLinkFormSet,
     OpeningHourFormSet,
     RestaurantProfileForm,
+    ReviewForm,
 )
 from locations.models import UserAddress
 from django.db.models import Q
+from users.models import Review
+
 
 
 @login_required
@@ -70,3 +73,27 @@ def browse_restaurants(request):
         'restaurants': restaurants,
         'GOOGLE_MAPS_API_KEY': key,
     })
+
+def restaurant_reviews(request, restaurant_pk):
+    restaurant = get_object_or_404(RestaurantProfile, pk=restaurant_pk)
+    reviews = restaurant.reviews.filter(is_approved=True)
+    return render(request, "users/restaurant_reviews.html", {
+        "restaurant": restaurant,
+        "reviews": reviews,
+    })
+
+
+def leave_review(request, restaurant_pk):
+    restaurant = get_object_or_404(RestaurantProfile, pk=restaurant_pk)
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.restaurant = restaurant
+            if request.user.is_authenticated:
+                review.user = request.user
+            review.save()
+            messages.success(request, "Thank you for your review!")
+        else:
+            messages.error(request, "There was an error with your review. Please check the form.")
+    return redirect('home')

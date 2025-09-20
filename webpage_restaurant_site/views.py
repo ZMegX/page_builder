@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect, Http404
 import calendar
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render
@@ -7,19 +8,24 @@ from menus.models import Menu
 from locations.models import UserAddress
 from django.db.models import Q
 
-def _get_profile(slug: str) -> RestaurantProfile:
-    """
-    Resolves a restaurant profile from a slug.
-    """
-    qs = RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours")
-    try:
-        return qs.get(slug=slug)
-    except RestaurantProfile.DoesNotExist:
-        try:
-            return qs.get(slug=slug)
-        except RestaurantProfile.DoesNotExist:
-            return qs.get(slug=slug)
+    
+def restaurant_landing(request, slug):
+    profile = get_object_or_404(
+        RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours"),
+        slug=slug
+    )
 
+def redirect_to_restaurant_slug(request, username):
+    try:
+        user = User.objects.get(username=username)
+        profile = user.restaurant_profile
+        if profile and profile.slug:
+            return HttpResponseRedirect(f"/r/{profile.slug}/")
+        else:
+            raise Http404("No restaurant profile or slug found for this user.")
+    except (User.DoesNotExist, RestaurantProfile.DoesNotExist):
+        raise Http404("User or restaurant profile not found.")
+    
 def _primary_address(profile: RestaurantProfile):
     """
     Gets the most recently created address for the profile.
@@ -42,8 +48,7 @@ def _opening_status(profile: RestaurantProfile):
     return {"today_name": today_name, "today_hours": today_hours, "open_now": open_now}
 
 def _slug_fallback(profile: RestaurantProfile) -> str:
-    """Provides a fallback URL slug."""
-    return getattr(profile, "slug", None) or getattr(profile.user, "username", None) or str(profile.pk)
+    return profile.slug if profile and profile.slug else None
 
 def restaurant_landing(request, slug):
     """
@@ -52,8 +57,8 @@ def restaurant_landing(request, slug):
     print("\n--- DEBUG: restaurant_landing view entered ---")
     print(f"1. SLUG: '{slug}'")
     
-    profile = _get_profile(slug)
-    print(f"2. PROFILE FOUND: {profile.name if profile else 'None'}")
+    profile = RestaurantProfile.objects.select_related("user").get(slug=slug)    
+    print(f"2. RESTAURANTPROFILE FOUND: {profile.name if profile else 'None'}")
 
     if profile:
         all_addresses = list(profile.addresses.all())
@@ -89,18 +94,26 @@ def restaurant_menu(request, slug):
     """
     Renders the public menu page for a restaurant.
     """
-    profile = _get_profile(slug)
+    profile = get_object_or_404(RestaurantProfile.objects.select_related("user"), slug=slug)
     menus = (Menu.objects
              .filter(owner=profile.user, is_active=True)
              .prefetch_related("items")
              .order_by("name"))
 
-    return render(request, 
-        "webpage_restaurant_site/menu.html", 
-        {
-            "profile": profile,
-            "menus": menus,
-            "slug": _slug_fallback(profile) if profile else "",
-        },   
-    )
+    address = _primary_address(profile)
+    status = _opening_status(profile)
+    lat = float(address.latitude) if address and hasattr(address, 'latitude') and address.latitude is not None else None
+    lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    context = {
+        "profile": profile,
+        "menus": menus,
+        "slug": _slug_fallback(profile) if profile else "",
+        "address": address,
+        "status": status,
+        "GOOGLE_MAPS_API_KEY": key,
+        "map_center": {"lat": lat, "lng": lng},
+    }
+    return render(request, "webpage_restaurant_site/menu.html", context)
 

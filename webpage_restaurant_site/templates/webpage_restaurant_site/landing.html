@@ -58,9 +58,13 @@
             {% endif %}
           </div>
           <div class="my-4">
-            <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-primary btn-lg w-100">
-              <i class="bi bi-book-fill me-2"></i>View Menus
-            </a>
+            {% if slug %}
+              <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-primary btn-lg w-100">
+                <i class="bi bi-book-fill me-2"></i>View Menus
+              </a>
+            {% else %}
+              <span class="btn btn-secondary btn-lg w-100 disabled">No menu available</span>
+              {% endif %}
           </div>
           {% if profile.social_links.all %}
             <section class="mt-auto pt-3 fade-in-section">
@@ -103,7 +107,7 @@
   // This function will be called by the Google Maps API script
   function initMap() {
     // The location of the restaurant
-    const location = { lat: {{ map_center.lat }}, lng: {{ map_center.lng }} };
+    const location = { lat: parseFloat("{{ map_center.lat }}"), lng: parseFloat("{{ map_center.lng }}") };
     
     // The map, centered at the restaurant's location
     const map = new google.maps.Map(document.getElementById("map"), {

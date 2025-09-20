@@ -33,6 +33,13 @@ class MenuItem(models.Model):
         ('dinner', 'Dinner'),
         ('dessert', 'Dessert'),
         ('drinks', 'Drinks'),
+        ('appetizers', 'Appetizers'),
+        ('sides', 'Sides'),
+        ('specials', 'Specials'),
+        ('vegan', 'Vegan'),
+        ('gluten_free', 'Gluten Free'),
+        ('kids', "Kids' Menu"),
+        ('hot_drinks', 'Hot Drinks')
     ]
     
     menu = models.ForeignKey(Menu, related_name="items", on_delete=models.CASCADE)
