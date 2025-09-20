@@ -31,7 +31,14 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-    
+
+THEME_CHOICES = [
+    ('synthwave', 'Synthwave'),
+    ('elegant', 'Elegant'),
+    ('minimal', 'Minimal'),
+    # Add more themes as needed
+]
+
 class RestaurantProfile(models.Model):
     class Meta:
         verbose_name = "Restaurant Profile"
@@ -45,7 +52,12 @@ class RestaurantProfile(models.Model):
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
-
+    theme_choice = models.CharField(
+        max_length=32,
+        choices=THEME_CHOICES,
+        default='synthwave',
+        help_text="Select the theme for your restaurant page."
+    )
     def __str__(self):
         if self.profile and self.profile.user:
             return f"{self.profile.user.username} Restaurant Details"

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+{% block body_class %}{{ profile.theme_choice }}-theme{% endblock %}
+<link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">
 {% block title %}{{ profile.name }} — Restaurant{% endblock %}
-
 {% block content %}
 <div class="container py-4">
   <div class="card shadow-lg border-0 rounded-4 mb-5 bg-light fade-in-section">

@@ -1,0 +1,188 @@
+:root {
+  --synthwave-purple: #601BA6;
+  --synthwave-indigo: #5144A6;
+  --synthwave-darkblue: #141E59;
+  --synthwave-blue: #1B578C;
+  --synthwave-cyan: #49F2F2;
+}
+
+/* Scope all synthwave styles to .synthwave-theme body class */
+.synthwave-theme {
+  background: linear-gradient(135deg, var(--synthwave-darkblue) 0%, var(--synthwave-indigo) 100%) !important;
+  color: var(--synthwave-cyan);
+  font-family: 'Lato', 'Arial', sans-serif;
+}
+
+.synthwave-theme .menu-selection-card,
+.synthwave-theme .card,
+.synthwave-theme .menu-modern-card {
+  background: linear-gradient(120deg, rgba(96,27,166,0.92) 0%, rgba(73,242,242,0.18) 100%);
+  border: none;
+  border-radius: 2rem;
+  color: var(--synthwave-cyan);
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 0 24px 2px var(--synthwave-cyan),
+    0 0 48px 8px var(--synthwave-purple),
+    0 0 8px 2px var(--synthwave-blue);
+  animation: neon-glow 2s infinite alternate;
+}
+
+@keyframes neon-glow {
+  0% {
+    box-shadow:
+      0 0 24px 2px var(--synthwave-cyan),
+      0 0 48px 8px var(--synthwave-purple),
+      0 0 8px 2px var(--synthwave-blue);
+    filter: brightness(1.1);
+  }
+  100% {
+    box-shadow:
+      0 0 36px 6px var(--synthwave-cyan),
+      0 0 64px 16px var(--synthwave-purple),
+      0 0 16px 4px var(--synthwave-blue);
+    filter: brightness(1.3);
+  }
+}
+
+.synthwave-theme .menu-modern-section-title,
+.synthwave-theme .display-6,
+.synthwave-theme h1, 
+.synthwave-theme h2, 
+.synthwave-theme h3 {
+  color: var(--synthwave-cyan);
+  text-shadow:
+    0 0 8px var(--synthwave-cyan),
+    0 0 16px var(--synthwave-purple),
+    0 0 4px var(--synthwave-blue);
+  animation: neon-text 2s infinite alternate;
+}
+
+@keyframes neon-text {
+  0% { text-shadow: 0 0 8px var(--synthwave-cyan), 0 0 16px var(--synthwave-purple), 0 0 4px var(--synthwave-blue); }
+  100% { text-shadow: 0 0 16px var(--synthwave-cyan), 0 0 32px var(--synthwave-purple), 0 0 8px var(--synthwave-blue); }
+}
+
+.synthwave-theme .menu-modern-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--synthwave-blue);
+  background: linear-gradient(90deg, rgba(20,30,89,0.92) 0%, rgba(73,242,242,0.12) 100%);
+  border-radius: 1rem;
+  box-shadow:
+    0 0 6px 1px var(--synthwave-cyan),
+    0 0 12px 2px var(--synthwave-purple),
+    0 0 3px 1px var(--synthwave-blue);
+  animation: neon-glow-item 2s infinite alternate;
+}
+
+@keyframes neon-glow-item {
+  0% {
+    box-shadow:
+      0 0 6px 1px var(--synthwave-cyan),
+      0 0 12px 2px var(--synthwave-purple),
+      0 0 3px 1px var(--synthwave-blue);
+    filter: brightness(1.03);
+  }
+  100% {
+    box-shadow:
+      0 0 12px 2px var(--synthwave-cyan),
+      0 0 18px 4px var(--synthwave-purple),
+      0 0 6px 2px var(--synthwave-blue);
+    filter: brightness(1.08);
+  }
+}
+
+.synthwave-theme .menu-modern-item-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px var(--synthwave-blue);
+  background: var(--synthwave-indigo);
+  flex-shrink: 0;
+}
+
+.synthwave-theme .menu-modern-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--synthwave-cyan);
+}
+
+.synthwave-theme .menu-modern-item-name {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  color: var(--synthwave-purple);
+  letter-spacing: 0.01em;
+}
+
+.synthwave-theme .menu-modern-item-desc {
+  font-size: 1.02rem;
+  color: var(--synthwave-cyan);
+  margin-bottom: 0.2rem;
+  line-height: 1.5;
+}
+
+.synthwave-theme .menu-modern-item-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--synthwave-cyan);
+  margin-top: 0.2rem;
+  align-self: flex-end;
+}
+
+.synthwave-theme .btn-outline-secondary,
+.synthwave-theme .btn-primary,
+.synthwave-theme .btn {
+  background: linear-gradient(90deg, var(--synthwave-purple) 0%, var(--synthwave-blue) 100%);
+  color: var(--synthwave-cyan) !important;
+  border: none;
+  font-weight: 700;
+  border-radius: 1em;
+  padding: 0.5em 1.2em;
+  transition: background 0.2s;
+}
+
+.synthwave-theme .btn-outline-secondary:hover,
+.synthwave-theme .btn-primary:hover,
+.synthwave-theme .btn:hover {
+  background: linear-gradient(90deg, var(--synthwave-blue) 0%, var(--synthwave-purple) 100%);
+  color: var(--synthwave-cyan) !important;
+}
+
+.synthwave-theme .badge {
+  background: var(--synthwave-cyan) !important;
+  color: var(--synthwave-darkblue) !important;
+  font-weight: 700;
+  border-radius: 0.5em;
+}
+
+.synthwave-theme #menu-map,
+.synthwave-theme #map {
+  height: 240px;
+  margin-top: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 12px 2px var(--synthwave-blue);
+}
+
+.synthwave-theme a {
+  color: var(--synthwave-cyan);
+  text-decoration: underline;
+}
+
+.synthwave-theme a:hover {
+  color: var(--synthwave-purple);
+}
+
+.synthwave-theme .menu-bg-overlay {
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.12;
+}
