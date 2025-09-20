@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block body_class %}synthwave-theme{% endblock %}
+{% block body_class %}{{ profile.theme_choice }}-theme{% endblock %}
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">

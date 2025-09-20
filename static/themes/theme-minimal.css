@@ -1,0 +1,142 @@
+:root {
+  --minimal-dark: #252626;
+  --minimal-black: #0D0D0C;
+  --minimal-gray: #A6A6A6;
+  --minimal-light: #F2F2F2;
+  --minimal-mid: #BFBFBF;
+}
+
+/* Scope all minimal styles to .minimal-theme body class */
+.minimal-theme {
+  background: var(--minimal-light) !important;
+  color: var(--minimal-black);
+  font-family: 'Inter', 'Arial', sans-serif;
+}
+
+/* Card and menu selection */
+.minimal-theme .menu-selection-card,
+.minimal-theme .card,
+.minimal-theme .menu-modern-card {
+  background: var(--minimal-light);
+  border: 1px solid var(--minimal-mid);
+  border-radius: 1.2rem;
+  color: var(--minimal-black);
+  box-shadow: 0 2px 8px var(--minimal-mid);
+}
+
+/* Section titles */
+.minimal-theme .menu-modern-section-title,
+.minimal-theme .display-6,
+.minimal-theme h1, 
+.minimal-theme h2, 
+.minimal-theme h3 {
+  color: var(--minimal-dark);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Menu item styling */
+.minimal-theme .menu-modern-item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--minimal-mid);
+  background: var(--minimal-light);
+  border-radius: 0.8rem;
+  box-shadow: 0 1px 4px var(--minimal-mid);
+}
+
+.minimal-theme .menu-modern-item-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 0.8rem;
+  background: var(--minimal-gray);
+  flex-shrink: 0;
+}
+
+.minimal-theme .menu-modern-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--minimal-black);
+}
+
+.minimal-theme .menu-modern-item-name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: var(--minimal-dark);
+  letter-spacing: 0.01em;
+}
+
+.minimal-theme .menu-modern-item-desc {
+  font-size: 0.98rem;
+  color: var(--minimal-gray);
+  margin-bottom: 0.2rem;
+  line-height: 1.5;
+}
+
+.minimal-theme .menu-modern-item-price {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--minimal-dark);
+  margin-top: 0.2rem;
+  align-self: flex-end;
+}
+
+/* Buttons and badges */
+.minimal-theme .btn-outline-secondary,
+.minimal-theme .btn-primary,
+.minimal-theme .btn {
+  background: var(--minimal-dark);
+  color: var(--minimal-light) !important;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.6em;
+  padding: 0.4em 1em;
+  transition: background 0.2s;
+}
+
+.minimal-theme .btn-outline-secondary:hover,
+.minimal-theme .btn-primary:hover,
+.minimal-theme .btn:hover {
+  background: var(--minimal-black);
+  color: var(--minimal-light) !important;
+}
+
+.minimal-theme .badge {
+  background: var(--minimal-gray) !important;
+  color: var(--minimal-black) !important;
+  font-weight: 600;
+  border-radius: 0.4em;
+}
+
+/* Map container style */
+.minimal-theme #menu-map,
+.minimal-theme #map {
+  height: 240px;
+  margin-top: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 8px 1px var(--minimal-mid);
+}
+
+/* Links */
+.minimal-theme a {
+  color: var(--minimal-dark);
+  text-decoration: underline;
+}
+
+.minimal-theme a:hover {
+  color: var(--minimal-black);
+}
+
+/* Overlay */
+.minimal-theme .menu-bg-overlay {
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+}

@@ -56,7 +56,6 @@
             {% for field in rp_form %}
               {% if field.name != "logo" %}
                 {{ field|as_crispy_field }}
-                {{ rp_form.theme_choice|as_crispy_field }}
               {% endif %}
             {% endfor %}
           </div>
