@@ -12,9 +12,9 @@ from .forms import (
                     CustomUserCreationForm, 
                     UserUpdateForm, 
                     ProfileUpdateForm,
-                    RestaurantDetailsForm,
-                    ReviewForm,
+                    RestaurantDetailsForm,  
                     )
+from .restaurant_forms import ( ReviewForm, )
 from .models import Profile, RestaurantProfile, SocialLink, OpeningHour, Review
 from locations.models import UserAddress
 from django.db.models import Q
@@ -66,21 +66,6 @@ def home(request):
         'review_form': review_form,
         'restaurant_reviews': restaurant_reviews,
     })
-
-def leave_review(request, restaurant_pk):
-    restaurant = get_object_or_404(RestaurantProfile, pk=restaurant_pk)
-    if request.method == "POST":
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.restaurant = restaurant
-            if request.user.is_authenticated:
-                review.user = request.user
-            review.save()
-            messages.success(request, "Thank you for your review!")
-        else:
-            messages.error(request, "There was an error with your review. Please check the form.")
-    return redirect('home')
 
 def register(request):
     if request.method == 'POST':

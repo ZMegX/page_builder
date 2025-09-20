@@ -16,13 +16,21 @@ DAYS_OF_WEEK = [
 class RestaurantProfileForm(forms.ModelForm):
     class Meta:
         model = RestaurantProfile
-        fields = ["name", "cuisine_type", "registration_number", "phone_number", "logo"]
+        fields = [
+            "name",
+            "cuisine_type",
+            "registration_number",
+            "phone_number",
+            "logo",
+            "theme_choice",
+        ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Restaurant name"}),
             "cuisine_type": forms.TextInput(attrs={"class": "form-control", "placeholder": "Cuisine type"}),
             "registration_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "Registration number"}),
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
+            "theme_choice": forms.Select(attrs={"class": "form-select"}), 
         }
     
 class SocialLinkForm(forms.ModelForm):

@@ -56,10 +56,7 @@ nav .navbar-profile-img {
     opacity: 1;
 }
 
-/* Body */
-body {
-    background: #fff !important;
-}
+
 
 /* Buttons */
 .btn-dark {
@@ -571,3 +568,7 @@ body {
 gmp-place-autocomplete input {
   width: 300px; /* Adjust width as needed */
   }
+
+body.menu-dark-bg {
+    background: #111 !important;
+}

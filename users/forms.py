@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
-from users.models import Profile, RestaurantProfile, Review
+from users.models import Profile, RestaurantProfile
 from locations.models import UserAddress
 
 # Profile Create/Edit Form
@@ -61,12 +61,3 @@ class CustomSetPasswordForm(SetPasswordForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 
-class ReviewForm(forms.ModelForm):
-    class Meta:
-        model = Review
-        fields = ['rating', 'comment', 'reviewer_name']
-        widgets = {
-            'rating': forms.RadioSelect(choices=[(i, f"{i} Stars") for i in range(1, 6)]),
-            'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your review...'}),
-            'reviewer_name': forms.TextInput(attrs={'placeholder': 'Your name (optional)'}),
-        }
