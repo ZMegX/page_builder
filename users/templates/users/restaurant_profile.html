@@ -53,8 +53,21 @@
                 {% endfor %}
               </div>
             {% endif %}
+            <div class="mb-3">
+              <label class="form-label">Theme</label>
+              {% for value, label in rp_form.theme_choice.field.choices %}
+                <label style="display:block; margin-bottom:1em;">
+                  <input type="radio" name="theme_choice" value="{{ value }}"
+                    {% if rp_form.theme_choice.value == value %}checked{% endif %}>
+                  <img src="{% static 'themes/previews/' %}{{ value }}-preview.png"
+                      alt="{{ label }} preview"
+                      style="height:60px; vertical-align:middle; margin-right:10px;">
+                  {{ label }}
+                </label>
+              {% endfor %}
+            </div>
             {% for field in rp_form %}
-              {% if field.name != "logo" %}
+              {% if field.name != "logo" and field.name != "theme_choice" %}
                 {{ field|as_crispy_field }}
               {% endif %}
             {% endfor %}

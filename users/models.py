@@ -36,6 +36,7 @@ THEME_CHOICES = [
     ('synthwave', 'Synthwave'),
     ('elegant', 'Elegant'),
     ('minimal', 'Minimal'),
+    ('default', 'Default'),
     # Add more themes as needed
 ]
 

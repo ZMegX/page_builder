@@ -85,33 +85,43 @@
       </div>
     </section>
     <!-- Menu Items Section -->
+    {% for menu in menus %}
     <div class="menu-modern-card">
-      {% for menu in menus %}
-        <div class="menu-modern-section-title">{{ menu.name }}</div>
-        {% for item in menu.items.all %}
-          <div class="menu-modern-item">
-            <img
-              src="{% if item.image %}{% cloudinary_url item.image.public_id width=90 height=90 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
-              class="menu-modern-item-img"
-              alt="{{ item.name }}">
-            <div class="menu-modern-item-info">
-              <div class="menu-modern-item-name">{{ item.name }}</div>
-              {% if item.ingredients %}
-                <div class="menu-modern-item-desc">{{ item.ingredients }}</div>
-              {% endif %}
-              <div class="menu-modern-item-price">${{ item.price|floatformat:2 }}</div>
-            </div>
-          </div>
-        {% empty %}
-          <div class="text-muted text-center mb-3">This menu currently has no items.</div>
-        {% endfor %}
-      {% empty %}
-        <div class="text-muted text-center mb-3">No active menus found for this restaurant.</div>
-      {% endfor %}
+      <div class="menu-modern-section-title">{{ menu.name }}</div>
+      <div class="table-responsive">
+        <table class="menu-modern-table table align-middle">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col"></th>
+              <th scope="col"></th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in menu.items.all %}
+            <tr class="menu-modern-row">
+              <td>
+                <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
+                    class="menu-modern-item-img"
+                    alt="{{ item.name }}">
+              </td>
+              <td class="menu-modern-item-name">{{ item.name }}</td>
+              <td class="menu-modern-item-desc">{% if item.ingredients %}<span>{{ item.ingredients }}</span>{% endif %}</td>
+              <td class="menu-modern-item-price">${{ item.price|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-muted text-center">This menu currently has no items.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+    {% endfor %}
   </div>
 {% endblock %}
-
 {% block extra_js %}
 {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
 <script>

@@ -1,109 +1,115 @@
 :root {
-  --synthwave-purple: #601BA6;
-  --synthwave-indigo: #5144A6;
-  --synthwave-darkblue: #141E59;
-  --synthwave-blue: #1B578C;
-  --synthwave-cyan: #49F2F2;
+  --synthwave2-purple: #6A23EB;
+  --synthwave2-pink: #EB23E7;
+  --synthwave2-violet: #AB23EB;
+  --synthwave2-blue: #2923EB;
+  --synthwave2-magenta: #EB236F;
+  --synthwave2-lightviolet: #C471EB;
 }
 
 /* Scope all synthwave styles to .synthwave-theme body class */
-.synthwave-theme {
-  background: linear-gradient(135deg, var(--synthwave-darkblue) 0%, var(--synthwave-indigo) 100%) !important;
-  color: var(--synthwave-cyan);
+/* .synthwave-theme {
+  background: linear-gradient(135deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%) !important;
+  color: var(--synthwave2-magenta);
   font-family: 'Lato', 'Arial', sans-serif;
-}
+} */
 
 .synthwave-theme .menu-selection-card,
 .synthwave-theme .card,
 .synthwave-theme .menu-modern-card {
-  background: linear-gradient(120deg, rgba(96,27,166,0.92) 0%, rgba(73,242,242,0.18) 100%);
+  background: #fff !important;  
   border: none;
   border-radius: 2rem;
-  color: var(--synthwave-cyan);
+  color: #000;
   position: relative;
   z-index: 2;
   box-shadow:
-    0 0 24px 2px var(--synthwave-cyan),
-    0 0 48px 8px var(--synthwave-purple),
-    0 0 8px 2px var(--synthwave-blue);
+    0 0 24px 2px var(--synthwave2-pink),
+    0 0 48px 8px var(--synthwave2-purple),
+    0 0 8px 2px var(--synthwave2-blue);
   animation: neon-glow 2s infinite alternate;
-}
-
-@keyframes neon-glow {
-  0% {
-    box-shadow:
-      0 0 24px 2px var(--synthwave-cyan),
-      0 0 48px 8px var(--synthwave-purple),
-      0 0 8px 2px var(--synthwave-blue);
-    filter: brightness(1.1);
-  }
-  100% {
-    box-shadow:
-      0 0 36px 6px var(--synthwave-cyan),
-      0 0 64px 16px var(--synthwave-purple),
-      0 0 16px 4px var(--synthwave-blue);
-    filter: brightness(1.3);
-  }
-}
-
-.synthwave-theme .menu-modern-section-title,
-.synthwave-theme .display-6,
-.synthwave-theme h1, 
-.synthwave-theme h2, 
-.synthwave-theme h3 {
-  color: var(--synthwave-cyan);
-  text-shadow:
-    0 0 8px var(--synthwave-cyan),
-    0 0 16px var(--synthwave-purple),
-    0 0 4px var(--synthwave-blue);
-  animation: neon-text 2s infinite alternate;
-}
-
-@keyframes neon-text {
-  0% { text-shadow: 0 0 8px var(--synthwave-cyan), 0 0 16px var(--synthwave-purple), 0 0 4px var(--synthwave-blue); }
-  100% { text-shadow: 0 0 16px var(--synthwave-cyan), 0 0 32px var(--synthwave-purple), 0 0 8px var(--synthwave-blue); }
-}
-
-.synthwave-theme .menu-modern-item {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--synthwave-blue);
-  background: linear-gradient(90deg, rgba(20,30,89,0.92) 0%, rgba(73,242,242,0.12) 100%);
-  border-radius: 1rem;
-  box-shadow:
-    0 0 6px 1px var(--synthwave-cyan),
-    0 0 12px 2px var(--synthwave-purple),
-    0 0 3px 1px var(--synthwave-blue);
-  animation: neon-glow-item 2s infinite alternate;
 }
 
 @keyframes neon-glow-item {
   0% {
     box-shadow:
-      0 0 6px 1px var(--synthwave-cyan),
-      0 0 12px 2px var(--synthwave-purple),
-      0 0 3px 1px var(--synthwave-blue);
+      0 0 3px 1px var(--synthwave2-lightviolet),
+      0 0 6px 1px var(--synthwave2-violet),
+      0 0 1px 1px var(--synthwave2-blue);
+    filter: brightness(1.01);
+  }
+  100% {
+    box-shadow:
+      0 0 6px 2px var(--synthwave2-lightviolet),
+      0 0 9px 2px var(--synthwave2-violet),
+      0 0 2px 1px var(--synthwave2-blue);
+    filter: brightness(1.06);
+  }
+}
+
+.synthwave-theme .menu-modern-section-title,
+.synthwave-theme .display-6, 
+.synthwave-theme h2, 
+.synthwave-theme h3 {
+  color: #000 !important;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+  text-shadow: none;
+}
+
+@keyframes neon-text {
+  0% { text-shadow: 0 0 8px var(--synthwave2-pink), 0 0 16px var(--synthwave2-purple), 0 0 4px var(--synthwave2-blue); }
+  100% { text-shadow: 0 0 16px var(--synthwave2-pink), 0 0 32px var(--synthwave2-purple), 0 0 8px var(--synthwave2-blue); }
+}
+
+.synthwave-theme .menu-modern-item {
+  background: linear-gradient(135deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px #0003;
+  color: #fff; /* High contrast text */
+  border: none;
+  min-width: 260px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center; 
+}
+
+@keyframes neon-glow-item {
+  0% {
+    box-shadow:
+      0 0 6px 1px var(--synthwave2-lightviolet),
+      0 0 12px 2px var(--synthwave2-violet),
+      0 0 3px 1px var(--synthwave2-blue);
     filter: brightness(1.03);
   }
   100% {
     box-shadow:
-      0 0 12px 2px var(--synthwave-cyan),
-      0 0 18px 4px var(--synthwave-purple),
-      0 0 6px 2px var(--synthwave-blue);
+      0 0 12px 2px var(--synthwave2-lightviolet),
+      0 0 18px 4px var(--synthwave2-violet),
+      0 0 6px 2px var(--synthwave2-blue);
     filter: brightness(1.08);
   }
 }
 
 .synthwave-theme .menu-modern-item-img {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;       /* Vertically center info */
+  align-items: center; 
   width: 90px;
   height: 90px;
   object-fit: cover;
   border-radius: 1rem;
-  box-shadow: 0 2px 8px var(--synthwave-blue);
-  background: var(--synthwave-indigo);
+  box-shadow: 0 2px 8px var(--synthwave2-blue);
+  background: var(--synthwave2-violet);
   flex-shrink: 0;
 }
 
@@ -112,37 +118,45 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: var(--synthwave-cyan);
+  align-items: center;
+  color: var(--synthwave2-magenta);
+  text-align: center;
 }
 
 .synthwave-theme .menu-modern-item-name {
+  color: #FFA726;
   font-size: 1.18rem;
   font-weight: 700;
   margin-bottom: 0.3rem;
-  color: var(--synthwave-purple);
   letter-spacing: 0.01em;
 }
 
 .synthwave-theme .menu-modern-item-desc {
   font-size: 1.02rem;
-  color: var(--synthwave-cyan);
+  color: var(--synthwave2-magenta);
   margin-bottom: 0.2rem;
   line-height: 1.5;
+  font-style: italic;
+  text-align: center;
 }
 
 .synthwave-theme .menu-modern-item-price {
+  color: #fff;
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--synthwave-cyan);
   margin-top: 0.2rem;
-  align-self: flex-end;
+  align-self: center;;
+  background: var(--synthwave2-magenta);
+  border-radius: 0.5em;
+  padding: 0.2em 0.7em;
+  box-shadow: 0 1px 6px var(--synthwave2-magenta)44;
 }
 
 .synthwave-theme .btn-outline-secondary,
 .synthwave-theme .btn-primary,
 .synthwave-theme .btn {
-  background: linear-gradient(90deg, var(--synthwave-purple) 0%, var(--synthwave-blue) 100%);
-  color: var(--synthwave-cyan) !important;
+  background: linear-gradient(90deg, var(--synthwave2-purple) 0%, var(--synthwave2-blue) 100%);
+  color: var(--synthwave2-magenta) !important;
   border: none;
   font-weight: 700;
   border-radius: 1em;
@@ -153,13 +167,13 @@
 .synthwave-theme .btn-outline-secondary:hover,
 .synthwave-theme .btn-primary:hover,
 .synthwave-theme .btn:hover {
-  background: linear-gradient(90deg, var(--synthwave-blue) 0%, var(--synthwave-purple) 100%);
-  color: var(--synthwave-cyan) !important;
+  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
+  color: var(--synthwave2-magenta) !important;
 }
 
 .synthwave-theme .badge {
-  background: var(--synthwave-cyan) !important;
-  color: var(--synthwave-darkblue) !important;
+  background: var(--synthwave2-magenta) !important;
+  color: var(--synthwave2-blue) !important;
   font-weight: 700;
   border-radius: 0.5em;
 }
@@ -169,20 +183,99 @@
   height: 240px;
   margin-top: 0.5rem;
   border-radius: 1rem;
-  box-shadow: 0 0 12px 2px var(--synthwave-blue);
+  box-shadow: 0 0 12px 2px var(--synthwave2-blue);
 }
 
 .synthwave-theme a {
-  color: var(--synthwave-cyan);
+  color: var(--synthwave2-magenta);
   text-decoration: underline;
 }
 
 .synthwave-theme a:hover {
-  color: var(--synthwave-purple);
+  color: var(--synthwave2-purple);
 }
 
 .synthwave-theme .menu-bg-overlay {
   pointer-events: none;
   z-index: 0;
   opacity: 0.12;
+}
+/* Optional: Add hover effect for smart interactivity */
+.synthwave-theme .menu-modern-item:hover {
+  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
+  transform: translateY(-2px) scale(1.03);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.synthwave-theme .menu-modern-table {
+  width: 100%;
+  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  color: #fff;
+  box-shadow: 0 2px 16px #0006;
+}
+
+.synthwave-theme .menu-modern-table th {
+  background: var(--synthwave2-purple);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.08rem;
+  border: none;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.synthwave-theme .menu-modern-table td {
+  background: transparent;
+  color: #fff;
+  border: none;
+  text-align: center;
+  vertical-align: middle;
+  padding: 1rem 0.5rem;
+  font-size: 1.05rem;
+}
+
+.synthwave-theme .menu-modern-row {
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+}
+
+.synthwave-theme .menu-modern-row:hover {
+  background: var(--synthwave2-violet);
+  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.synthwave-theme .menu-modern-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  box-shadow: 0 2px 8px var(--synthwave2-blue);
+  background: var(--synthwave2-violet);
+  margin: 0 auto;
+  display: block;
+}
+
+.synthwave-theme .menu-modern-item-name {
+  color: #FFA726;
+  font-weight: 700;
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+}
+
+.synthwave-theme .menu-modern-item-desc span {
+  color: var(--synthwave2-magenta);
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.synthwave-theme .menu-modern-item-price {
+  color: #fff;
+  font-weight: 700;
+  background: var(--synthwave2-magenta);
+  border-radius: 0.5em;
+  padding: 0.2em 0.7em;
+  box-shadow: 0 1px 6px var(--synthwave2-magenta)44;
+  display: inline-block;
 }
