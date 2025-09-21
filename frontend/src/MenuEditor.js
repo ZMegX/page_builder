@@ -132,111 +132,181 @@ function MenuEditor() {
 }
 
   return (
-    <div className="container py-4" style={{ maxWidth: '900px' }}>
-      {/* Header Card */}
-      <div className="card mb-4 shadow-sm border-0" style={{ borderRadius: '16px' }}>
-        <div className="card-body">
-          <div className="row align-items-center">
-            <div className="col-md-8">
-              <div className="d-flex align-items-center mb-3">
-                <input
-                  type="text"
-                  value={menuName}
-                  onChange={e => setMenuName(e.target.value)}
-                  className="form-control"
-                  style={{ fontWeight: 700, fontSize: '1.3em', maxWidth: '320px', marginRight: '1em' }}
-                />
-                {selectedMenu && (
-                  <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>
-                    {selectedMenu.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                )}
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  style={{ marginLeft: '1em' }}
-                  onClick={handleMenuNameSave}
-                >
-                  Save Name
-                </Button>
-              </div>
-                {selectedMenu && (
-                  <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>{selectedMenu.is_active ? 'Active' : 'Inactive'}</span>
-                )}
-              </div>
-              <div className="d-flex gap-2 mb-2">
-                <select value={selectedMenuId || ''} onChange={e => setSelectedMenuId(Number(e.target.value))} className="form-select" style={{ maxWidth: '260px', fontSize: '1.1em', borderRadius: '8px' }}>
-                  {menus.map(menu => (
-                    <option key={menu.id} value={menu.id}>{menu.name}</option>
-                  ))}
-                </select>
-                <Button onClick={() => { setEditingItem(null); setShowModal(true); }} className="mb-0" style={{ fontWeight: 500, fontSize: '1em', borderRadius: '8px' }}>Create Item</Button>
-              </div>
-              {selectedMenu && selectedMenu.items && (
-                <div className="mb-2 text-muted" style={{ fontSize: '1em' }}>{selectedMenu.items.length} items</div>
+  <div className="container py-4" style={{ maxWidth: '900px' }}>
+    {/* Header Card */}
+    <div className="card mb-4 shadow-sm border-0" style={{ borderRadius: '16px' }}>
+      <div className="card-body">
+        <div className="row align-items-center">
+          <div className="col-md-8">
+            <div className="d-flex align-items-center mb-3">
+              <input
+                type="text"
+                value={menuName}
+                onChange={e => setMenuName(e.target.value)}
+                className="form-control"
+                style={{ fontWeight: 700, fontSize: '1.3em', maxWidth: '320px', marginRight: '1em' }}
+              />
+              {selectedMenu && (
+                <span className={`badge ${selectedMenu.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                  {selectedMenu.is_active ? 'Active' : 'Inactive'}
+                </span>
               )}
+              <Button
+                variant="outline-primary"
+                size="sm"
+                style={{ marginLeft: '1em' }}
+                onClick={handleMenuNameSave}
+              >
+                Save Name
+              </Button>
             </div>
-            <div className="col-md-4 text-center">
-              {selectedMenu && selectedMenu.photo && (
-                <img
-                  src={`https://res.cloudinary.com/dgmvyic4g/${selectedMenu.photo}`}
-                  alt={selectedMenu.name}
-                  className="img-fluid rounded shadow"
-                  style={{ maxHeight: '160px', objectFit: 'cover', borderRadius: '12px' }}
-                />
-              )}
+            <div className="d-flex gap-2 mb-2">
+              <select
+                value={selectedMenuId || ''}
+                onChange={e => setSelectedMenuId(Number(e.target.value))}
+                className="form-select"
+                style={{ maxWidth: '260px', fontSize: '1.1em', borderRadius: '8px' }}
+              >
+                {menus.map(menu => (
+                  <option key={menu.id} value={menu.id}>{menu.name}</option>
+                ))}
+              </select>
+              <Button
+                onClick={() => { setEditingItem(null); setShowModal(true); }}
+                className="mb-0"
+                style={{ fontWeight: 500, fontSize: '1em', borderRadius: '8px' }}
+              >
+                Create Item
+              </Button>
             </div>
+            {selectedMenu && selectedMenu.items && (
+              <div className="mb-2 text-muted" style={{ fontSize: '1em' }}>
+                {selectedMenu.items.length} items
+              </div>
+            )}
           </div>
-        </div>
-
-      {/* Menu Items Card */}
-      <div className="card shadow-sm border-0" style={{ borderRadius: '16px' }}>
-        <div className="card-body">
-          <MenuItemModal
-            show={showModal}
-            item={editingItem}
-            onSave={handleSave}
-            onClose={() => setShowModal(false)}
-          />
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="menu" direction="horizontal">
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: 'flex', flexWrap: 'wrap', gap: '18px', minHeight: '120px' }}>
-                  {items.map((item, idx) => (
-                    <Draggable key={item.id} draggableId={item.id} index={idx}>
-                      {(provided) => (
-                        <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} style={{ minWidth: '220px', maxWidth: '260px', flex: '1 1 220px', marginBottom: '0', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderRadius: '10px', border: '1px solid #e3e3e3', background: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                          {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
-                            <div className="card-img-top" style={{ textAlign: 'center', marginTop: '12px' }}>
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                style={{ maxWidth: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}
-                                onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
-                              />
-                            </div>
-                          ) : null}
-                          <Card.Body style={{ padding: '14px 12px 10px 12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <Card.Title style={{ fontWeight: 600, fontSize: '1.08em', marginBottom: '6px' }}>{item.name}</Card.Title>
-                            <Card.Text style={{ fontSize: '0.98em', color: '#555', marginBottom: '8px' }}>Section: <span style={{ fontWeight: 500 }}>{item.section}</span> | Price: <span style={{ color: '#007bff', fontWeight: 600 }}>${item.price}</span></Card.Text>
-                            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
-                              <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)} style={{ borderRadius: '6px', fontWeight: 500 }}>Delete</Button>
-                              <Button onClick={() => { setEditingItem(item); setShowModal(true); }} size="sm" style={{ borderRadius: '6px', fontWeight: 500, background: '#f8f9fa', color: '#007bff', border: '1px solid #007bff' }}>Edit</Button>
-                            </div>
-                          </Card.Body>
-                        </Card>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <div className="col-md-4 text-center">
+            {selectedMenu && selectedMenu.photo && (
+              <img
+                src={`https://res.cloudinary.com/dgmvyic4g/${selectedMenu.photo}`}
+                alt={selectedMenu.name}
+                className="img-fluid rounded shadow"
+                style={{ maxHeight: '160px', objectFit: 'cover', borderRadius: '12px' }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
-  );
+    {/* Menu Items Card */}
+    <div className="card shadow-sm border-0" style={{ borderRadius: '16px' }}>
+      <div className="card-body">
+        <MenuItemModal
+          show={showModal}
+          item={editingItem}
+          onSave={handleSave}
+          onClose={() => setShowModal(false)}
+        />
+        <div className="table-responsive">
+          <table className="table table-bordered align-middle">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Section</th>
+                <th>Price</th>
+                <th>Ingredients</th>
+                <th>Available</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(item => (
+                <tr key={item.id}>
+                  <td>
+                    {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        style={{ maxWidth: '60px', maxHeight: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                        onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
+                      />
+                    ) : (
+                      <span className="text-muted">No image</span>
+                    )}
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={e => {
+                        const updated = { ...item, name: e.target.value };
+                        setItems(items.map(i => i.id === item.id ? updated : i));
+                      }}
+                      className="form-control form-control-sm"
+                      style={{ minWidth: '120px' }}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={item.section}
+                      onChange={e => {
+                        const updated = { ...item, section: e.target.value };
+                        setItems(items.map(i => i.id === item.id ? updated : i));
+                      }}
+                      className="form-control form-control-sm"
+                      style={{ minWidth: '80px' }}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={item.price}
+                      onChange={e => {
+                        const updated = { ...item, price: e.target.value };
+                        setItems(items.map(i => i.id === item.id ? updated : i));
+                      }}
+                      className="form-control form-control-sm"
+                      style={{ minWidth: '70px' }}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={item.ingredients}
+                      onChange={e => {
+                        const updated = { ...item, ingredients: e.target.value };
+                        setItems(items.map(i => i.id === item.id ? updated : i));
+                      }}
+                      className="form-control form-control-sm"
+                      style={{ minWidth: '120px' }}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={item.is_available}
+                      onChange={e => {
+                        const updated = { ...item, is_available: e.target.checked };
+                        setItems(items.map(i => i.id === item.id ? updated : i));
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)} style={{ borderRadius: '6px', fontWeight: 500, marginRight: '6px' }}>Delete</Button>
+                    <Button variant="primary" size="sm" onClick={() => { setEditingItem(item); setShowModal(true); }} style={{ borderRadius: '6px', fontWeight: 500 }}>Edit</Button>
+                    <Button variant="success" size="sm" onClick={() => handleSave(item)} style={{ borderRadius: '6px', fontWeight: 500, marginLeft: '6px' }}>Save</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 }
 
 export default MenuEditor;

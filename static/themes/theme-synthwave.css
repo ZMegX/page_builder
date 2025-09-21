@@ -209,16 +209,16 @@
 
 .synthwave-theme .menu-modern-table {
   width: 100%;
-  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
+  background: #fff !important;
   border-radius: 1.2rem;
   overflow: hidden;
-  color: #fff;
+  color: #000;
   box-shadow: 0 2px 16px #0006;
 }
 
 .synthwave-theme .menu-modern-table th {
-  background: var(--synthwave2-purple);
-  color: #fff;
+  background: #fff !important;
+  color: #000;
   font-weight: 700;
   font-size: 1.08rem;
   border: none;
@@ -228,7 +228,7 @@
 
 .synthwave-theme .menu-modern-table td {
   background: transparent;
-  color: #fff;
+  color: #000;
   border: none;
   text-align: center;
   vertical-align: middle;
@@ -252,7 +252,7 @@
   object-fit: cover;
   border-radius: 0.7rem;
   box-shadow: 0 2px 8px var(--synthwave2-blue);
-  background: var(--synthwave2-violet);
+  background: #fff !important;
   margin: 0 auto;
   display: block;
 }
@@ -278,4 +278,29 @@
   padding: 0.2em 0.7em;
   box-shadow: 0 1px 6px var(--synthwave2-magenta)44;
   display: inline-block;
+}
+
+.synthwave-theme .menu-modern-table,
+.synthwave-theme .menu-modern-table th,
+.synthwave-theme .menu-modern-table td,
+.synthwave-theme .menu-modern-row {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Optional: Add subtle row separation with background or shadow on hover only */
+.synthwave-theme .menu-modern-row {
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.synthwave-theme .menu-modern-row:hover {
+  background: var(--synthwave2-violet);
+  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Add margin and padding to each menu card for spacing */
+.synthwave-theme .menu-modern-card {
+  margin-bottom: 2.5rem;
+  padding: 2rem 1.5rem;
 }
