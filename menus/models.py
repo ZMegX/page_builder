@@ -54,6 +54,7 @@ class MenuItem(models.Model):
         blank=True,
         help_text="Optional image for the menu item."
     )
+    popular_items = models.BooleanField(default=False, help_text="Mark this item as a popular dish")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

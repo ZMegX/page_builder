@@ -3,6 +3,96 @@
 {% block body_class %}{{ profile.theme_choice }}-theme{% endblock %}
 <link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">
 {% block title %}{{ profile.name }} — Restaurant{% endblock %}
+{% block header %}
+<header class="bg-white shadow-sm py-3 mb-4">
+  <div class="container d-flex align-items-center justify-content-between">
+    <!-- Logo -->
+    <div class="d-flex align-items-center">
+      {% if profile.logo %}
+        <img src="{{ profile.logo.url }}" alt="{{ profile.name }} logo"
+             class="img-fluid rounded logo-avatar me-3" style="height: 56px; width: 56px; object-fit: cover;">
+      {% endif %}
+      <span class="fw-bold fs-4">{{ profile.name }}</span>
+    </div>
+    <!-- Navigation Links -->
+    <nav>
+      <ul class="nav">
+        <li class="nav-item">
+          <a class="nav-link fw-semibold" href="#about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-semibold" href="#menu">Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-semibold" href="#contact">Contact</a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Call-to-Action Button -->
+    <a href="{% url 'webpage_restaurant_site:order_online' slug=slug %}" class="btn btn-gradient btn-lg px-4">
+      <i class="bi bi-bag-fill me-2"></i>Order Online
+    </a>
+  </div>
+</header>
+{% endblock %}
+{% block hero %}
+<section class="hero-section position-relative text-white" style="background: url('{% if profile.hero_image %}{{ profile.hero_image.url }}{% else %}{% static 'img/hero-default.jpg' %}{% endif %}') center center/cover no-repeat; min-height: 480px;">
+  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center" style="position: relative; z-index: 2;">
+    <h1 class="display-4 fw-bold mb-3" style="text-shadow: 0 2px 16px #0008;">{{ profile.hero_headline|default:"Welcome to " }}{{ profile.name }}</h1>
+    <p class="lead mb-4" style="max-width: 600px; text-shadow: 0 2px 8px #0006;">
+      {{ profile.hero_description|default:"Enjoy authentic cuisine, friendly service, and a cozy atmosphere. Order online, view our menu, or book a table today!" }}
+    </p>
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+      <a href="{% url 'webpage_restaurant_site:order_online' slug=slug %}" class="btn btn-gradient btn-lg px-4">
+        <i class="bi bi-bag-fill me-2"></i>Order Food
+      </a>
+      <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-primary btn-lg px-4">
+        <i class="bi bi-book-fill me-2"></i>View Menu
+      </a>
+      <a href="#booking" class="btn btn-outline-dark btn-lg px-4">
+        <i class="bi bi-calendar-check me-2"></i>Book a Table
+      </a>
+    </div>
+  </div>
+  <!-- Optional: Overlay for better text contrast -->
+  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100" style="background: rgba(30,41,59,0.45); z-index:1;"></div>
+</section>
+{% endblock %}
+{% block about %}
+<section id="about" class="py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-lg-7 mb-4 mb-lg-0">
+        <h2 class="fw-bold mb-3">About Us</h2>
+        <p class="lead text-muted mb-3">
+          {{ profile.about_headline|default:"Our Story" }}
+        </p>
+        <p class="mb-4" style="font-size: 1.08rem;">
+          {% if profile.about_description %}
+            {{ profile.about_description }}
+          {% else %}
+            Founded with a passion for great food and warm hospitality, {{ profile.name }} brings together the best of local flavors and international inspiration. Our philosophy is simple: serve delicious dishes, treat every guest like family, and create memorable experiences every day.
+          {% endif %}
+        </p>
+        {% if profile.about_highlight %}
+          <div class="alert alert-primary rounded-3">
+            <i class="bi bi-star-fill me-2"></i>{{ profile.about_highlight }}
+          </div>
+        {% endif %}
+      </div>
+      <div class="col-lg-5 text-center">
+        {% if profile.about_image %}
+          <img src="{{ profile.about_image.url }}" alt="About {{ profile.name }}" class="img-fluid rounded shadow" style="max-height: 320px; object-fit: cover;">
+        {% else %}
+          <div class="bg-secondary d-flex align-items-center justify-content-center rounded shadow" style="height: 220px;">
+            <span class="text-white-50">Our team, our kitchen, our story</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
 {% block content %}
 <div class="container py-4">
   <div class="card shadow-lg border-0 rounded-4 mb-5 bg-light fade-in-section">

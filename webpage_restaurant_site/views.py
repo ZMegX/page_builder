@@ -4,16 +4,16 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from users.models import RestaurantProfile, User
-from menus.models import Menu
+from menus.models import Menu, MenuItem
 from locations.models import UserAddress
 from django.db.models import Q
 
     
-def restaurant_landing(request, slug):
-    profile = get_object_or_404(
-        RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours"),
-        slug=slug
-    )
+# def restaurant_landing(request, slug):
+#     profile = get_object_or_404(
+#         RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours"),
+#         slug=slug
+#     )
 
 def redirect_to_restaurant_slug(request, username):
     try:
@@ -52,7 +52,8 @@ def _slug_fallback(profile: RestaurantProfile) -> str:
 
 def restaurant_landing(request, slug):
     """
-    Renders the public landing page for a restaurant, including map and details.
+    renders the public landing page for a restaurant, including map and details.
+    passes all hero, about and popular menu item context for dynamics sections.
     """
     print("\n--- DEBUG: restaurant_landing view entered ---")
     print(f"1. SLUG: '{slug}'")
@@ -80,6 +81,16 @@ def restaurant_landing(request, slug):
     print(f"6. GOOGLE MAPS API KEY IS SET: {bool(key)}")
     print("--- DEBUG: END ---\n")
 
+    popular_items = (
+        MenuItem.objects.filter(menu__owner=profile.user, popular_items=True)
+        .order_by('-menu__is_active', '-menu__name', 'price')[:2]
+    )
+    if not popular_items:
+        popular_items = (
+            MenuItem.objects.filter(menu__owner=profile.user)
+            .order_by('-menu__is_active', '-menu__name', 'price')[:2]
+        )
+
     context = {
         "profile": profile,
         "address": address,
@@ -87,6 +98,17 @@ def restaurant_landing(request, slug):
         "GOOGLE_MAPS_API_KEY": key,
         "map_center": {"lat": lat, "lng": lng},
         "slug": _slug_fallback(profile) if profile else "",
+        # for hero section
+        "hero_headline": getattr(profile, "hero_headline", None),
+        "hero_description": getattr(profile, "hero_description", None),
+        "hero_image": getattr(profile, "hero_image", None),
+        # For about section
+        "about_headline": getattr(profile, "about_headline", None),
+        "about_description": getattr(profile, "about_description", None),
+        "about_image": getattr(profile, "about_image", None),
+        "about_highlight": getattr(profile, "about_highlight", None),
+        # For menu section
+        "popular_items": popular_items,
     }
     return render(request, "webpage_restaurant_site/landing.html", context)
 
@@ -117,3 +139,65 @@ def restaurant_menu(request, slug):
     }
     return render(request, "webpage_restaurant_site/menu.html", context)
 
+def restaurant_contact(request, slug):
+    """
+    Renders the public contact page for a restaurant.
+    """
+    profile = get_object_or_404(RestaurantProfile.objects.select_related("user"), slug=slug)
+    address = _primary_address(profile)
+    status = _opening_status(profile)
+    lat = float(address.latitude) if address and hasattr(address, 'latitude') and address.latitude is not None else None
+    lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    context = {
+        "profile": profile,
+        "slug": _slug_fallback(profile) if profile else "",
+        "address": address,
+        "status": status,
+        "GOOGLE_MAPS_API_KEY": key,
+        "map_center": {"lat": lat, "lng": lng},
+    }
+    return render(request, "webpage_restaurant_site/contact.html", context)
+
+def restaurant_about(request, slug):
+    """
+    Renders the public about page for a restaurant.
+    """
+    profile = get_object_or_404(RestaurantProfile.objects.select_related("user"), slug=slug)
+    address = _primary_address(profile)
+    status = _opening_status(profile)
+    lat = float(address.latitude) if address and hasattr(address, 'latitude') and address.latitude is not None else None
+    lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    context = {
+        "profile": profile,
+        "slug": _slug_fallback(profile) if profile else "",
+        "address": address,
+        "status": status,
+        "GOOGLE_MAPS_API_KEY": key,
+        "map_center": {"lat": lat, "lng": lng},
+    }
+    return render(request, "webpage_restaurant_site/about.html", context)
+
+def order_online(request, slug):
+    """
+    Renders the public order online page for a restaurant.
+    """
+    profile = get_object_or_404(RestaurantProfile.objects.select_related("user"), slug=slug)
+    address = _primary_address(profile)
+    status = _opening_status(profile)
+    lat = float(address.latitude) if address and hasattr(address, 'latitude') and address.latitude is not None else None
+    lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
+    key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    context = {
+        "profile": profile,
+        "slug": _slug_fallback(profile) if profile else "",
+        "address": address,
+        "status": status,
+        "GOOGLE_MAPS_API_KEY": key,
+        "map_center": {"lat": lat, "lng": lng},
+    }
+    return render(request, "webpage_restaurant_site/order_online.html", context)

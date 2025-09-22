@@ -23,6 +23,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
     ingredients: '',
     is_available: true,
     image: '',
+    is_popular: false,
   });
 
   useEffect(() => {
@@ -34,6 +35,8 @@ function MenuItemModal({ show, item, onSave, onClose }) {
         ingredients: item.ingredients || '',
         is_available: item.is_available !== undefined ? item.is_available : true,
         image: item.image || '',
+        is_popular: item.is_popular !== undefined ? item.is_popular : false,
+
       });
     } else {
       setForm({
@@ -43,6 +46,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
         ingredients: '',
         is_available: true,
         image: '',
+        is_popular: false,
       });
     }
   }, [item, show]);
@@ -95,6 +99,15 @@ function MenuItemModal({ show, item, onSave, onClose }) {
           <Form.Group className="mb-3">
             <Form.Label>Name</Form.Label>
             <Form.Control name="name" value={form.name} onChange={handleChange} required />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Check
+              type="checkbox"
+              label="Popular Dish"
+              name="is_popular"
+              checked={form.is_popular}
+              onChange={handleChange}
+            />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Section</Form.Label>

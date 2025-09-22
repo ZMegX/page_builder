@@ -86,41 +86,33 @@
     </section>
     <!-- Menu Items Section -->
     {% for menu in menus %}
-    <div class="menu-modern-card">
+    <div class="menu-modern-card mb-5">
       <div class="menu-modern-section-title">{{ menu.name }}</div>
-      <div class="table-responsive">
-        <table class="menu-modern-table table align-middle">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th scope="col"></th>
-              <th scope="col"></th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in menu.items.all %}
-            <tr class="menu-modern-row">
-              <td>
-                <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
-                    class="menu-modern-item-img"
-                    alt="{{ item.name }}">
-              </td>
-              <td class="menu-modern-item-name">{{ item.name }}</td>
-              <td class="menu-modern-item-desc">{% if item.ingredients %}<span>{{ item.ingredients }}</span>{% endif %}</td>
-              <td class="menu-modern-item-price">${{ item.price|floatformat:2 }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="4" class="text-muted text-center">This menu currently has no items.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="menu-modern-list">
+        {% for item in menu.items.all %}
+          <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2" style="border-radius: 1rem; background: #fff;">
+            <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
+              <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
+                  alt="{{ item.name }}"
+                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
+            </div>
+            <div class="menu-modern-item-info flex-grow-1">
+              <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
+              {% if item.ingredients %}
+                <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.ingredients }}</div>
+              {% endif %}
+            </div>
+            <div class="menu-modern-item-price ms-3" style="font-weight:700; color:#EB236F; font-size:1.1rem;">
+              ${{ item.price|floatformat:2 }}
+            </div>
+          </div>
+        {% empty %}
+          <div class="text-muted text-center py-4">This menu currently has no items.</div>
+        {% endfor %}
       </div>
     </div>
-    {% endfor %}
-  </div>
+  {% endfor %}
+</div>
 {% endblock %}
 {% block extra_js %}
 {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
