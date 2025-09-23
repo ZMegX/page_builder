@@ -53,10 +53,28 @@ class RestaurantProfile(models.Model):
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
-    theme_choice = models.CharField(
-        max_length=32,
-        choices=THEME_CHOICES,
-        default='synthwave',
+    hero_headline = models.CharField(max_length=120, blank=True, null=True,
+        help_text="Headline for the hero section on the landing page."
+    )
+    hero_description = models.TextField(blank=True, null=True,
+        help_text="Short description for the hero section."
+    )
+    hero_image = CloudinaryField('Hero image', blank=True, null=True, 
+        help_text="Background image for the hero section."
+    )
+    about_headline = models.CharField(max_length=120, blank=True, null=True,
+        help_text="Headline for the About Us section."
+    )
+    about_description = models.TextField(blank=True, null=True,
+        help_text="Description for the About Us section."
+    )
+    about_image = CloudinaryField('About image', blank=True, null=True,
+        help_text="Image for the About Us section."
+    )
+    about_highlight = models.CharField(max_length=120, blank=True, null=True,
+        help_text="Highlighted quote or fact for the About Us section."
+    )
+    theme_choice = models.CharField(max_length=32, choices=THEME_CHOICES, default='default',
         help_text="Select the theme for your restaurant page."
     )
     def __str__(self):

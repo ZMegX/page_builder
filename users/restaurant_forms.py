@@ -23,6 +23,15 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number",
             "logo",
             "theme_choice",
+            # Hero section fields
+            "hero_headline",
+            "hero_description",
+            "hero_image",
+            # About section fields
+            "about_headline",
+            "about_description",
+            "about_image",
+            "about_highlight",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Restaurant name"}),
@@ -31,6 +40,13 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
             "theme_choice": forms.Select(attrs={"class": "form-select"}), 
+            "hero_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "Hero headline"}),
+            "hero_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "Hero description", "rows": 2}),
+            "hero_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+            "about_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "About headline"}),
+            "about_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "About description", "rows": 3}),
+            "about_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+            "about_highlight": forms.TextInput(attrs={"class": "form-control", "placeholder": "About highlight"}),
         }
     
 class SocialLinkForm(forms.ModelForm):

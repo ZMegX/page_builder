@@ -190,6 +190,48 @@
   </div>
 </div>
 {% endblock %}
+{% block services %}
+<section id="services" class="py-5 bg-white">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-4">Our Services</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0 text-center">
+          <div class="card-body">
+            <i class="bi bi-truck display-5 text-primary mb-3"></i>
+            <h5 class="card-title fw-bold mb-2">Delivery</h5>
+            <p class="card-text text-muted mb-0">
+              Enjoy our dishes from the comfort of your home. Fast and reliable delivery available daily.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0 text-center">
+          <div class="card-body">
+            <i class="bi bi-bag-check display-5 text-success mb-3"></i>
+            <h5 class="card-title fw-bold mb-2">Takeout</h5>
+            <p class="card-text text-muted mb-0">
+              Order ahead and pick up your meal at your convenience. Fresh and ready to go!
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0 text-center">
+          <div class="card-body">
+            <i class="bi bi-calendar-check display-5 text-warning mb-3"></i>
+            <h5 class="card-title fw-bold mb-2">Table Reservations</h5>
+            <p class="card-text text-muted mb-0">
+              Reserve your table online for a guaranteed spot and a seamless dining experience.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/landing_animations.js' %}" defer></script>
