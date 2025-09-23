@@ -10,5 +10,5 @@ urlpatterns = [
     path("<slug:slug>/menu/", views.restaurant_menu, name="menu"),
     path('r/<str:username>/', views.redirect_to_restaurant_slug, name='redirect_to_restaurant_slug'),
     path('<slug:slug>/order/', views.order_online, name='order_online'),
-
+    path('order/place/<int:item_id>/', views.place_order, name='place_order'),
 ]

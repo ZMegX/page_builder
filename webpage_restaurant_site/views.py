@@ -1,3 +1,10 @@
+from django.contrib import messages
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404, redirect
+from users.models import Order
+from menus.models import MenuItem
+from users.models import RestaurantProfile
 from django.http import HttpResponseRedirect, Http404
 import calendar
 from django.conf import settings
@@ -8,6 +15,30 @@ from menus.models import Menu, MenuItem
 from locations.models import UserAddress
 from django.db.models import Q
 
+
+def is_customer(user):
+    return user.is_authenticated and user.groups.filter(name='Customer').exists()
+
+@login_required
+@user_passes_test(is_customer)
+def place_order(request, item_id):
+    item = get_object_or_404(MenuItem, id=item_id)
+    restaurant = item.menu.restaurant
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 1))
+        special_instructions = request.POST.get('special_instructions', '')
+        total_price = item.price * quantity
+        order = Order.objects.create(
+            customer=request.user,
+            restaurant=restaurant,
+            total_price=total_price,
+            special_instructions=special_instructions,
+        )
+        order.items.add(item)
+        order.save()
+        messages.success(request, f"Order placed for {quantity} x {item.name}!")
+        return redirect(reverse('webpage_restaurant_site:menu', kwargs={'slug': restaurant.slug}))
+    return render(request, 'webpage_restaurant_site/place_order.html', {'item': item, 'request': request})
     
 # def restaurant_landing(request, slug):
 #     profile = get_object_or_404(
@@ -128,6 +159,7 @@ def restaurant_menu(request, slug):
     lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
 
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
     context = {
         "profile": profile,
         "menus": menus,
@@ -136,6 +168,7 @@ def restaurant_menu(request, slug):
         "status": status,
         "GOOGLE_MAPS_API_KEY": key,
         "map_center": {"lat": lat, "lng": lng},
+        "is_customer": is_customer,
     }
     return render(request, "webpage_restaurant_site/menu.html", context)
 
