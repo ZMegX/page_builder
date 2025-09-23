@@ -115,6 +115,13 @@
                   </li>
                 </ul>
               </li>
+                {% if is_customer %}
+                  <li class="nav-item ms-lg-2">
+                    <a href="{% url 'webpage_restaurant_site:cart' %}" class="nav-link d-flex align-items-center">
+                      <i class="bi bi-cart3 me-1"></i>Cart
+                    </a>
+                  </li>
+                {% endif %}
             {% else %}
               <!-- Guest -->
               <li class="nav-item">

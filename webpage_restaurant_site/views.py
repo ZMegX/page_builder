@@ -1,3 +1,4 @@
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -15,6 +16,54 @@ from menus.models import Menu, MenuItem
 from locations.models import UserAddress
 from django.db.models import Q
 
+def is_customer(user):
+    return user.is_authenticated and user.groups.filter(name='Customer').exists()
+
+@login_required
+@user_passes_test(is_customer)
+@require_POST
+def add_to_cart(request, item_id):
+    item = get_object_or_404(MenuItem, id=item_id)
+    cart = request.session.get('cart', {})
+    cart_item = cart.get(str(item_id), {'name': item.name, 'price': float(item.price), 'quantity': 0})
+    cart_item['quantity'] += 1
+    cart[str(item_id)] = cart_item
+    request.session['cart'] = cart
+    messages.success(request, f"Added {item.name} to cart.")
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+@user_passes_test(is_customer)
+def cart_display(request):
+    cart = request.session.get('cart', {})
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    # Do not fetch RestaurantProfile for the current user (customer)
+    return render(request, 'webpage_restaurant_site/cart.html', {'cart': cart, 'total': total})
+
+@login_required
+@user_passes_test(is_customer)
+@require_POST
+def remove_from_cart(request, item_id):
+    cart = request.session.get('cart', {})
+    if str(item_id) in cart:
+        del cart[str(item_id)]
+        request.session['cart'] = cart
+        messages.success(request, "Item removed from cart.")
+    return redirect('webpage_restaurant_site:cart')
+
+@login_required
+@user_passes_test(is_customer)
+@require_POST
+def update_cart(request, item_id):
+    cart = request.session.get('cart', {})
+    quantity = int(request.POST.get('quantity', 1))
+    if str(item_id) in cart:
+        cart[str(item_id)]['quantity'] = quantity
+        request.session['cart'] = cart
+        messages.success(request, "Cart updated.")
+    return redirect('webpage_restaurant_site:cart')
+
+
 
 def is_customer(user):
     return user.is_authenticated and user.groups.filter(name='Customer').exists()
@@ -23,7 +72,7 @@ def is_customer(user):
 @user_passes_test(is_customer)
 def place_order(request, item_id):
     item = get_object_or_404(MenuItem, id=item_id)
-    restaurant = item.menu.restaurant
+    restaurant = RestaurantProfile.objects.get(user=item.menu.owner)
     if request.method == 'POST':
         quantity = int(request.POST.get('quantity', 1))
         special_instructions = request.POST.get('special_instructions', '')

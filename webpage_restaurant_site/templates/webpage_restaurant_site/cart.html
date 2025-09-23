@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Your Cart</h2>
+  {% if cart %}
+    <form method="post" action="">
+      {% csrf_token %}
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item_id, item in cart.items %}
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>${{ item.price|floatformat:2 }}</td>
+            <td>
+              <form method="post" action="{% url 'webpage_restaurant_site:update_cart' item_id=item_id %}">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control d-inline-block" style="width:80px;">
+                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Update</button>
+              </form>
+            </td>
+            <td>${{ item.price|floatformat:2|add:item.price|floatformat:2 }}</td>
+            <td>
+              <form method="post" action="{% url 'webpage_restaurant_site:remove_from_cart' item_id=item_id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <h4>Total: ${{ total|floatformat:2 }}</h4>
+        <a href="#" class="btn btn-success btn-lg">Place Order</a>
+      </div>
+    </form>
+  {% else %}
+    <div class="alert alert-info">Your cart is empty.</div>
+  {% endif %}
+</div>
+{% endblock %}
