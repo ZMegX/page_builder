@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
+from locations.models import CustomerAddress
 from django.utils.text import slugify
 from django.conf import settings
 
@@ -95,6 +96,19 @@ class RestaurantProfile(models.Model):
             self.slug = slugify(base)
         super().save(*args, **kwargs)
 
+
+class CustomerProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer_profile')
+    full_name = models.CharField(max_length=120, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    profile_picture = CloudinaryField('Profile picture', blank=True, null=True)
+    default_address = models.ForeignKey(CustomerAddress, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    preferences = models.JSONField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
 
 class Review(models.Model):
     restaurant = models.ForeignKey(RestaurantProfile, related_name="reviews", on_delete=models.CASCADE)

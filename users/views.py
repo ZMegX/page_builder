@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,6 +20,14 @@ from .models import Profile, RestaurantProfile, SocialLink, OpeningHour, Review
 from locations.models import UserAddress
 from django.db.models import Q
 from django.forms import modelformset_factory
+from django.contrib.auth.models import Group
+
+
+def is_restaurant_owner(user):
+    return user.is_authenticated and user.groups.filter(name='RestaurantOwner').exists()
+
+def is_customer(user):
+    return user.is_authenticated and user.groups.filter(name='Customer').exists()
 
 def documentation(request):
     return render(request, 'users/docs.html')
@@ -72,8 +81,18 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            role = form.cleaned_data.get('role')
             Profile.objects.get_or_create(user=user)
-            return redirect('login')  
+            if role == 'customer':
+                from users.models import CustomerProfile
+                CustomerProfile.objects.create(user=user)
+                group, _ = Group.objects.get_or_create(name='Customer')
+            else:
+                from users.models import RestaurantProfile
+                RestaurantProfile.objects.create(user=user)
+                group, _ = Group.objects.get_or_create(name='RestaurantOwner')
+            user.groups.add(group)
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
