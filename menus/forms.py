@@ -18,7 +18,8 @@ class MenuForm(forms.ModelForm):
             }),
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
-            })
+            }),
+            
         }
         labels = {
             'name': 'Menu Name',
@@ -35,7 +36,7 @@ class MenuForm(forms.ModelForm):
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["section", "name", "price", "ingredients", "image", "is_available"]
+        fields = ["section", "name", "price", "ingredients", "image", "is_available", "popular_items"]
         widgets = {
             'section': forms.Select(attrs={
                 'class': 'form-select'
@@ -64,6 +65,9 @@ class MenuItemForm(forms.ModelForm):
             'is_available': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
+            'popular_items': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
         }
         labels = {
             'section': 'Category',
@@ -71,7 +75,8 @@ class MenuItemForm(forms.ModelForm):
             'price': 'Price ($)',
             'ingredients': 'Ingredients',
             'image': 'Item Image',
-            'is_available': 'Available'
+            'is_available': 'Available',
+            'popular_items': 'Mark as Popular'
         }
 
     def __init__(self, *args, **kwargs):
