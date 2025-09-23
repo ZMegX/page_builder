@@ -31,4 +31,5 @@ urlpatterns = [
     path('review/<int:restaurant_pk>/', leave_review, name='leave_review'),
     # users/urls.py
     path('restaurant/<int:restaurant_pk>/reviews/', restaurant_reviews, name='restaurant_reviews'),
+    path('restaurant/orders/', views.restaurant_orders_list, name='restaurant_orders_list'),
 ]

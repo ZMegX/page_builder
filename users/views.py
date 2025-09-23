@@ -1,3 +1,6 @@
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+from .models import Order
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.conf import settings
@@ -22,6 +25,14 @@ from django.db.models import Q
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
 
+def is_restaurant_owner(user):
+    return hasattr(user, 'restaurant_profile') and user.restaurant_profile is not None
+
+@login_required
+@user_passes_test(is_restaurant_owner)
+def restaurant_orders_list(request):
+    orders = Order.objects.filter(restaurant=request.user.restaurant_profile).order_by('-created_at')
+    return render(request, 'users/restaurant_orders_list.html', {'orders': orders})
 
 def is_restaurant_owner(user):
     return user.is_authenticated and user.groups.filter(name='RestaurantOwner').exists()

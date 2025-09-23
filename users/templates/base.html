@@ -64,6 +64,12 @@
                       </a>
                     </li>
                     <li>
+                      <a class="dropdown-item {% if request.resolver_match.url_name == 'restaurant_orders_list' %}active{% endif %}"
+                        href="{% url 'restaurant_orders_list' %}">
+                        <i class="bi bi-receipt me-2"></i>Orders Received
+                      </a>
+                    </li>
+                    <li>
                       <a class="dropdown-item {% if request.resolver_match.url_name == 'restaurant_profile' %}active{% endif %}"
                         href="{% url 'restaurant_profile' %}">
                         <i class="bi bi-pencil-square me-2"></i>Restaurant Details

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Manage Orders{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Orders Received</h2>
+  {% if orders %}
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Total Price</th>
+          <th>Created At</th>
+          <th>Special Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.customer.username }}</td>
+          <td>{{ order.get_status_display }}</td>
+          <td>${{ order.total_price }}</td>
+          <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ order.special_instructions|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">No orders received yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
