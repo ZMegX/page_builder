@@ -1,9 +1,13 @@
-{% extends "base.html" %}
-{% block title %}Place Order{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Checkout Complete{% endblock %}
 {% block content %}
 <div class="container py-5">
-  <h2 class="mb-4">Place Your Order</h2>
-  <h4 class="mb-3">Review Your Cart</h4>
+  <h2 class="mb-4">Thank You For Your Order!</h2>
+  <h5 class="mb-3">Order Number: <span class="text-primary">{{ order_number }}</span></h5>
+  <div id="order-status" class="mb-3">
+    <strong>Status:</strong> <span class="text-info">{{ order_status }}</span>
+  </div>
+  <h4 class="mb-3">Order Summary</h4>
   <table class="table table-bordered table-hover align-middle">
     <thead class="table-light">
       <tr>
@@ -25,15 +29,13 @@
     </tbody>
   </table>
   <div class="d-flex justify-content-between align-items-center mt-4">
-    <h4>Total: €{{ cart.values|map:'price'|sum }}</h4>
+    <h4>Total: €{{ total_price|floatformat:2 }}</h4>
+    <span class="fw-bold">Option: {{ checkout_option }}</span>
   </div>
-  <form method="post" class="mt-4">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="special_instructions" class="form-label">Special Instructions (optional):</label>
-      <textarea name="special_instructions" id="special_instructions" class="form-control" rows="3"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary btn-lg">Place Order</button>
-  </form>
+  <div class="mt-4">
+    <h5>Payment Method: <span class="text-success">Cash</span></h5>
+    <p class="lead">Please pay by cash upon delivery or pickup.</p>
+  </div>
+
 </div>
 {% endblock %}

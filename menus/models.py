@@ -29,6 +29,7 @@ class Menu(models.Model):
 class MenuItem(models.Model):
     SECTION_CHOICES = [
         ('breakfast', 'Breakfast'),
+        ('main', 'Main Courses'),
         ('lunch', 'Lunch'),
         ('dinner', 'Dinner'),
         ('dessert', 'Dessert'),

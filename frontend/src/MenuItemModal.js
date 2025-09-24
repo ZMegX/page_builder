@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner, Alert } from 'react-bootstrap';
 
-function MenuItemModal({ show, item, onSave, onClose }) {
-  const SECTION_CHOICES = [
-    { value: 'breakfast', label: 'Breakfast' },
-    { value: 'lunch', label: 'Lunch' },
-    { value: 'dinner', label: 'Dinner' },
-    { value: 'dessert', label: 'Dessert' },
-    { value: 'drinks', label: 'Drinks' },
-    { value: 'appetizers', label: 'Appetizers' },
-    { value: 'sides', label: 'Sides' },
-    { value: 'specials', label: 'Specials' },
-    { value: 'vegan', label: 'Vegan' },
-    { value: 'gluten_free', label: 'Gluten Free' },
-    { value: 'kids', label: "Kids' Menu" },
-    { value: 'hot_drinks', label: 'Hot Drinks' }
-  ];
+function MenuItemModal({ show, item, onSave, onClose, sectionChoices }) {
+  // Always use sectionChoices prop for dropdown options
+  const SECTION_CHOICES = Array.isArray(sectionChoices) && sectionChoices.length > 0
+    ? sectionChoices
+    : [
+        { value: 'breakfast', label: 'Breakfast' },
+        { value: 'main', label: 'Main Courses' },
+        { value: 'lunch', label: 'Lunch' },
+        { value: 'dinner', label: 'Dinner' },
+        { value: 'dessert', label: 'Dessert' },
+        { value: 'drinks', label: 'Drinks' },
+        { value: 'appetizers', label: 'Appetizers' },
+        { value: 'sides', label: 'Sides' },
+        { value: 'specials', label: 'Specials' },
+        { value: 'vegan', label: 'Vegan' },
+        { value: 'gluten_free', label: 'Gluten Free' },
+        { value: 'kids', label: "Kids' Menu" },
+        { value: 'hot_drinks', label: 'Hot Drinks' }
+      ];
   const [form, setForm] = useState({
     name: '',
     section: 'breakfast',
@@ -25,6 +29,8 @@ function MenuItemModal({ show, item, onSave, onClose }) {
     image: '',
     is_popular: false,
   });
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (item) {
@@ -54,7 +60,8 @@ function MenuItemModal({ show, item, onSave, onClose }) {
   function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-
+    setUploading(true);
+    setError('');
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', 'react_upload_menuItem'); 
@@ -65,7 +72,17 @@ function MenuItemModal({ show, item, onSave, onClose }) {
     })
       .then(res => res.json())
       .then(data => {
-        setForm(f => ({ ...f, image: data.secure_url }));      });
+        if (data.secure_url) {
+          setForm(f => ({ ...f, image: data.secure_url }));
+        } else {
+          setError('Image upload failed.');
+        }
+        setUploading(false);
+      })
+      .catch(() => {
+        setError('Image upload failed.');
+        setUploading(false);
+      });
   }
 
   function handleChange(e) {
@@ -78,6 +95,16 @@ function MenuItemModal({ show, item, onSave, onClose }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setError('');
+    // Validation
+    if (!form.name.trim()) {
+      setError('Name is required.');
+      return;
+    }
+    if (!form.price || isNaN(form.price) || Number(form.price) <= 0) {
+      setError('Price must be a positive number.');
+      return;
+    }
     const payload = { ...form };
     if (item && item.id) payload.id = item.id;
     onSave(payload);
@@ -90,6 +117,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
           <Modal.Title>{item ? 'Edit Item' : 'Create Item'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}
           {/* Card-style image preview above form fields */}
           {form.image && (
             <div className="card-img-top mb-3" style={{ textAlign: 'center' }}>
@@ -97,43 +125,48 @@ function MenuItemModal({ show, item, onSave, onClose }) {
             </div>
           )}
           <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
-            <Form.Control name="name" value={form.name} onChange={handleChange} required />
+            <Form.Label htmlFor="menuitem-name">Name</Form.Label>
+            <Form.Control name="name" id="menuitem-name" aria-label="Menu Item Name" value={form.name} onChange={handleChange} required />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Check
               type="checkbox"
               label="Popular Dish"
               name="is_popular"
+              id="menuitem-popular"
+              aria-label="Popular Dish"
               checked={form.is_popular}
               onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Section</Form.Label>
-             <Form.Select name="section" value={form.section} onChange={handleChange}>
+            <Form.Label htmlFor="menuitem-section">Section</Form.Label>
+             <Form.Select name="section" id="menuitem-section" aria-label="Menu Item Section" value={form.section} onChange={handleChange}>
               {SECTION_CHOICES.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Price</Form.Label>
-            <Form.Control name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
+            <Form.Label htmlFor="menuitem-price">Price</Form.Label>
+            <Form.Control name="price" id="menuitem-price" aria-label="Menu Item Price" type="number" step="0.01" value={form.price} onChange={handleChange} required min="0.01" />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Ingredients</Form.Label>
-            <Form.Control name="ingredients" value={form.ingredients} onChange={handleChange} />
+            <Form.Label htmlFor="menuitem-ingredients">Ingredients</Form.Label>
+            <Form.Control name="ingredients" id="menuitem-ingredients" aria-label="Menu Item Ingredients" value={form.ingredients} onChange={handleChange} />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Image</Form.Label>
-            <Form.Control type="file" accept="image/*" onChange={handleImageUpload} />
+            <Form.Label htmlFor="menuitem-image">Image</Form.Label>
+            <Form.Control type="file" id="menuitem-image" aria-label="Menu Item Image" accept="image/*" onChange={handleImageUpload} />
+            {uploading && <Spinner animation="border" size="sm" className="ms-2" />}
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Check
               type="checkbox"
               label="Available"
               name="is_available"
+              id="menuitem-available"
+              aria-label="Available"
               checked={form.is_available}
               onChange={handleChange}
             />
@@ -141,7 +174,7 @@ function MenuItemModal({ show, item, onSave, onClose }) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" type="submit">{item ? 'Save Changes' : 'Create'}</Button>
+          <Button variant="primary" type="submit" disabled={uploading}>{item ? 'Save Changes' : 'Create'}</Button>
         </Modal.Footer>
       </Form>
     </Modal>

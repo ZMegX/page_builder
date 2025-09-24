@@ -111,26 +111,20 @@ def group_items_by_section(items):
         items_by_section[section_label].append(item)
     return dict(items_by_section)
 
-def public_menu_detail(request, slug: str, pk: int):
-    # public endpoint: slug = owner's username
-    owner = get_object_or_404(User, username=slug)
-    menu = get_object_or_404(
-        Menu.objects.prefetch_related("items"),
-        pk=pk,
-        owner=owner,
+def public_menu_detail(request, slug: str):
+    # public endpoint: slug = restaurant's slug
+    restaurant_profile = get_object_or_404(RestaurantProfile, slug=slug)
+    menus = Menu.objects.prefetch_related("items").filter(
+        owner=restaurant_profile.user,
         is_active=True,
     )
 
-    items_by_section = group_items_by_section(menu.items.all())
-
     context = {
-        "menu": menu,
-        "owner": owner,
-        "items_by_section": dict(items_by_section),
-        "is_owner": request.user.is_authenticated and menu.owner == request.user,
-        "total_items": menu.items.count(),
+        "menus": menus,
+        "restaurant_profile": restaurant_profile,
+        "is_owner": request.user.is_authenticated and restaurant_profile.user == request.user,
     }
-    return render(request, "restaurant_site/menu_detail.html", context)
+    return render(request, "restaurant_site/menus_list.html", context)
 
 class MenuUpdateView(LoginRequiredMixin, UpdateView):
     model = Menu
@@ -294,5 +288,16 @@ def my_menu(request):
         .order_by("menu__name", "section", "name")
     )
     return render(request, "menus/my_menu.html", {"items": items})
+
+from django.views.decorators.http import require_GET
+
+@require_GET
+def menu_sections_api(request):
+    # Always return all possible section choices
+    result = [
+        {"value": value, "label": label}
+        for value, label in MenuItem.SECTION_CHOICES
+    ]
+    return JsonResponse(result, safe=False)
 
 

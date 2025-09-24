@@ -19,6 +19,166 @@ from django.db.models import Q
 def is_customer(user):
     return user.is_authenticated and user.groups.filter(name='Customer').exists()
 
+
+@login_required
+@user_passes_test(is_customer)
+def place_order(request):
+    # Multi-item checkout: process all items in the cart
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        special_instructions = request.POST.get('special_instructions', '')
+        total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+        # Assume all items are from the same restaurant
+        first_item_id = next(iter(cart))
+        first_item = get_object_or_404(MenuItem, id=first_item_id)
+        restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+
+        # store order details in session for confirmation
+        request.session['order_details'] = {
+            'cart': cart,
+            'special_instructions': special_instructions,
+            'checkout_option': None,
+            'total_price': total_price,
+            'restaurant_slug': restaurant.slug,
+        }
+        messages.success(request, "Order placed successfully! Please confirm your order.")
+        return redirect('webpage_restaurant_site:order_confirmation')
+
+    return render(request, 'webpage_restaurant_site/place_order.html', {'cart': cart, 'request': request})
+
+    return render(request, 'webpage_restaurant_site/place_order.html', {'cart': cart, 'request': request})
+
+@login_required
+@user_passes_test(is_customer)
+def order_confirmation(request):
+
+    order_details = request.session.get('order_details', None)
+    # If order_details is missing, populate it from cart and redirect to self
+    if not order_details:
+        cart = request.session.get('cart', {})
+        if not cart:
+            messages.error(request, "Your cart is empty.")
+            return redirect('webpage_restaurant_site:cart')
+        # Calculate total and get restaurant info
+        total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+        first_item_id = next(iter(cart))
+        first_item = get_object_or_404(MenuItem, id=first_item_id)
+        restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+        order_details = {
+            'cart': cart,
+            'special_instructions': '',
+            'checkout_option': None,
+            'total_price': total_price,
+            'restaurant_slug': restaurant.slug,
+        }
+        request.session['order_details'] = order_details
+        # Redirect to self to ensure context is loaded
+        return redirect('webpage_restaurant_site:order_confirmation')
+
+    cart = order_details.get('cart', {})
+    total_price = order_details.get('total_price', 0)
+    special_instructions = order_details.get('special_instructions', '')
+    checkout_option = order_details.get('checkout_option', None)
+    restaurant_slug = order_details.get('restaurant_slug', '')
+    order_status = request.session.get('order_status', 'Pending')
+
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        # Guest chooses delivery/takeout and payment method
+        pay_method = request.POST.get('pay_method')
+        option = request.POST.get('option')
+        if not pay_method or not option:
+            messages.error(request, "Please select both delivery/takeout and payment method before confirming your order.")
+        else:
+            order_details['checkout_option'] = option
+            request.session['order_details'] = order_details
+            cart = order_details['cart']
+            special_instructions = order_details.get('special_instructions', '')
+            total_price = order_details.get('total_price', 0)
+            first_item_id = next(iter(cart))
+            first_item = get_object_or_404(MenuItem, id=first_item_id)
+            restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+            # Create the order now
+            order = Order.objects.create(
+                customer=request.user,
+                restaurant=restaurant,
+                total_price=total_price,
+                special_instructions=special_instructions,
+                status='Pending',
+                # fulfillment_option=option, # Uncomment if your model supports this
+                # payment_method=pay_method, # Uncomment if your model supports this
+            )
+            for item_id, item_data in cart.items():
+                menu_item = get_object_or_404(MenuItem, id=item_id)
+                order.items.add(menu_item)
+            order.save()
+            request.session['cart'] = {}
+            request.session['order_details'] = {}
+            request.session['order_id'] = order.id
+            request.session['order_status'] = 'Preparing'
+            messages.success(request, "Order confirmed! Please pay by cash upon delivery or pickup.")
+            return redirect('webpage_restaurant_site:checkout')
+
+    return render(request, 'webpage_restaurant_site/order_confirmation.html', {
+        'cart': cart,
+        'checkout_option': checkout_option,
+        'total_price': total_price,
+        'special_instructions': special_instructions,
+        'restaurant_slug': restaurant_slug,
+        'order_status': order_status,
+    })
+
+@login_required
+@user_passes_test(is_customer)
+def checkout(request):
+    order_id = request.session.get('order_id')
+    order = None
+    cart = {}
+    total_price = 0
+    checkout_option = None
+    order_number = None
+    order_status = request.session.get('order_status', 'Pending')
+    if order_id:
+        order = get_object_or_404(Order, id=order_id)
+        order_number = order.id
+        # Reconstruct cart from order items
+        for item in order.items.all():
+            cart[str(item.id)] = {
+                'name': item.name,
+                'price': float(item.price),
+                'quantity': 1,  # If you support quantity per item, update accordingly
+            }
+        total_price = order.total_price
+        # Try to get checkout_option from session or order (if you store it)
+        checkout_option = request.session.get('order_details', {}).get('checkout_option', None)
+    else:
+        messages.error(request, "No order found.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        # Finalize order, show thank you or payment page
+        messages.success(request, "Thank you for your order!")
+        # Optionally clear order session info
+        request.session['order_id'] = None
+        request.session['order_status'] = None
+        return redirect('webpage_restaurant_site:menu', slug=order.restaurant.slug)
+
+    return render(request, 'webpage_restaurant_site/checkout.html', {
+        'order': order,
+        'cart': cart,
+        'total_price': total_price,
+        'checkout_option': checkout_option,
+        'order_number': order_number,
+        'order_status': order_status,
+    })
+
 @login_required
 @user_passes_test(is_customer)
 @require_POST
@@ -64,37 +224,11 @@ def update_cart(request, item_id):
     return redirect('webpage_restaurant_site:cart')
 
 
-
-def is_customer(user):
-    return user.is_authenticated and user.groups.filter(name='Customer').exists()
-
-@login_required
-@user_passes_test(is_customer)
-def place_order(request, item_id):
-    item = get_object_or_404(MenuItem, id=item_id)
-    restaurant = RestaurantProfile.objects.get(user=item.menu.owner)
-    if request.method == 'POST':
-        quantity = int(request.POST.get('quantity', 1))
-        special_instructions = request.POST.get('special_instructions', '')
-        total_price = item.price * quantity
-        order = Order.objects.create(
-            customer=request.user,
-            restaurant=restaurant,
-            total_price=total_price,
-            special_instructions=special_instructions,
-        )
-        order.items.add(item)
-        order.save()
-        messages.success(request, f"Order placed for {quantity} x {item.name}!")
-        return redirect(reverse('webpage_restaurant_site:menu', kwargs={'slug': restaurant.slug}))
-    return render(request, 'webpage_restaurant_site/place_order.html', {'item': item, 'request': request})
-    
 # def restaurant_landing(request, slug):
 #     profile = get_object_or_404(
 #         RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours"),
 #         slug=slug
 #     )
-
 def redirect_to_restaurant_slug(request, username):
     try:
         user = User.objects.get(username=username)

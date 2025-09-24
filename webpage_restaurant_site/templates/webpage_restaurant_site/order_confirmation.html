@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Order Confirmation{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Order Confirmation</h2>
+  <h4 class="mb-3">Your Selected Items</h4>
+  <table class="table table-bordered table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item_id, item in cart.items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>€{{ item.price|floatformat:2 }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>€{{ item.price|floatformat:2|add:item.price|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <h4>Total: €{{ total_price|floatformat:2 }}</h4>    <span class="fw-bold">Option: {{ checkout_option }}</span>
+  </div>
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Choose fulfillment option:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="option" id="delivery" value="Delivery" required>
+        <label class="form-check-label" for="delivery">Delivery</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="option" id="takeout" value="Takeout" required>
+        <label class="form-check-label" for="takeout">Takeout</label>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Choose payment method:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="pay_method" id="cash" value="cash" required>
+        <label class="form-check-label" for="cash">Pay by Cash</label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success btn-lg">Confirm Order</button>
+  </form>
+
+  <div class="mt-5">
+    <h5>Order Status</h5>
+    <div class="alert alert-info">
+      <strong>Status:</strong>
+      {% if order_status %}
+        <span class="badge bg-primary">{{ order_status }}</span>
+      {% else %}
+        <span class="badge bg-secondary">Pending</span>
+      {% endif %}
+    </div>
+    <div class="mb-2">
+      <span class="text-muted">Possible statuses: </span>
+      <span class="badge bg-secondary">Pending</span>
+      <span class="badge bg-warning">Preparing</span>
+      <span class="badge bg-info">Ready</span>
+      <span class="badge bg-success">Completed</span>
+      <span class="badge bg-danger">Cancelled</span>
+    </div>
+    <p class="small text-muted">You can refresh this page to check for updates to your order status.</p>
+  </div>
+</div>
+{% endblock %}
