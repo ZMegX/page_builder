@@ -6,6 +6,8 @@ import MenuItemModal from './MenuItemModal';
 function MenuEditor() {
   // Toast state
   const [toast, setToast] = React.useState({ show: false, message: '', variant: 'success' });
+  const [savingOrder, setSavingOrder] = React.useState(false);
+  const [lastReorderedIds, setLastReorderedIds] = React.useState([]);
   const [menus, setMenus] = React.useState([]);
   const [selectedMenuId, setSelectedMenuId] = React.useState(null);
   const [items, setItems] = React.useState([]);
@@ -21,6 +23,12 @@ function MenuEditor() {
         if (userMenus.length > 0) {
           setSelectedMenuId(userMenus[0].id);
           setItems(userMenus[0].items);
+        }
+        // Check for ?addItem=1 in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('addItem') === '1') {
+          setEditingItem(null);
+          setShowModal(true);
         }
       });
   }, []);
@@ -129,7 +137,37 @@ function MenuEditor() {
     const newItems = items.filter(i => (i.section || 'Uncategorized') !== section)
       .concat(reordered);
     setItems(newItems);
-    setToast({ show: true, message: 'Items reordered (not yet saved to backend).', variant: 'info' });
+    setLastReorderedIds(reordered.map(i => i.id));
+    setToast({ show: true, message: 'Items reordered. Click "Save Order" to persist.', variant: 'info' });
+    // Optionally auto-save (comment out next line to disable auto-save)
+    // handleSaveOrder(section, reordered);
+    // Highlight for 1.5s
+    setTimeout(() => setLastReorderedIds([]), 1500);
+  }
+
+  function handleSaveOrder(section, reorderedItems) {
+    setSavingOrder(true);
+    const orderPayload = (reorderedItems || (sectionMap[section] || [])).map((item, idx) => ({ id: item.id, order: idx }));
+    fetch('/api/menu-items/reorder/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify(orderPayload),
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`Failed to save order for ${section}`);
+        return res.json();
+      })
+      .then(() => {
+        setToast({ show: true, message: `Order saved for ${section}!`, variant: 'success' });
+      })
+      .catch(err => {
+        setToast({ show: true, message: `Error saving order for ${section}: ${err.message}`, variant: 'danger' });
+      })
+      .finally(() => setSavingOrder(false));
+  // Remove stray bracket here
   }
 
   function handleMenuNameSave() {
@@ -317,87 +355,111 @@ function MenuEditor() {
                       No items in this section yet. Click <b>'Create Item'</b> to add one.
                     </div>
                   ) : (
-                    <Droppable droppableId={section} direction="vertical">
-                      {(provided) => (
-                        <div className="table-responsive" ref={provided.innerRef} {...provided.droppableProps}>
-                          <table className="table table-bordered align-middle">
-                            <thead>
-                              <tr>
-                                <th style={{ width: '40px' }}></th>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {sectionMap[section].map((item, idx) => {
-                                const isUnsaved = unsavedItemIds.includes(item.id);
-                                return (
-                                  <Draggable key={item.id} draggableId={String(item.id)} index={idx}>
-                                    {(provided, snapshot) => (
-                                      <tr
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        style={{
-                                          ...provided.draggableProps.style,
-                                          borderLeft: isUnsaved ? '6px solid #ffe066' : undefined,
-                                          background: isUnsaved ? '#fffbe6' : undefined,
-                                          boxShadow: snapshot.isDragging ? '0 2px 12px #e9ecef' : undefined
-                                        }}
-                                      >
-                                        <td {...provided.dragHandleProps} style={{ cursor: 'grab', textAlign: 'center', fontSize: '1.2em', color: '#adb5bd' }}>
-                                          &#9776;
-                                        </td>
-                                        <td>
-                                          {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
-                                            <img
-                                              src={item.image}
-                                              alt={item.name}
-                                              style={{ maxWidth: '60px', maxHeight: '60px', objectFit: 'cover', borderRadius: '8px' }}
-                                              onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
-                                            />
-                                          ) : (
-                                            <span className="text-muted">No image</span>
-                                          )}
-                                        </td>
-                                        <td>
-                                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            <input
-                                              type="text"
-                                              value={item.name}
-                                              onChange={e => {
-                                                const updated = { ...item, name: e.target.value };
-                                                setItems(items.map(i => i.id === item.id ? updated : i));
-                                                if (!unsavedItemIds.includes(item.id)) {
-                                                  setUnsavedItemIds([...unsavedItemIds, item.id]);
-                                                }
-                                              }}
-                                              className="form-control form-control-sm"
-                                              style={{ minWidth: '120px' }}
-                                            />
-                                            {isUnsaved && (
-                                              <span title="Unsaved changes" style={{ color: '#ffc107', marginLeft: '6px', fontSize: '1.2em' }}>
-                                                &#9888;
-                                              </span>
+                    <>
+                      <div className="d-flex mb-2 align-items-center gap-2">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          disabled={savingOrder || !(selectedMenu && selectedMenu.is_active)}
+                          onClick={() => handleSaveOrder(section)}
+                        >
+                          {savingOrder ? (
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          ) : null}
+                          Save Order
+                        </Button>
+                        {!selectedMenu?.is_active && (
+                          <span className="text-danger" style={{ fontSize: '0.95em' }}>Menu is inactive. Drag-and-drop disabled.</span>
+                        )}
+                      </div>
+                      <Droppable droppableId={section} direction="vertical" isDropDisabled={!selectedMenu?.is_active}>
+                        {(provided) => (
+                          <div className="table-responsive" ref={provided.innerRef} {...provided.droppableProps}>
+                            <table className="table table-bordered align-middle">
+                              <thead>
+                                <tr>
+                                  <th style={{ width: '40px' }}></th>
+                                  <th>Image</th>
+                                  <th>Name</th>
+                                  <th>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {sectionMap[section].map((item, idx) => {
+                                  const isUnsaved = unsavedItemIds.includes(item.id);
+                                  const isReordered = lastReorderedIds.includes(item.id);
+                                  return (
+                                    <Draggable key={item.id} draggableId={String(item.id)} index={idx} isDragDisabled={!selectedMenu?.is_active}>
+                                      {(provided, snapshot) => (
+                                        <tr
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          style={{
+                                            ...provided.draggableProps.style,
+                                            borderLeft: isUnsaved ? '6px solid #ffe066' : isReordered ? '6px solid #0d6efd' : undefined,
+                                            background: isUnsaved ? '#fffbe6' : isReordered ? '#e7f1ff' : undefined,
+                                            boxShadow: snapshot.isDragging ? '0 2px 12px #e9ecef' : undefined
+                                          }}
+                                        >
+                                          <td {...provided.dragHandleProps} style={{ cursor: selectedMenu?.is_active ? 'grab' : 'not-allowed', textAlign: 'center', fontSize: '1.2em', color: '#adb5bd' }} title={selectedMenu?.is_active ? 'Drag to reorder' : 'Menu is inactive'}>
+                                            &#9776;
+                                          </td>
+                                          <td>
+                                            {typeof item.image === 'string' && item.image.startsWith('https://res.cloudinary.com/') && item.image.trim() !== '' ? (
+                                              <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                style={{ maxWidth: '60px', maxHeight: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                                                onError={e => { e.target.onerror = null; e.target.src = '/static/default_profile_pic.png'; }}
+                                              />
+                                            ) : (
+                                              <span className="text-muted">No image</span>
                                             )}
-                                          </div>
-                                        </td>
-                                        <td>
-                                          <Button variant="primary" size="sm" onClick={() => { setEditingItem(item); setShowModal(true); }} style={{ borderRadius: '6px', fontWeight: 500 }}>Edit</Button>
-                                          <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)} style={{ borderRadius: '6px', fontWeight: 500, marginLeft: '6px' }}>Delete</Button>
-                                          <Button variant="success" size="sm" onClick={() => handleSave(item)} style={{ borderRadius: '6px', fontWeight: 500, marginLeft: '6px' }}>Save</Button>
-                                        </td>
-                                      </tr>
-                                    )}
-                                  </Draggable>
-                                );
-                              })}
-                              {provided.placeholder}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </Droppable>
+                                          </td>
+                                          <td>
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                              <input
+                                                type="text"
+                                                value={item.name}
+                                                onChange={e => {
+                                                  const updated = { ...item, name: e.target.value };
+                                                  setItems(items.map(i => i.id === item.id ? updated : i));
+                                                  if (!unsavedItemIds.includes(item.id)) {
+                                                    setUnsavedItemIds([...unsavedItemIds, item.id]);
+                                                  }
+                                                }}
+                                                className="form-control form-control-sm"
+                                                style={{ minWidth: '120px' }}
+                                              />
+                                              {isUnsaved && (
+                                                <span title="Unsaved changes" style={{ color: '#ffc107', marginLeft: '6px', fontSize: '1.2em' }}>
+                                                  &#9888;
+                                                </span>
+                                              )}
+                                              {isReordered && (
+                                                <span title="Reordered" style={{ color: '#0d6efd', marginLeft: '6px', fontSize: '1.2em' }}>
+                                                  &#8635;
+                                                </span>
+                                              )}
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <Button variant="primary" size="sm" onClick={() => { setEditingItem(item); setShowModal(true); }} style={{ borderRadius: '6px', fontWeight: 500 }}>Edit</Button>
+                                            <Button variant="danger" size="sm" onClick={() => handleDelete(item.id)} style={{ borderRadius: '6px', fontWeight: 500, marginLeft: '6px' }}>Delete</Button>
+                                            <Button variant="success" size="sm" onClick={() => handleSave(item)} style={{ borderRadius: '6px', fontWeight: 500, marginLeft: '6px' }}>Save</Button>
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </Draggable>
+                                  );
+                                })}
+                                {provided.placeholder}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </Droppable>
+                    </>
                   )}
                 </Tab>
               ))}
