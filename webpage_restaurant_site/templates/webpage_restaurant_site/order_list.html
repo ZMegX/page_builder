@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+{% block extra_css %}
+<style>
+  .order-table {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    background: #fff;
+  }
+  .order-table th, .order-table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    font-size: 1.05rem;
+  }
+  .order-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #222;
+    border-bottom: 2px solid #eee;
+  }
+  .order-table tbody tr {
+    transition: background 0.15s;
+  }
+  .order-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+  .order-status {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35em 0.8em;
+    font-size: 0.98rem;
+    display: inline-block;
+  }
+  .order-status.pending { background: #ffe082; color: #7c6f00; }
+  .order-status.completed { background: #c8e6c9; color: #256029; }
+  .order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
+  .order-status.in_progress { background: #bbdefb; color: #0d47a1; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="fw-bold mb-4 text-center">My Orders</h1>
+  <div class="table-responsive">
+    <table class="table order-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Restaurant</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td>{{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
+          <td>{{ order.restaurant.name }}</td>
+          <td>{{ order.total|floatformat:2 }} €</td>
+          <td>
+            <span class="order-status {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
+          </td>
+          <td>
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-primary btn-sm">View</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No orders found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

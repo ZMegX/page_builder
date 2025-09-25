@@ -9,6 +9,7 @@ from . import views
 from .views_menu_items import add_menu_item, menu_item_detail
 from rest_framework import routers
 from .views import MenuViewSet, MenuItemViewSet
+from users.views_restaurant import browse_restaurants
 
 app_name = "menus"
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('<int:pk>/export/', views.menu_export, name='menu_export'),  
     path('<int:menu_id>/items/add/', add_menu_item, name='menu_items_add'),  # Keep menu_id for clarity
     path('item/<int:item_id>/', menu_item_detail, name='menu_item_detail'),
+    path('restaurants/', browse_restaurants, name='browse_restaurants'),
     re_path(r'^(?!menu-editor/)(?P<slug>[^/]+)/$', views.public_menu_detail, name='public_menu_detail'),
     path('menus/<int:pk>/', MenuDetailView.as_view(), name='menu_detail'),    
     path("my/", views.my_menu, name="my_menu"), 

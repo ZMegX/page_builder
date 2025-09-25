@@ -68,6 +68,8 @@
       <span class="badge bg-success">Completed</span>
       <span class="badge bg-danger">Cancelled</span>
     </div>
+    <a href="{% url 'order_list' %}" class="btn btn-primary">View My Orders</a>
+    <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-secondary">View This Order</a>
     <p class="small text-muted">You can refresh this page to check for updates to your order status.</p>
   </div>
 </div>

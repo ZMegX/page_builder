@@ -20,8 +20,8 @@ urlpatterns = [
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
-    path("", include('menus.urls', namespace='menus')),
     path('', include('webpage_restaurant_site.urls')),
+    path("", include('menus.urls', namespace='menus')),
     path("", include("menus.public_urls")),
     path('locations/', include('locations.urls')),
     path('docs/', user_views.documentation, name='docs'),
