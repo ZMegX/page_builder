@@ -1,35 +1,88 @@
-{% extends 'base.html' %}
-{% block title %}Manage Orders{% endblock %}
+{% extends "base.html" %}
+{% block title %}Orders Received{% endblock %}
+{% block extra_css %}
+<style>
+  .order-table {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    background: #fff;
+  }
+  .order-table th, .order-table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+    font-size: 1.05rem;
+  }
+  .order-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #222;
+    border-bottom: 2px solid #eee;
+  }
+  .order-table tbody tr {
+    transition: background 0.15s;
+  }
+  .order-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+  .order-status {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35em 0.8em;
+    font-size: 0.98rem;
+    display: inline-block;
+  }
+  .order-status.pending { background: #ffe082; color: #7c6f00; }
+  .order-status.completed { background: #c8e6c9; color: #256029; }
+  .order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
+  .order-status.in_progress { background: #bbdefb; color: #0d47a1; }
+</style>
+{% endblock %}
 {% block content %}
-<div class="container">
-  <h2 class="mb-4">Orders Received</h2>
-  {% if orders %}
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
+<div class="container py-5">
+  <h1 class="fw-bold mb-4 text-center">Orders Received</h1>
+  <div class="table-responsive">
+    <table class="table order-table">
+      <thead>
         <tr>
-          <th>ID</th>
-          <th>Customer</th>
-          <th>Status</th>
-          <th>Total Price</th>
-          <th>Created At</th>
-          <th>Special Instructions</th>
+          <th scope="col">ID</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Status</th>
+          <th scope="col">Total</th>
+          <th scope="col">Created At</th>
+          <th scope="col">Instructions</th>
         </tr>
       </thead>
       <tbody>
         {% for order in orders %}
         <tr>
-          <td>{{ order.id }}</td>
+          <td>
+            <a href="{% url 'restaurant_order_detail' order.id %}" class="btn btn-link btn-sm">#{{ order.id }}</a>
+          </td>
           <td>{{ order.customer.username }}</td>
-          <td>{{ order.get_status_display }}</td>
-          <td>${{ order.total_price }}</td>
-          <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            <form method="post" action="{% url 'restaurant_orders_list' %}" class="d-inline">
+              {% csrf_token %}
+              <select name="status" class="form-select form-select-sm order-status-dropdown" onchange="this.form.submit()">
+                {% for key, value in order.STATUS_CHOICES %}
+                  <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+              <input type="hidden" name="order_id" value="{{ order.id }}">
+            </form>
+            <span class="order-status {{ order.status|lower|slugify }} ms-2">{{ order.get_status_display }}</span>
+          </td>
+          <td>{{ order.total|floatformat:2 }} €</td>
+          <td>{{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
           <td>{{ order.special_instructions|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">No orders received yet.</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
-    <div class="alert alert-info">No orders received yet.</div>
-  {% endif %}
+  </div>
 </div>
 {% endblock %}

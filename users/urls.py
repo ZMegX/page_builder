@@ -1,5 +1,5 @@
 from django.urls import path, include
-from users import views, ajax_views, views_restaurant
+from users import views, views_restaurant
 from django.contrib.auth import views as auth_views
 from users.forms import CustomSetPasswordForm
 from users.views_restaurant import (
@@ -10,6 +10,10 @@ from users.views_restaurant import (
 from users.views_users import (
     order_detail,
     order_list,
+)
+from users.api_views import (
+    CustomerOrderListView, CustomerOrderDetailView,
+    RestaurantOrderListView, RestaurantOrderDetailView,
 )
 
 urlpatterns = [
@@ -43,4 +47,11 @@ urlpatterns = [
     path('orders/<int:order_id>/', order_detail, name='order_detail'),
     path('orders/', order_list, name='order_list'),  # for order history
     path('restaurant/orders/', views.restaurant_orders_list, name='restaurant_orders_list'),
+    path('restaurant/orders/<int:order_id>/', views_restaurant.restaurant_order_detail, name='restaurant_order_detail'),
+
+    # API endpoints
+    path('api/orders/', CustomerOrderListView.as_view(), name='api_customer_orders'),
+    path('api/orders/<int:pk>/', CustomerOrderDetailView.as_view(), name='api_customer_order_detail'),
+    path('api/restaurant-orders/', RestaurantOrderListView.as_view(), name='api_restaurant_orders'),
+    path('api/restaurant-orders/<int:pk>/', RestaurantOrderDetailView.as_view(), name='api_restaurant_order_detail'),
 ]

@@ -65,12 +65,6 @@
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item {% if request.resolver_match.url_name == 'restaurant_orders_list' %}active{% endif %}"
-                        href="{% url 'restaurant_orders_list' %}">
-                        <i class="bi bi-receipt me-2"></i>Orders Received
-                      </a>
-                    </li>
-                    <li>
                       <a class="dropdown-item {% if request.resolver_match.url_name == 'restaurant_profile' %}active{% endif %}"
                         href="{% url 'restaurant_profile' %}">
                         <i class="bi bi-pencil-square me-2"></i>Restaurant Details
@@ -106,14 +100,29 @@
                       <i class="bi bi-person-circle me-2"></i>Account Settings
                     </a>
                   </li>
-                  {% if user.is_authenticated %}
+                  {% if user.customer_profile %}
                     <li>
                       <a class="dropdown-item {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}"
                         href="{% url 'order_list' %}">
                         <i class="bi bi-list-check me-2"></i>My Orders
                       </a>
                     </li>
+                  {% elif user.restaurant_profile %}
+                    <li>
+                      <a class="dropdown-item {% if request.resolver_match.url_name == 'restaurant_orders_list' %}active{% endif %}"
+                        href="{% url 'restaurant_orders_list' %}">
+                        <i class="bi bi-list-check me-2"></i>Recent Orders
+                      </a>
+                    </li>
                   {% endif %}
+                    {% if is_customer %}
+                      <li>
+                        <a class="dropdown-item {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}"
+                          href="{% url 'order_list' %}">
+                          <i class="bi bi-list-check me-2"></i>My Orders
+                        </a>
+                      </li>
+                    {% endif %}
                   <li>
                     <form method="post" action="{% url 'logout' %}">
                       {% csrf_token %}

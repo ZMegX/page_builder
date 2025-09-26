@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Order Details{% endblock %}
+{% block title %}Order #{{ order.id }} Details{% endblock %}
 {% block extra_css %}
 <style>
   .order-detail-card {
@@ -38,13 +38,12 @@
 {% endblock %}
 {% block content %}
 <div class="container py-5">
-  <h1 class="fw-bold mb-4 text-center">Order #{{ order.id }}</h1>
+  <h1 class="fw-bold mb-4 text-center">Order #{{ order.id }} Details</h1>
   <div class="order-detail-card">
     <div class="row mb-3">
       <div class="col-md-6">
-        <h5>Restaurant</h5>
-        <p class="mb-1 fw-bold">{{ order.restaurant.name }}</p>
-        <p class="mb-1 text-muted"><i class="bi bi-geo-alt me-1"></i>{{ order.restaurant.addresses.first.formatted_address }}</p>
+        <h5>Customer</h5>
+        <p class="mb-1 fw-bold">{{ order.customer.username }}</p>
       </div>
       <div class="col-md-6 text-md-end">
         <h5>Status</h5>
@@ -57,10 +56,10 @@
       <table class="table order-items-table">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Unit Price</th>
-            <th>Total</th>
+            <th scope="col">Item</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Unit Price</th>
+            <th scope="col">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -81,15 +80,15 @@
     </div>
     <div class="row mt-4">
       <div class="col-md-6">
-        <h5>Delivery Address</h5>
-        <p>{{ order.delivery_address|default:"Pickup" }}</p>
+        <h5>Special Instructions</h5>
+        <p>{{ order.special_instructions|default:"-" }}</p>
       </div>
       <div class="col-md-6 text-md-end">
-  <h5 class="mb-1">Total</h5>
-  <p class="fs-4 fw-bold">{{ order.total_price|floatformat:2 }} €</p>
+        <h5 class="mb-1">Total</h5>
+        <p class="fs-4 fw-bold">{{ order.total|floatformat:2 }} €</p>
       </div>
     </div>
   </div>
-  <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">Back to Orders</a>
+  <a href="{% url 'restaurant_orders_list' %}" class="btn btn-outline-secondary">Back to Orders</a>
 </div>
 {% endblock %}

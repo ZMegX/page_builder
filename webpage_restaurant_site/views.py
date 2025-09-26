@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect
-from users.models import Order
+from users.models import Order, OrderItem
 from menus.models import MenuItem
 from users.models import RestaurantProfile
 from django.http import HttpResponseRedirect, Http404
@@ -117,7 +117,13 @@ def order_confirmation(request):
             )
             for item_id, item_data in cart.items():
                 menu_item = get_object_or_404(MenuItem, id=item_id)
-                order.items.add(menu_item)
+                OrderItem.objects.create(
+                    order=order,
+                    menu_item=menu_item,
+                    quantity=item_data['quantity'],
+                    price=item_data['price'],
+                    notes=item_data.get('notes', '')
+                )
             order.save()
             request.session['cart'] = {}
             request.session['order_details'] = {}
@@ -126,6 +132,7 @@ def order_confirmation(request):
             messages.success(request, "Order confirmed! Please pay by cash upon delivery or pickup.")
             return redirect('webpage_restaurant_site:checkout')
 
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
     return render(request, 'webpage_restaurant_site/order_confirmation.html', {
         'cart': cart,
         'checkout_option': checkout_option,
@@ -133,6 +140,7 @@ def order_confirmation(request):
         'special_instructions': special_instructions,
         'restaurant_slug': restaurant_slug,
         'order_status': order_status,
+        'is_customer': is_customer,
     })
 
 @login_required
@@ -149,11 +157,12 @@ def checkout(request):
         order = get_object_or_404(Order, id=order_id)
         order_number = order.id
         # Reconstruct cart from order items
-        for item in order.items.all():
-            cart[str(item.id)] = {
-                'name': item.name,
+        for item in order.order_items.all():
+            cart[str(item.menu_item.id)] = {
+                'name': item.menu_item.name,
                 'price': float(item.price),
-                'quantity': 1,  # If you support quantity per item, update accordingly
+                'quantity': item.quantity,
+                'notes': item.notes,
             }
         total_price = order.total_price
         # Try to get checkout_option from session or order (if you store it)
@@ -170,6 +179,7 @@ def checkout(request):
         request.session['order_status'] = None
         return redirect('webpage_restaurant_site:menu', slug=order.restaurant.slug)
 
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
     return render(request, 'webpage_restaurant_site/checkout.html', {
         'order': order,
         'cart': cart,
@@ -177,6 +187,7 @@ def checkout(request):
         'checkout_option': checkout_option,
         'order_number': order_number,
         'order_status': order_status,
+        'is_customer': is_customer,
     })
 
 @login_required
