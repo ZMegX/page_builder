@@ -49,30 +49,5 @@
     </div>
     <button type="submit" class="btn btn-success btn-lg">Confirm Order</button>
   </form>
-
-  <div class="mt-5">
-    <h5>Order Status</h5>
-    <div class="alert alert-info">
-      <strong>Status:</strong>
-      {% if order_status %}
-        <span class="badge bg-primary">{{ order_status }}</span>
-      {% else %}
-        <span class="badge bg-secondary">Pending</span>
-      {% endif %}
-    </div>
-    <div class="mb-2">
-      <span class="text-muted">Possible statuses: </span>
-      <span class="badge bg-secondary">Pending</span>
-      <span class="badge bg-warning">Preparing</span>
-      <span class="badge bg-info">Ready</span>
-      <span class="badge bg-success">Completed</span>
-      <span class="badge bg-danger">Cancelled</span>
-    </div>
-    <a href="{% url 'order_list' %}" class="btn btn-primary">View My Orders</a>
-    {% if order and order.id %}
-      <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-secondary">View This Order</a>
-    {% endif %}
-    <p class="small text-muted">You can refresh this page to check for updates to your order status.</p>
-  </div>
 </div>
 {% endblock %}

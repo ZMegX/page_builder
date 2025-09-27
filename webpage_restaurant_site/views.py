@@ -15,6 +15,7 @@ from users.models import RestaurantProfile, User
 from menus.models import Menu, MenuItem
 from locations.models import UserAddress
 from django.db.models import Q
+from django.core.mail import send_mail
 
 def is_customer(user):
     return user.is_authenticated and user.groups.filter(name='Customer').exists()
@@ -125,6 +126,30 @@ def order_confirmation(request):
                     notes=item_data.get('notes', '')
                 )
             order.save()
+            # send confirmation email to customer
+            subject = f"Order Confirmation - {restaurant.name}"
+            item_lines = []
+            for item_data in cart.values():
+                item_lines.append(f"{item_data['name']} x{item_data['quantity']} (€{item_data['price']:.2f} each)")
+            items_str = "\n".join(item_lines)
+            message = (
+                f"Thank you for your order!\n\n"
+                f"Restaurant: {restaurant.name}\n"
+                f"Order Details:\n{items_str}\n"
+                f"Total: €{total_price:.2f}\n"
+                f"Fulfillment: {option}\n"
+                f"Payment: {pay_method}\n"
+                f"Special Instructions: {special_instructions}\n\n"
+                f"We will notify you when your order is ready."
+            )
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=True,
+            )
+
             request.session['cart'] = {}
             request.session['order_details'] = {}
             request.session['order_id'] = order.id
