@@ -7,8 +7,6 @@ from locations.models import CustomerAddress
 from django.utils.text import slugify
 
 
-
-
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),

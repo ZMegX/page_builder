@@ -47,10 +47,11 @@ def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
 def home(request):
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     q = request.GET.get('q', '')
-    restaurants = RestaurantProfile.objects.prefetch_related('addresses')
+    restaurants_qs = RestaurantProfile.objects.prefetch_related('addresses')
     if q:
-        restaurants = restaurants.filter(
+        restaurants_qs = restaurants_qs.filter(
             Q(name__icontains=q) |
             Q(cuisine_type__icontains=q) |
             Q(registration_number__icontains=q) |
@@ -60,13 +61,23 @@ def home(request):
         ).distinct()
     print("--- DEBUG: home view entered ---")
     print(f"Search query: '{q}'")
-    print(f"Restaurant count: {restaurants.count()}")
-    for r in restaurants:
+    print(f"Restaurant count: {restaurants_qs.count()}")
+    for r in restaurants_qs:
         print(f"- {r.name} | Cuisine: {r.cuisine_type} | Slug: {r.slug} | Addresses: {r.addresses.count()}")
         for addr in r.addresses.all():
             print(f"  Address: {addr.formatted_address} | lat={addr.latitude} | lng={addr.longitude}")
     print("--- DEBUG: END ---")
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    # Pagination
+    paginator = Paginator(restaurants_qs, 10)
+    page = request.GET.get('page')
+    try:
+        restaurants = paginator.page(page)
+    except PageNotAnInteger:
+        restaurants = paginator.page(1)
+    except EmptyPage:
+        restaurants = paginator.page(paginator.num_pages)
 
     review_form = ReviewForm(request.POST or None)
     if request.method == "POST" and review_form.is_valid():

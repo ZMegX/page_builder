@@ -1,0 +1,36 @@
+/* Hero Banner Styles for Why Choose Us */
+.hero-banner {
+  position: relative;
+  min-height: 480px;
+  border-radius: 2rem;
+  box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.12);
+  background: url('https://res.cloudinary.com/dgmvyic4g/image/upload/v1758984942/Firefly_A_modern_clean_and_appetizing_hero_image_for_a_restaurant_website_with_online_order_975371_jd25hb.jpg') center center/cover no-repeat;
+  overflow: hidden;
+}
+.hero-banner .container {
+  position: relative;
+  z-index: 2;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.hero-banner .hero-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.25); /* lighter overlay */
+  border-radius: 2rem;
+  z-index: 1;
+}
+.text-shadow {
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.lead.text-light {
+  color: #f8f9fa;
+}
+.display-5.text-white {
+  color: #fff;
+}
