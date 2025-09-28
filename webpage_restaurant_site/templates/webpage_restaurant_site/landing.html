@@ -21,7 +21,7 @@
           <a class="nav-link fw-semibold" href="#about">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-semibold" href="#menu">Menu</a>
+          <a class="nav-link fw-semibold" href="{% url 'webpage_restaurant_site:menu' slug=slug %}">Menu</a>
         </li>
         <li class="nav-item">
           <a class="nav-link fw-semibold" href="#contact">Contact</a>
@@ -59,15 +59,16 @@
 </section>
 {% endblock %}
 {% block about %}
-<section id="about" class="py-5 bg-light">
+<section id="about" class="py-5 bg-light fade-in">
   <div class="container">
     <div class="row justify-content-center align-items-center">
       <div class="col-lg-7 mb-4 mb-lg-0">
-        <h2 class="fw-bold mb-3">About Us</h2>
-        <p class="lead text-muted mb-3">
+        <h2 class="fw-bold mb-3" style="font-size:2rem;">About Us</h2>
+        <hr>
+        <p class="lead text-dark mb-3" style="font-size:1.15rem;">
           {{ profile.about_headline|default:"Our Story" }}
         </p>
-        <p class="mb-4" style="font-size: 1.08rem;">
+        <p class="mb-4" style="font-size: 1.15rem;">
           {% if profile.about_description %}
             {{ profile.about_description }}
           {% else %}
@@ -94,9 +95,10 @@
 </section>
 {% endblock %}
 {% block popular_items %}
-<section id="popular-items" class="py-5 bg-white">
+<section id="popular-items" class="py-5 bg-white fade-in">
   <div class="container">
-    <h2 class="text-center fw-bold mb-4">Most Popular Dishes</h2>
+    <h2 class="text-center fw-bold mb-4" style="font-size:2rem;">Most Popular Dishes</h2>
+    <hr>
     <div class="row justify-content-center">
       {% for item in popular_items %}
         <div class="col-md-4 mb-4">
@@ -123,103 +125,101 @@
     </div>
   </div>
 </section>
-{% endblock %}
-{% block content %}
-<div class="container py-4">
+<section id="contact" class="py-5 bg-white fade-in">
   <div class="card shadow-lg border-0 rounded-4 mb-5 bg-light fade-in-section">
-    <div class="row g-0 align-items-stretch">
-      <!-- Left Column: Restaurant Details -->
-      <div class="col-lg-6 d-flex flex-column justify-content-between p-4">
-        <div>
-          <div class="d-flex align-items-center mb-3">
-            {% if profile.logo %}
-              <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm me-3 logo-animate" style="max-height: 80px; border: 4px solid #fff;" alt="{{ profile.name }} logo">
-            {% endif %}
-            <div>
-              <h1 class="display-6 mb-0">{{ profile.name }}</h1>
-              {% if status.open_now %}
-                <span class="badge text-bg-success ms-auto">Open now</span>
-              {% else %}
-                <span class="badge text-bg-secondary ms-auto">Closed</span>
+      <div class="row g-0 align-items-stretch">
+        <!-- Left Column: Restaurant Details -->
+        <div class="col-lg-6 d-flex flex-column justify-content-between p-4">
+          <div>
+            <div class="d-flex align-items-center mb-3">
+              {% if profile.logo %}
+                <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm me-3 logo-animate" style="max-height: 80px; border: 4px solid #fff;" alt="{{ profile.name }} logo">
+              {% endif %}
+              <div>
+                <h1 class="display-6 mb-0">{{ profile.name }}</h1>
+                {% if status.open_now %}
+                  <span class="badge text-bg-success ms-auto">Open now</span>
+                {% else %}
+                  <span class="badge text-bg-secondary ms-auto">Closed</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2 fade-in-section">
+              {% if profile.cuisine_type %}
+                <div class="mb-2">
+                  <i class="bi bi-egg-fried me-2 text-muted"></i>
+                  <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+                </div>
+              {% endif %}
+              {% if profile.phone_number %}
+                <div class="mb-2">
+                  <i class="bi bi-telephone me-2 text-muted"></i>
+                  <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+                </div>
+              {% endif %}
+              {% if status.today_hours %}
+                <div class="mb-2">
+                  <i class="bi bi-clock me-2 text-muted"></i>
+                  <strong>Today's hours:</strong>
+                  {% for oh in status.today_hours %}
+                    {{ oh.open_time|time:"g:i A" }}–{{ oh.close_time|time:"g:i A" }}{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {% if address.formatted_address %}
+                <div class="mb-2">
+                  <i class="bi bi-geo-alt me-2 text-muted"></i>
+                  <strong>Address:</strong> {{ address.formatted_address }}
+                  <div>
+                    <a class="small" target="_blank" rel="noopener"
+                      href="https://www.google.com/maps/search/?api=1&query={{ address.formatted_address|urlencode }}">
+                      Get directions
+                    </a>
+                  </div>
+                </div>
               {% endif %}
             </div>
+            <div class="my-4">
+              {% if slug %}
+                <a href="{% url 'menus:public_menu_detail' slug=slug %}" class="btn btn-primary btn-lg w-100">
+                  <i class="bi bi-book-fill me-2"></i>View Menus
+                </a>
+              {% else %}
+                <span class="btn btn-secondary btn-lg w-100 disabled">No menu available</span>
+                {% endif %}
+            </div>
+            {% if profile.social_links.all %}
+              <section class="mt-auto pt-3 fade-in-section">
+                <strong>Follow us:</strong>
+                <div class="d-flex gap-2 mt-2 flex-wrap">
+                  {% for sl in profile.social_links.all %}
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ sl.url }}" target="_blank" rel="noopener">
+                      <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                    </a>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
           </div>
-          <div class="mb-2 fade-in-section">
-            {% if profile.cuisine_type %}
-              <div class="mb-2">
-                <i class="bi bi-egg-fried me-2 text-muted"></i>
-                <strong>Cuisine:</strong> {{ profile.cuisine_type }}
-              </div>
-            {% endif %}
-            {% if profile.phone_number %}
-              <div class="mb-2">
-                <i class="bi bi-telephone me-2 text-muted"></i>
-                <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
-              </div>
-            {% endif %}
-            {% if status.today_hours %}
-              <div class="mb-2">
-                <i class="bi bi-clock me-2 text-muted"></i>
-                <strong>Today's hours:</strong>
-                {% for oh in status.today_hours %}
-                  {{ oh.open_time|time:"g:i A" }}–{{ oh.close_time|time:"g:i A" }}{% if not forloop.last %}, {% endif %}
-                {% endfor %}
-              </div>
-            {% endif %}
-            {% if address.formatted_address %}
-              <div class="mb-2">
-                <i class="bi bi-geo-alt me-2 text-muted"></i>
-                <strong>Address:</strong> {{ address.formatted_address }}
+        </div>
+        <!-- Right Column: Map -->
+        <div class="col-lg-6 p-0">
+          <div class="h-100 w-100 d-flex align-items-center justify-content-center">
+            {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+              <div id="map" class="rounded w-100" style="height: 320px;"></div>
+            {% else %}
+              <div class="p-5 h-100 d-flex justify-content-center align-items-center text-center text-muted">
                 <div>
-                  <a class="small" target="_blank" rel="noopener"
-                     href="https://www.google.com/maps/search/?api=1&query={{ address.formatted_address|urlencode }}">
-                     Get directions
-                  </a>
+                  <i class="bi bi-geo-alt" style="font-size: 2.5rem;"></i>
+                  <div class="mt-2">No address has been set for this restaurant.</div>
                 </div>
               </div>
             {% endif %}
           </div>
-          <div class="my-4">
-            {% if slug %}
-              <a href="{% url 'menus:public_menu_detail' slug=slug %}" class="btn btn-primary btn-lg w-100">
-                <i class="bi bi-book-fill me-2"></i>View Menus
-              </a>
-            {% else %}
-              <span class="btn btn-secondary btn-lg w-100 disabled">No menu available</span>
-              {% endif %}
-          </div>
-          {% if profile.social_links.all %}
-            <section class="mt-auto pt-3 fade-in-section">
-              <strong>Follow us:</strong>
-              <div class="d-flex gap-2 mt-2 flex-wrap">
-                {% for sl in profile.social_links.all %}
-                  <a class="btn btn-sm btn-outline-secondary" href="{{ sl.url }}" target="_blank" rel="noopener">
-                    <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
-                  </a>
-                {% endfor %}
-              </div>
-            </section>
-          {% endif %}
-        </div>
-      </div>
-      <!-- Right Column: Map -->
-      <div class="col-lg-6 p-0">
-        <div class="h-100 w-100 d-flex align-items-center justify-content-center">
-          {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
-            <div id="map" class="rounded w-100" style="height: 320px;"></div>
-          {% else %}
-            <div class="p-5 h-100 d-flex justify-content-center align-items-center text-center text-muted">
-              <div>
-                <i class="bi bi-geo-alt" style="font-size: 2.5rem;"></i>
-                <div class="mt-2">No address has been set for this restaurant.</div>
-              </div>
-            </div>
-          {% endif %}
         </div>
       </div>
     </div>
-  </div>
-</div>
+</section>
 {% endblock %}
 {% block services %}
 <section id="services" class="py-5 bg-white">

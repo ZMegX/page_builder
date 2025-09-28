@@ -14,6 +14,7 @@ class Order(models.Model):
         ('ready', 'Ready'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        ('confirmed', 'Confirmed'),
     ]
 
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
@@ -23,6 +24,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     delivery_address = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True, help_text="Customer's phone number for this order")
     special_instructions = models.TextField(blank=True, null=True)
     pay_method = models.CharField(max_length=50, blank=True, null=True)  
 
@@ -52,11 +54,17 @@ class SocialLink(models.Model):
 class OpeningHour(models.Model):
     profile = models.ForeignKey('RestaurantProfile', on_delete=models.CASCADE, related_name='opening_hours')
     day_of_week = models.CharField(max_length=10)  # e.g., 'Monday'
-    open_time = models.TimeField()
-    close_time = models.TimeField()
+    is_closed = models.BooleanField(default=False)
+    open_time = models.TimeField(null=True, blank=True)
+    close_time = models.TimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.day_of_week}: {self.open_time} - {self.close_time}"
+        if self.is_closed:
+            return f"{self.day_of_week}: Closed"
+        elif self.open_time and self.close_time:
+            return f"{self.day_of_week}: {self.open_time} - {self.close_time}"
+        else:
+            return f"{self.day_of_week}: Not set"
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -87,6 +95,7 @@ class RestaurantProfile(models.Model):
     cuisine_type = models.CharField(max_length=100, blank=True, null=True)
     registration_number = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    max_capacity = models.PositiveIntegerField(default=40, help_text="Maximum number of guests the restaurant can accommodate at once")
     slug = models.SlugField(unique=True, blank=True)
     hero_headline = models.CharField(max_length=120, blank=True, null=True,
         help_text="Headline for the hero section on the landing page."

@@ -88,33 +88,29 @@
     {% for menu in menus %}
     <div class="menu-modern-card mb-5">
       <div class="menu-modern-section-title">{{ menu.name }}</div>
-      <div class="menu-modern-list">
-        {% for item in menu.items.all %}
-          <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2" style="border-radius: 1rem; background: #fff;">
-            <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
-              <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
-                  alt="{{ item.name }}"
-                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
-            </div>
-            <div class="menu-modern-item-info flex-grow-1">
-              <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
-              {% if item.ingredients %}
-                <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.ingredients }}</div>
-              {% endif %}
-            </div>
-            <div class="menu-modern-item-price ms-3" style="font-weight:700; color:#EB236F; font-size:1.1rem;">
-              ${{ item.price|floatformat:2 }}
-            </div>
-              {% if is_customer %}
+        <div class="menu-modern-list">
+          {% for item in menu.items.all %}
+            <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2" style="border-radius: 1rem; background: #fff;">
+              <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
+                <img src="{{ item.image.url|default:'/static/default_profile_pic.png' }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
+              </div>
+              <div class="menu-modern-item-info flex-grow-1">
+                <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
+                {% if item.description %}
+                  <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.description }}</div>
+                {% endif %}
+              </div>
+              <div class="menu-modern-item-price ms-3" style="font-weight:700; color:#EB236F; font-size:1.1rem;">
+                ${{ item.price }}
+              </div>
               <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="ms-3">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
               </form>
-            {% endif %}
-          </div>
-        {% empty %}
-          <div class="text-muted text-center py-4">This menu currently has no items.</div>
-        {% endfor %}
+            </div>
+          {% empty %}
+            <div class="text-muted text-center py-4">This menu currently has no items.</div>
+          {% endfor %}
       </div>
     </div>
   {% endfor %}

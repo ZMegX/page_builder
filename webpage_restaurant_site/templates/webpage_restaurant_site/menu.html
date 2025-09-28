@@ -3,6 +3,7 @@
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">
+<link rel="stylesheet" href="{% static 'css/menu_custom.css' %}">
 {% endblock %}
 {% load cloudinary %}
 {% block title %}{{ profile.name }} — Menu{% endblock %}
@@ -14,6 +15,13 @@
       <a href="{% url 'webpage_restaurant_site:landing' slug=profile.slug %}" class="btn btn-outline-secondary">
         &larr; Back to Restaurant
       </a>
+    </div>
+    <div class="mb-3">
+      {% if not user.is_authenticated %}
+        <div class="alert alert-info text-center mb-4">
+          To order, please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">sign up</a>.
+        </div>
+      {% endif %}
     </div>
     <section class="menu-selection-card mb-5">
       <div class="row g-0 align-items-stretch">
@@ -102,15 +110,15 @@
                 <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.ingredients }}</div>
               {% endif %}
             </div>
-            <div class="menu-modern-item-price ms-3" style="font-weight:700; color:#EB236F; font-size:1.1rem;">
-              ${{ item.price|floatformat:2 }}
-            </div>
-              {% if is_customer %}
-              <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="ms-3">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
-              </form>
-            {% endif %}
+              <div class="menu-modern-item-actions ms-3" style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="menu-modern-item-price">
+                  €{{ item.price|floatformat:2 }}
+                </div>
+                <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                </form>
+              </div>
           </div>
         {% empty %}
           <div class="text-muted text-center py-4">This menu currently has no items.</div>

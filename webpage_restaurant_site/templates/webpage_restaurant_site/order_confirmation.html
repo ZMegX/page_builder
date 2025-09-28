@@ -31,6 +31,10 @@
   <form method="post" class="mt-4">
     {% csrf_token %}
     <div class="mb-3">
+      <label class="form-label">Phone Number:</label>
+      <input type="text" name="phone_number" class="form-control" placeholder="Enter your phone number" required>
+    </div>
+    <div class="mb-3">
       <label class="form-label">Choose fulfillment option:</label>
       <div class="form-check">
         <input class="form-check-input" type="radio" name="option" id="delivery" value="Delivery" required>

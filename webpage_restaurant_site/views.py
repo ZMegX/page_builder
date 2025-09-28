@@ -95,6 +95,7 @@ def order_confirmation(request):
         # Guest chooses delivery/takeout and payment method
         pay_method = request.POST.get('pay_method')
         option = request.POST.get('option')
+        phone_number = request.POST.get('phone_number', '').strip()
         if not pay_method or not option:
             messages.error(request, "Please select both delivery/takeout and payment method before confirming your order.")
         else:
@@ -120,7 +121,7 @@ def order_confirmation(request):
                     delivery_address = new_address
                 else:
                     delivery_address = ''
-            # Create the order now
+            # Create the order now, including phone_number
             order = Order.objects.create(
                 customer=request.user,
                 restaurant=restaurant,
@@ -129,7 +130,8 @@ def order_confirmation(request):
                 status='Pending',
                 delivery_address=delivery_address,
                 pay_method=pay_method,
-         )
+                phone_number=phone_number,
+            )
             for item_id, item_data in cart.items():
                 menu_item = get_object_or_404(MenuItem, id=item_id)
                 OrderItem.objects.create(
@@ -153,6 +155,7 @@ def order_confirmation(request):
                 f"Total: €{total_price:.2f}\n"
                 f"Fulfillment: {option}\n"
                 f"Payment: {pay_method}\n"
+                f"Phone Number: {phone_number}\n"
                 f"Special Instructions: {special_instructions}\n\n"
                 f"We will notify you when your order is ready."
             )
@@ -229,10 +232,16 @@ def checkout(request):
         'is_customer': is_customer,
     })
 
-@login_required
-@user_passes_test(is_customer)
 @require_POST
 def add_to_cart(request, item_id):
+    # Check if user is authenticated and is a customer
+    if not request.user.is_authenticated or not is_customer(request.user):
+        # Save intended menu URL for redirect after signup
+        next_url = request.META.get('HTTP_REFERER', '/')
+        signup_url = reverse('register')  # Change 'signup' to your actual signup URL name
+        messages.info(request, "Please sign up or log in to add items to your cart.")
+        return redirect(f"{signup_url}?next={next_url}")
+
     item = get_object_or_404(MenuItem, id=item_id)
     cart = request.session.get('cart', {})
     cart_item = cart.get(str(item_id), {'name': item.name, 'price': float(item.price), 'quantity': 0})

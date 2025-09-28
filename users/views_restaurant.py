@@ -121,4 +121,15 @@ def restaurant_orders_list(request):
 def restaurant_order_detail(request, order_id):
     rp = getattr(request.user, 'restaurant_profile', None)
     order = get_object_or_404(Order, id=order_id, restaurant=rp)
+
+    if request.method == "POST":
+        status = request.POST.get("status")
+        if status and status in dict(order.STATUS_CHOICES):
+            order.status = status
+            order.save()
+            messages.success(request, f"Order status updated to {order.get_status_display()}.")
+        else:
+            messages.error(request, "Invalid status.")
+        return redirect("restaurant_order_detail", order_id=order.id)
+
     return render(request, 'users/restaurant_order_detail.html', {'order': order})
