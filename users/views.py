@@ -31,6 +31,24 @@ def is_restaurant_owner(user):
 @login_required
 @user_passes_test(is_restaurant_owner)
 def restaurant_orders_list(request):
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+        status = request.POST.get("status")
+        if order_id and status:
+            try:
+                order = Order.objects.get(id=order_id, restaurant=request.user.restaurant_profile)
+                order.status = status
+                order.save()
+                # Send email to customer
+                from django.core.mail import send_mail
+                subject = f"Your order #{order.id} status has been updated"
+                message = f"Hello {order.customer.username},\n\nYour order status is now: {order.get_status_display()}.\n\nThank you for ordering from {order.restaurant.name}."
+                recipient_list = [order.customer.email]
+                send_mail(subject, message, None, recipient_list, fail_silently=True)
+                messages.success(request, "Order status updated and customer notified.")
+            except Order.DoesNotExist:
+                messages.error(request, "Order not found.")
+        return redirect('restaurant_orders_list')
     orders = Order.objects.filter(restaurant=request.user.restaurant_profile).order_by('-created_at')
     return render(request, 'users/restaurant_orders_list.html', {'orders': orders})
 

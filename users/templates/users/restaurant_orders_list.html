@@ -72,9 +72,12 @@
             </form>
             <span class="order-status {{ order.status|lower|slugify }} ms-2">{{ order.get_status_display }}</span>
           </td>
-          <td>{{ order.total|floatformat:2 }} €</td>
+          <td>{{ order.total_price|floatformat:2 }} €</td>
           <td>{{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
           <td>{{ order.special_instructions|default:"-" }}</td>
+          <td>
+            <a href="{% url 'restaurant_order_detail' order.id %}" class="btn btn-outline-primary btn-sm">View</a>
+          </td>
         </tr>
         {% empty %}
         <tr>

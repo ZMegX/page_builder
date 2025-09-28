@@ -60,7 +60,7 @@
 					<td>{{ order.id }}</td>
 					<td>{{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</td>
 					<td>{{ order.restaurant.name }}</td>
-					<td>{{ order.total|floatformat:2 }} €</td>
+					<td>{{ order.total_price|floatformat:2 }} €</td>
 					<td>
 						<span class="order-status {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
 					</td>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load math_filters %}
 {% block title %}Your Cart{% endblock %}
 {% block content %}
 <div class="container py-5">
@@ -26,7 +27,7 @@
               <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Update</button>
             </form>
           </td>
-          <td>€{{ item.price|floatformat:2|add:item.price|floatformat:2 }}</td>
+          <td>€{{ item.price|mul:item.quantity|floatformat:2 }}</td>
           <td>
             <form method="post" action="{% url 'webpage_restaurant_site:remove_from_cart' item_id=item_id %}">
               {% csrf_token %}

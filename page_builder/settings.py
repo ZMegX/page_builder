@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'webpage_restaurant_site',
     'locations',
     'rest_framework',
-    
 ]
 
 MIDDLEWARE = [

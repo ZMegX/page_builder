@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load math_filters %}
 {% block title %}Order #{{ order.id }} Details{% endblock %}
 {% block extra_css %}
 <style>
@@ -68,7 +69,7 @@
             <td>{{ item.menu_item.name }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.price|floatformat:2 }} €</td>
-            <td>{{ item.price|floatformat:2|add:item.quantity|floatformat:2 }} €</td>
+            <td>{{ item.price|mul:item.quantity|floatformat:2 }} €</td>
           </tr>
           {% empty %}
           <tr>
@@ -80,12 +81,20 @@
     </div>
     <div class="row mt-4">
       <div class="col-md-6">
+        <h5>Delivery / Pickup</h5>
+        <p>
+          {% if order.delivery_address %}
+            <strong>Delivery Address:</strong> {{ order.delivery_address }}
+          {% else %}
+            <strong>Pickup at restaurant</strong>
+          {% endif %}
+        </p>
         <h5>Special Instructions</h5>
         <p>{{ order.special_instructions|default:"-" }}</p>
       </div>
       <div class="col-md-6 text-md-end">
         <h5 class="mb-1">Total</h5>
-        <p class="fs-4 fw-bold">{{ order.total|floatformat:2 }} €</p>
+        <p class="fs-4 fw-bold">{{ order.total_price|floatformat:2 }} €</p>
       </div>
     </div>
   </div>

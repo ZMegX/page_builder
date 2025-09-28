@@ -106,6 +106,20 @@ def order_confirmation(request):
             first_item_id = next(iter(cart))
             first_item = get_object_or_404(MenuItem, id=first_item_id)
             restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+            # Get delivery address if needed
+            delivery_address = None
+            if option == "Delivery":
+                address_id = request.POST.get("delivery_address")
+                new_address = request.POST.get("new_delivery_address")
+                if address_id:
+                    # Fetch address object and use its formatted_address
+                    from locations.models import CustomerAddress
+                    address_obj = CustomerAddress.objects.filter(id=address_id, customer_profile=request.user.customer_profile).first()
+                    delivery_address = address_obj.formatted_address if address_obj else ''
+                elif new_address:
+                    delivery_address = new_address
+                else:
+                    delivery_address = ''
             # Create the order now
             order = Order.objects.create(
                 customer=request.user,
@@ -113,6 +127,7 @@ def order_confirmation(request):
                 total_price=total_price,
                 special_instructions=special_instructions,
                 status='Pending',
+                delivery_address=delivery_address,
                 # fulfillment_option=option, # Uncomment if your model supports this
                 # payment_method=pay_method, # Uncomment if your model supports this
             )
