@@ -128,9 +128,8 @@ def order_confirmation(request):
                 special_instructions=special_instructions,
                 status='Pending',
                 delivery_address=delivery_address,
-                # fulfillment_option=option, # Uncomment if your model supports this
-                # payment_method=pay_method, # Uncomment if your model supports this
-            )
+                pay_method=pay_method,
+         )
             for item_id, item_data in cart.items():
                 menu_item = get_object_or_404(MenuItem, id=item_id)
                 OrderItem.objects.create(

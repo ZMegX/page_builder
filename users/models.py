@@ -24,6 +24,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     delivery_address = models.CharField(max_length=255, blank=True, null=True)
     special_instructions = models.TextField(blank=True, null=True)
+    pay_method = models.CharField(max_length=50, blank=True, null=True)  
 
     def __str__(self):
         return f'Order #{self.id} by {self.customer} for {self.restaurant}'
