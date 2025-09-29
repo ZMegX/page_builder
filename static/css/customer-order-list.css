@@ -1,0 +1,36 @@
+/* customer-order-list.css */
+.customer-order-list.order-table {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  background: #fff;
+}
+.customer-order-list.order-table th,
+.customer-order-list.order-table td {
+  vertical-align: middle;
+  padding: 1rem 0.75rem;
+  font-size: 1.05rem;
+}
+.customer-order-list.order-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #222;
+  border-bottom: 2px solid #eee;
+}
+.customer-order-list.order-table tbody tr {
+  transition: background 0.15s;
+}
+.customer-order-list.order-table tbody tr:hover {
+  background: #f8f9fa;
+}
+.customer-order-list.order-status {
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.35em 0.8em;
+  font-size: 0.98rem;
+  display: inline-block;
+}
+.customer-order-list.order-status.pending { background: #ffe082; color: #7c6f00; }
+.customer-order-list.order-status.completed { background: #c8e6c9; color: #256029; }
+.customer-order-list.order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
+.customer-order-list.order-status.in_progress { background: #bbdefb; color: #0d47a1; }

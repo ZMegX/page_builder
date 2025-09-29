@@ -24,6 +24,8 @@ from locations.models import UserAddress
 from django.db.models import Q
 from django.forms import modelformset_factory
 from django.contrib.auth.models import Group
+import json
+from django.urls import reverse
 
 def is_restaurant_owner(user):
     return hasattr(user, 'restaurant_profile') and user.restaurant_profile is not None
@@ -99,8 +101,6 @@ def home(request):
     restaurant_reviews = {r.pk: r.reviews.filter(is_approved=True) for r in restaurants}
 
     # Prepare addresses for map
-    import json
-    from django.urls import reverse
     addresses = []
     for r in restaurants:
         for addr in r.addresses.all():
@@ -125,8 +125,7 @@ def home(request):
     review_form = ReviewForm(request.POST or None)
     if request.method == "POST" and review_form.is_valid():
         review = review_form.save(commit=False)
-        # You may want to get the restaurant from POST data or context
-        # For example: review.restaurant = RestaurantProfile.objects.get(pk=request.POST.get('restaurant_id'))
+
         if request.user.is_authenticated:
             review.user = request.user
         review.save()

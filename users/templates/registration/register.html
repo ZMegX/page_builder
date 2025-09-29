@@ -1,15 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Register{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock %}
 {% load widget_tweaks %}
 {% block content %}
-<div class="d-flex flex-column align-items-center justify-content-start" style="min-height: 90vh; padding-top: 56px;">
-  <div class="card shadow-lg border-0 rounded-4 register-main-card p-0" style="max-width: 440px; width:100%;">
+<div class="d-flex flex-column align-items-center justify-content-start register">
+  <div class="card shadow-lg border-0 rounded-4 register-main-card p-0 register">
     <div class="p-4 p-md-5">
       <div class="text-center mb-3">
           <div class="logo-avatar">
               <img src="{% static 'images/logo.png' %}" alt="Logo">
           </div>
-        <h2 class="fw-bold mb-2" style="letter-spacing: .5px;">Create your account</h2>
+  <h2 class="fw-bold mb-2 register">Create your account</h2>
         <p class="text-secondary mb-0">Quick and easy registration</p>
       </div>
       <form method="post" novalidate autocomplete="off">
