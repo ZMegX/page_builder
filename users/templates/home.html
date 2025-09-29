@@ -11,6 +11,7 @@
     overflow: hidden;
     border: none;
     margin-bottom: 2rem;
+    margin-top: 1.5rem;
   }
   .home-restaurant-card:hover {
     box-shadow: 0 8px 32px rgba(0,0,0,0.14);
@@ -55,23 +56,19 @@
     border-radius: 8px;
     transition: box-shadow 0.2s;
   }
-  .home-action-buttons .btn-outline-primary {
-    border-color: #00c896;
-    color: #00c896;
-  }
-  .home-action-buttons .btn-outline-primary:hover {
-    background: #00c896;
+  .home-action-buttons .btn-modern-black {
+    background: #111;
     color: #fff;
-    box-shadow: 0 2px 8px rgba(0,200,150,0.08);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
   }
-  .home-action-buttons .btn-outline-success {
-    border-color: #ffb300;
-    color: #ffb300;
-  }
-  .home-action-buttons .btn-outline-success:hover {
-    background: #ffb300;
+  .home-action-buttons .btn-modern-black:hover, .home-action-buttons .btn-modern-black:focus {
+    background: #222;
     color: #fff;
-    box-shadow: 0 2px 8px rgba(255,179,0,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   }
   .home-action-buttons .btn-outline-primary.btn-sm,
   .home-action-buttons .btn-outline-success.btn-sm {
@@ -80,12 +77,14 @@
   }
   .modal-content {
     border-radius: 16px;
+    margin-top: 1.5rem;
   }
   .modal-header, .modal-footer {
     background: #f5f5f5;
     border-radius: 16px 16px 0 0;
     border-bottom: none;
     border-top: none;
+    margin-top: 1rem;
   }
   .badge.bg-secondary {
     background: #00c896 !important;
@@ -98,7 +97,7 @@
 {% endblock %}
 {% block content %}
 <div class="container py-5">
-  <h1 class="fw-bold mb-4 text-center">Browse Restaurants</h1>
+  <h1 class="fw-bold mb-4 text-center">Find your meal</h1>
   <form class="row mb-4 justify-content-center" method="get">
     <div class="col-md-4 mb-2">
       <input type="text" name="q" class="form-control" placeholder="Search by name or cuisine..." value="{{ request.GET.q }}">
@@ -110,114 +109,150 @@
     </div>
   </form>
   <div class="row">
-    <div class="col-lg-12 mb-4">
-      <div class="card shadow-sm rounded-4">
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm rounded-4 h-100">
         <div class="card-body p-2">
-          <h2 class="h5">All Restaurants on Map</h2>
-          <div id="restaurants-map" style="height: 320px; width: 100%; position:sticky;" class="rounded"></div>
+          <div id="restaurants-map" style="height: 480px; width: 100%; position:sticky;" class="rounded"></div>
         </div>
       </div>
     </div>
-    <div class="col-lg-12">
-      <h2 class="h5 mb-3">Restaurant List ({{ restaurants|length }})</h2>
-      {% for restaurant in restaurants %}
-      <div class="card mb-4 home-restaurant-card shadow-sm rounded-4">
-        <div class="row g-0">
-          {% if restaurant.logo %}
-            <div class="col-md-4 d-flex align-items-center justify-content-center">
-              <img src="{{ restaurant.logo.url }}" class="home-restaurant-logo" alt="{{ restaurant.name }} logo">
-            </div>
-          {% endif %}
-          <div class="col-md-8">
-            <div class="card-body d-flex flex-column h-100">
-              <h5 class="home-card-title mb-1">{{ restaurant.name }}</h5>
-              <div class="mb-2">
-                <span class="badge home-cuisine-badge"><i class="bi bi-egg-fried me-1"></i>{{ restaurant.cuisine_type }}</span>
+    <div class="col-lg-6 d-flex flex-column">
+      <div style="max-height: 480px; overflow-y: auto;">
+        {% for restaurant in restaurants %}
+        <div class="card mb-4 home-restaurant-card shadow-sm rounded-4">
+          <div class="row g-0">
+            {% if restaurant.logo %}
+              <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <img src="{{ restaurant.logo.url }}" class="home-restaurant-logo" alt="{{ restaurant.name }} logo">
               </div>
-              <div class="home-address-list mb-2">
-                {% for address in restaurant.addresses.all %}
-                  <div class="small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ address.formatted_address }}</div>
-                {% empty %}
-                  <div class="small text-muted">No address set</div>
-                {% endfor %}
-              </div>
-              <div class="home-action-buttons mt-auto">
-                {% if restaurant.slug %}
-                  <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" class="btn btn-outline-primary btn-sm w-100">
-                    View Page
-                  </a>
-                {% else %}
-                  <span class="text-muted small">No public page</span>
-                {% endif %}
-                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#reviewsModal{{ restaurant.pk }}">
-                  See all reviews
-                </button>
-                <div class="modal fade" id="reviewsModal{{ restaurant.pk }}" tabindex="-1" aria-labelledby="reviewsModalLabel{{ restaurant.pk }}" aria-hidden="true">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="reviewsModalLabel{{ restaurant.pk }}">Reviews for {{ restaurant.name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        {% with reviews=restaurant.filtered_reviews %}                          {% if reviews %}
-                            {% for review in reviews %}
-                              <div class="card mb-2">
-                                <div class="card-body">
-                                  <strong>{{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}</strong>
-                                  <span class="badge bg-warning">{{ review.rating }}★</span>
-                                  <p>{{ review.comment }}</p>
-                                  <small class="text-muted">{{ review.created_at|date:"SHORT_DATE_FORMAT" }}</small>
-                                </div>
-                              </div>
-                            {% endfor %}
-                          {% else %}
-                            <p>No reviews yet for this restaurant.</p>
-                          {% endif %}
-                        {% endwith %}
-                      </div>
-                    </div>
-                  </div>
+            {% endif %}
+            <div class="col-md-8">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="home-card-title mb-1">{{ restaurant.name }}</h5>
+                <div class="mb-2">
+                  <span class="badge home-cuisine-badge"><i class="bi bi-egg-fried me-1"></i>{{ restaurant.cuisine_type }}</span>
                 </div>
-                <div class="mt-2 text-end">
-                  <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal{{ restaurant.pk }}">
-                    <i class="bi bi-star me-1"></i> Leave a Review
+                <div class="home-address-list mb-2">
+                  {% for address in restaurant.addresses.all %}
+                    <div class="small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ address.formatted_address }}</div>
+                  {% empty %}
+                    <div class="small text-muted">No address set</div>
+                  {% endfor %}
+                </div>
+                <div class="home-action-buttons mt-auto">
+                  {% if restaurant.slug %}
+                    <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" class="btn btn-modern-black btn-sm w-100">
+                      <i class="bi bi-eye me-1"></i> View Page
+                    </a>
+                  {% else %}
+                    <span class="text-muted small">No public page</span>
+                  {% endif %}
+                  <button type="button" class="btn btn-modern-black btn-sm" data-bs-toggle="modal" data-bs-target="#reviewsModal{{ restaurant.pk }}">
+                    <i class="bi bi-chat-left-text me-1"></i> Reviews
                   </button>
-                </div>
-                <div class="modal fade" id="reviewModal{{ restaurant.pk }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ restaurant.pk }}" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <form method="post" action="{% url 'leave_review' restaurant.pk %}">
-                        {% csrf_token %}
+                  <div class="modal fade" id="reviewsModal{{ restaurant.pk }}" tabindex="-1" aria-labelledby="reviewsModalLabel{{ restaurant.pk }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="reviewModalLabel{{ restaurant.pk }}">Leave a Review for {{ restaurant.name }}</h5>
+                          <h5 class="modal-title" id="reviewsModalLabel{{ restaurant.pk }}">Reviews for {{ restaurant.name }}</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          <!-- Star rating widget -->
-                          <div class="mb-3">
-                            <label class="form-label">Rating</label>
-                            <div>
-                              {% for i in "12345" %}
-                                <input type="radio" class="btn-check" name="rating" id="star{{ i }}-{{ restaurant.pk }}" value="{{ i }}">
-                                <label class="btn btn-outline-warning" for="star{{ i }}-{{ restaurant.pk }}"><i class="bi bi-star-fill"></i></label>
+                          {% with reviews=restaurant.reviews.all %}
+                            {% if reviews %}
+                              {% for review in reviews %}
+                                {% if review.is_approved %}
+                                  <div class="card mb-2">
+                                    <div class="card-body">
+                                      <strong>{{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}</strong>
+                                      <span class="badge bg-warning">{{ review.rating }}★</span>
+                                      <p>{{ review.comment }}</p>
+                                      <small class="text-muted">{{ review.created_at|date:"SHORT_DATE_FORMAT" }}</small>
+                                    </div>
+                                  </div>
+                                {% endif %}
                               {% endfor %}
+                            {% else %}
+                              <p>No reviews yet for this restaurant.</p>
+                            {% endif %}
+                          {% endwith %}
+                          <div class="text-center mt-3">
+                            <button type="button" class="btn btn-modern-black btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal{{ restaurant.pk }}" data-bs-dismiss="modal">
+                              <i class="bi bi-star me-1"></i> Leave a Review
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Leave a Review button moved inside reviews modal below -->
+                  <div class="modal fade" id="reviewsModal{{ restaurant.pk }}" tabindex="-1" aria-labelledby="reviewsModalLabel{{ restaurant.pk }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="reviewsModalLabel{{ restaurant.pk }}">Reviews for {{ restaurant.name }}</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          {% with reviews=restaurant.filtered_reviews %}                          {% if reviews %}
+                              {% for review in reviews %}
+                                <div class="card mb-2">
+                                  <div class="card-body">
+                                    <strong>{{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}</strong>
+                                    <span class="badge bg-warning">{{ review.rating }}★</span>
+                                    <p>{{ review.comment }}</p>
+                                    <small class="text-muted">{{ review.created_at|date:"SHORT_DATE_FORMAT" }}</small>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              <p>No reviews yet for this restaurant.</p>
+                            {% endif %}
+                          {% endwith %}
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                          <button type="button" class="btn btn-modern-black btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal{{ restaurant.pk }}" data-bs-dismiss="modal">
+                            <i class="bi bi-star me-1"></i> Leave a Review
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal fade" id="reviewModal{{ restaurant.pk }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ restaurant.pk }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <form method="post" action="{% url 'leave_review' restaurant.pk %}">
+                          {% csrf_token %}
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="reviewModalLabel{{ restaurant.pk }}">Leave a Review for {{ restaurant.name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <!-- Star rating widget -->
+                            <div class="mb-3">
+                              <label class="form-label">Rating</label>
+                              <div>
+                                {% for i in "12345" %}
+                                  <input type="radio" class="btn-check" name="rating" id="star{{ i }}-{{ restaurant.pk }}" value="{{ i }}">
+                                  <label class="btn btn-outline-warning" for="star{{ i }}-{{ restaurant.pk }}"><i class="bi bi-star-fill"></i></label>
+                                {% endfor %}
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                              <label for="reviewer_name{{ restaurant.pk }}" class="form-label">Your Name (optional)</label>
+                              <input type="text" class="form-control" id="reviewer_name{{ restaurant.pk }}" name="reviewer_name" maxlength="100">
+                            </div>
+                            <div class="mb-3">
+                              <label for="comment{{ restaurant.pk }}" class="form-label">Comment</label>
+                              <textarea class="form-control" id="comment{{ restaurant.pk }}" name="comment" rows="3" maxlength="500" placeholder="Write your review..."></textarea>
                             </div>
                           </div>
-                          <div class="mb-3">
-                            <label for="reviewer_name{{ restaurant.pk }}" class="form-label">Your Name (optional)</label>
-                            <input type="text" class="form-control" id="reviewer_name{{ restaurant.pk }}" name="reviewer_name" maxlength="100">
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Submit Review</button>
                           </div>
-                          <div class="mb-3">
-                            <label for="comment{{ restaurant.pk }}" class="form-label">Comment</label>
-                            <textarea class="form-control" id="comment{{ restaurant.pk }}" name="comment" rows="3" maxlength="500" placeholder="Write your review..."></textarea>
-                          </div>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                          <button type="submit" class="btn btn-success">Submit Review</button>
-                        </div>
-                      </form>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -225,10 +260,10 @@
             </div>
           </div>
         </div>
+        {% empty %}
+        <div class="alert alert-warning">No restaurants found.</div>
+        {% endfor %}
       </div>
-      {% empty %}
-      <div class="alert alert-warning">No restaurants found.</div>
-      {% endfor %}
     </div>
   </div>
 </div>

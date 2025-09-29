@@ -1,3 +1,6 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -16,6 +19,28 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from .models import Menu, MenuItem
 from .serializers import MenuSerializer, MenuItemSerializer
+
+def redirect_to_frontend_add_item(request):
+    # Redirect to the frontend route for adding a menu item
+    return redirect('/menu-editor?addItem=1')
+
+@csrf_exempt
+@require_POST
+def menu_items_reorder_api(request):
+    """
+    Accepts a POST with JSON: [{"id": 123, "order": 0}, ...]
+    Updates MenuItem.order for each item.
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        for item in data:
+            menu_item = MenuItem.objects.get(id=item['id'])
+            menu_item.order = item['order']
+            menu_item.save(update_fields=['order'])
+        return JsonResponse({"success": True})
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+
 
 class MenuViewSet(viewsets.ModelViewSet):
     queryset = Menu.objects.all()
@@ -44,41 +69,6 @@ def get_restaurant_profile_card(request):
     
     return JsonResponse({'card_html': card_html})
 
-class MenuCreateView(LoginRequiredMixin, CreateView):
-    model = Menu
-    form_class = MenuForm
-    template_name = "menus/create_menu.html"
-    success_url = reverse_lazy("menus:menu_list")  # Or use a detail view if you want to redirect to the new menu
-
-    def form_valid(self, form):
-        menu = form.save(commit=False)
-        menu.owner = self.request.user
-        menu.save()
-        # If you want to handle MenuItemFormSet, you need to do it here
-        formset = MenuItemFormSet(self.request.POST, instance=menu)
-        if formset.is_valid():
-            formset.save()
-        else:
-            return self.form_invalid(form)
-        messages.success(self.request, f'Menu "{menu.name}" created successfully!')
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context["restaurant_profile"], _ = RestaurantProfile.objects.get_or_create(user=user)
-        context["profile"], _ = Profile.objects.get_or_create(user=user)
-        if self.request.method == "POST":
-            context["formset"] = MenuItemFormSet(self.request.POST)
-        else:
-            context["formset"] = MenuItemFormSet()
-        context["title"] = "Create New Menu"
-        # Add quick stats for the sidebar
-        user_menus_count = Menu.objects.filter(owner=user).count()
-        context["user_menus_count"] = user_menus_count
-        # Optionally add more stats here (active_menus_count, total_items_count, etc.)
-        return context
-    
     
 class MenuDetailView(LoginRequiredMixin, DetailView):
     model = Menu
@@ -111,26 +101,20 @@ def group_items_by_section(items):
         items_by_section[section_label].append(item)
     return dict(items_by_section)
 
-def public_menu_detail(request, slug: str, pk: int):
-    # public endpoint: slug = owner's username
-    owner = get_object_or_404(User, username=slug)
-    menu = get_object_or_404(
-        Menu.objects.prefetch_related("items"),
-        pk=pk,
-        owner=owner,
+def public_menu_detail(request, slug: str):
+    # public endpoint: slug = restaurant's slug
+    restaurant_profile = get_object_or_404(RestaurantProfile, slug=slug)
+    menus = Menu.objects.prefetch_related("items").filter(
+        owner=restaurant_profile.user,
         is_active=True,
     )
 
-    items_by_section = group_items_by_section(menu.items.all())
-
     context = {
-        "menu": menu,
-        "owner": owner,
-        "items_by_section": dict(items_by_section),
-        "is_owner": request.user.is_authenticated and menu.owner == request.user,
-        "total_items": menu.items.count(),
+        "menus": menus,
+        "restaurant_profile": restaurant_profile,
+        "is_owner": request.user.is_authenticated and restaurant_profile.user == request.user,
     }
-    return render(request, "restaurant_site/menu_detail.html", context)
+    return render(request, "restaurant_site/menus_list.html", context)
 
 class MenuUpdateView(LoginRequiredMixin, UpdateView):
     model = Menu
@@ -294,5 +278,16 @@ def my_menu(request):
         .order_by("menu__name", "section", "name")
     )
     return render(request, "menus/my_menu.html", {"items": items})
+
+from django.views.decorators.http import require_GET
+
+@require_GET
+def menu_sections_api(request):
+    # Always return all possible section choices
+    result = [
+        {"value": value, "label": label}
+        for value, label in MenuItem.SECTION_CHOICES
+    ]
+    return JsonResponse(result, safe=False)
 
 

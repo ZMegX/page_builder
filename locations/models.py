@@ -18,3 +18,19 @@ class UserAddress(models.Model):
     def __str__(self):
         return self.formatted_address
 
+
+class CustomerAddress(models.Model):
+    customer_profile = models.ForeignKey(
+        'users.CustomerProfile',
+        on_delete=models.CASCADE,
+        related_name='addresses'
+    )
+    formatted_address = models.CharField(max_length=255)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.formatted_address

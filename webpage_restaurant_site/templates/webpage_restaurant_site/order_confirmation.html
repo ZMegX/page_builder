@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load math_filters %}
+{% block title %}Order Confirmation{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">Order Confirmation</h2>
+  <h4 class="mb-3">Your Selected Items</h4>
+  <table class="table table-bordered table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item_id, item in cart.items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>€{{ item.price|floatformat:2 }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>€{{ item.price|mul:item.quantity|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <h4>Total: €{{ total_price|floatformat:2 }}</h4>    <span class="fw-bold">Option: {{ checkout_option }}</span>
+  </div>
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Phone Number:</label>
+      <input type="text" name="phone_number" class="form-control" placeholder="Enter your phone number" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Choose fulfillment option:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="option" id="delivery" value="Delivery" required>
+        <label class="form-check-label" for="delivery">Delivery</label>
+      </div>
+      <div class="mb-3" id="delivery-address-block" style="display:none;">
+        <label class="form-label">Delivery Address:</label>
+        {% if customer_addresses %}
+          <select name="delivery_address" class="form-select">
+            {% for address in customer_addresses %}
+              <option value="{{ address.id }}">{{ address.formatted_address }}</option>
+            {% endfor %}
+          </select>
+          <div class="mt-2 text-muted small">Or enter a new address below:</div>
+        {% endif %}
+        <input type="text" name="new_delivery_address" class="form-control mt-2" id="autocomplete" placeholder="Enter address">
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="option" id="takeout" value="Takeout" required>
+        <label class="form-check-label" for="takeout">Takeout</label>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Choose payment method:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="pay_method" id="cash" value="cash" required>
+        <label class="form-check-label" for="cash">Pay by Cash</label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success btn-lg">Confirm Order</button>
+  </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places"></script>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const deliveryRadio = document.getElementById('delivery');
+          const takeoutRadio = document.getElementById('takeout');
+          const addressBlock = document.getElementById('delivery-address-block');
+          function toggleAddress() {
+            addressBlock.style.display = deliveryRadio.checked ? 'block' : 'none';
+          }
+          deliveryRadio.addEventListener('change', toggleAddress);
+          takeoutRadio.addEventListener('change', toggleAddress);
+          toggleAddress();
+          // Google Maps Autocomplete
+          if (window.google && document.getElementById('autocomplete')) {
+            new google.maps.places.Autocomplete(document.getElementById('autocomplete'));
+          }
+        });
+</script>
+{% endblock %}

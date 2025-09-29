@@ -1,3 +1,7 @@
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render
+from .models import Order
+from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,6 +23,40 @@ from .models import Profile, RestaurantProfile, SocialLink, OpeningHour, Review
 from locations.models import UserAddress
 from django.db.models import Q
 from django.forms import modelformset_factory
+from django.contrib.auth.models import Group
+
+def is_restaurant_owner(user):
+    return hasattr(user, 'restaurant_profile') and user.restaurant_profile is not None
+
+@login_required
+@user_passes_test(is_restaurant_owner)
+def restaurant_orders_list(request):
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+        status = request.POST.get("status")
+        if order_id and status:
+            try:
+                order = Order.objects.get(id=order_id, restaurant=request.user.restaurant_profile)
+                order.status = status
+                order.save()
+                # Send email to customer
+                from django.core.mail import send_mail
+                subject = f"Your order #{order.id} status has been updated"
+                message = f"Hello {order.customer.username},\n\nYour order status is now: {order.get_status_display()}.\n\nThank you for ordering from {order.restaurant.name}."
+                recipient_list = [order.customer.email]
+                send_mail(subject, message, None, recipient_list, fail_silently=True)
+                messages.success(request, "Order status updated and customer notified.")
+            except Order.DoesNotExist:
+                messages.error(request, "Order not found.")
+        return redirect('restaurant_orders_list')
+    orders = Order.objects.filter(restaurant=request.user.restaurant_profile).order_by('-created_at')
+    return render(request, 'users/restaurant_orders_list.html', {'orders': orders})
+
+def is_restaurant_owner(user):
+    return user.is_authenticated and user.groups.filter(name='RestaurantOwner').exists()
+
+def is_customer(user):
+    return user.is_authenticated and user.groups.filter(name='Customer').exists()
 
 def documentation(request):
     return render(request, 'users/docs.html')
@@ -27,10 +65,11 @@ def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
 def home(request):
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     q = request.GET.get('q', '')
-    restaurants = RestaurantProfile.objects.prefetch_related('addresses')
+    restaurants_qs = RestaurantProfile.objects.prefetch_related('addresses')
     if q:
-        restaurants = restaurants.filter(
+        restaurants_qs = restaurants_qs.filter(
             Q(name__icontains=q) |
             Q(cuisine_type__icontains=q) |
             Q(registration_number__icontains=q) |
@@ -40,13 +79,23 @@ def home(request):
         ).distinct()
     print("--- DEBUG: home view entered ---")
     print(f"Search query: '{q}'")
-    print(f"Restaurant count: {restaurants.count()}")
-    for r in restaurants:
+    print(f"Restaurant count: {restaurants_qs.count()}")
+    for r in restaurants_qs:
         print(f"- {r.name} | Cuisine: {r.cuisine_type} | Slug: {r.slug} | Addresses: {r.addresses.count()}")
         for addr in r.addresses.all():
             print(f"  Address: {addr.formatted_address} | lat={addr.latitude} | lng={addr.longitude}")
     print("--- DEBUG: END ---")
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
+
+    # Pagination
+    paginator = Paginator(restaurants_qs, 10)
+    page = request.GET.get('page')
+    try:
+        restaurants = paginator.page(page)
+    except PageNotAnInteger:
+        restaurants = paginator.page(1)
+    except EmptyPage:
+        restaurants = paginator.page(paginator.num_pages)
 
     review_form = ReviewForm(request.POST or None)
     if request.method == "POST" and review_form.is_valid():
@@ -72,8 +121,18 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            role = form.cleaned_data.get('role')
             Profile.objects.get_or_create(user=user)
-            return redirect('login')  
+            if role == 'customer':
+                from users.models import CustomerProfile
+                CustomerProfile.objects.create(user=user)
+                group, _ = Group.objects.get_or_create(name='Customer')
+            else:
+                from users.models import RestaurantProfile
+                RestaurantProfile.objects.create(user=user)
+                group, _ = Group.objects.get_or_create(name='RestaurantOwner')
+            user.groups.add(group)
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})

@@ -1,3 +1,11 @@
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404, redirect
+from users.models import Order, OrderItem
+from menus.models import MenuItem
+from users.models import RestaurantProfile
 from django.http import HttpResponseRedirect, Http404
 import calendar
 from django.conf import settings
@@ -7,14 +15,279 @@ from users.models import RestaurantProfile, User
 from menus.models import Menu, MenuItem
 from locations.models import UserAddress
 from django.db.models import Q
+from django.core.mail import send_mail
 
-    
+def is_customer(user):
+    return user.is_authenticated and user.groups.filter(name='Customer').exists()
+
+
+@login_required
+@user_passes_test(is_customer)
+def place_order(request):
+    # Multi-item checkout: process all items in the cart
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        special_instructions = request.POST.get('special_instructions', '')
+        total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+        # Assume all items are from the same restaurant
+        first_item_id = next(iter(cart))
+        first_item = get_object_or_404(MenuItem, id=first_item_id)
+        restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+
+        # store order details in session for confirmation
+        request.session['order_details'] = {
+            'cart': cart,
+            'special_instructions': special_instructions,
+            'checkout_option': None,
+            'total_price': total_price,
+            'restaurant_slug': restaurant.slug,
+        }
+        messages.success(request, "Order placed successfully! Please confirm your order.")
+        return redirect('webpage_restaurant_site:order_confirmation')
+
+    return render(request, 'webpage_restaurant_site/place_order.html', {'cart': cart, 'request': request})
+
+    return render(request, 'webpage_restaurant_site/place_order.html', {'cart': cart, 'request': request})
+
+@login_required
+@user_passes_test(is_customer)
+def order_confirmation(request):
+
+    order_details = request.session.get('order_details', None)
+    # If order_details is missing, populate it from cart and redirect to self
+    if not order_details:
+        cart = request.session.get('cart', {})
+        if not cart:
+            messages.error(request, "Your cart is empty.")
+            return redirect('webpage_restaurant_site:cart')
+        # Calculate total and get restaurant info
+        total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+        first_item_id = next(iter(cart))
+        first_item = get_object_or_404(MenuItem, id=first_item_id)
+        restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+        order_details = {
+            'cart': cart,
+            'special_instructions': '',
+            'checkout_option': None,
+            'total_price': total_price,
+            'restaurant_slug': restaurant.slug,
+        }
+        request.session['order_details'] = order_details
+        # Redirect to self to ensure context is loaded
+        return redirect('webpage_restaurant_site:order_confirmation')
+
+    cart = order_details.get('cart', {})
+    total_price = order_details.get('total_price', 0)
+    special_instructions = order_details.get('special_instructions', '')
+    checkout_option = order_details.get('checkout_option', None)
+    restaurant_slug = order_details.get('restaurant_slug', '')
+    order_status = request.session.get('order_status', 'Pending')
+
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        # Guest chooses delivery/takeout and payment method
+        pay_method = request.POST.get('pay_method')
+        option = request.POST.get('option')
+        phone_number = request.POST.get('phone_number', '').strip()
+        if not pay_method or not option:
+            messages.error(request, "Please select both delivery/takeout and payment method before confirming your order.")
+        else:
+            order_details['checkout_option'] = option
+            request.session['order_details'] = order_details
+            cart = order_details['cart']
+            special_instructions = order_details.get('special_instructions', '')
+            total_price = order_details.get('total_price', 0)
+            first_item_id = next(iter(cart))
+            first_item = get_object_or_404(MenuItem, id=first_item_id)
+            restaurant = RestaurantProfile.objects.get(user=first_item.menu.owner)
+            # Get delivery address if needed
+            delivery_address = None
+            if option == "Delivery":
+                address_id = request.POST.get("delivery_address")
+                new_address = request.POST.get("new_delivery_address")
+                if address_id:
+                    # Fetch address object and use its formatted_address
+                    from locations.models import CustomerAddress
+                    address_obj = CustomerAddress.objects.filter(id=address_id, customer_profile=request.user.customer_profile).first()
+                    delivery_address = address_obj.formatted_address if address_obj else ''
+                elif new_address:
+                    delivery_address = new_address
+                else:
+                    delivery_address = ''
+            # Create the order now, including phone_number
+            order = Order.objects.create(
+                customer=request.user,
+                restaurant=restaurant,
+                total_price=total_price,
+                special_instructions=special_instructions,
+                status='Pending',
+                delivery_address=delivery_address,
+                pay_method=pay_method,
+                phone_number=phone_number,
+            )
+            for item_id, item_data in cart.items():
+                menu_item = get_object_or_404(MenuItem, id=item_id)
+                OrderItem.objects.create(
+                    order=order,
+                    menu_item=menu_item,
+                    quantity=item_data['quantity'],
+                    price=item_data['price'],
+                    notes=item_data.get('notes', '')
+                )
+            order.save()
+            # send confirmation email to customer
+            subject = f"Order Confirmation - {restaurant.name}"
+            item_lines = []
+            for item_data in cart.values():
+                item_lines.append(f"{item_data['name']} x{item_data['quantity']} (€{item_data['price']:.2f} each)")
+            items_str = "\n".join(item_lines)
+            message = (
+                f"Thank you for your order!\n\n"
+                f"Restaurant: {restaurant.name}\n"
+                f"Order Details:\n{items_str}\n"
+                f"Total: €{total_price:.2f}\n"
+                f"Fulfillment: {option}\n"
+                f"Payment: {pay_method}\n"
+                f"Phone Number: {phone_number}\n"
+                f"Special Instructions: {special_instructions}\n\n"
+                f"We will notify you when your order is ready."
+            )
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=True,
+            )
+
+            request.session['cart'] = {}
+            request.session['order_details'] = {}
+            request.session['order_id'] = order.id
+            request.session['order_status'] = 'Preparing'
+            messages.success(request, "Order confirmed! Please pay by cash upon delivery or pickup.")
+            return redirect('webpage_restaurant_site:checkout')
+
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
+    return render(request, 'webpage_restaurant_site/order_confirmation.html', {
+        'cart': cart,
+        'checkout_option': checkout_option,
+        'total_price': total_price,
+        'special_instructions': special_instructions,
+        'restaurant_slug': restaurant_slug,
+        'order_status': order_status,
+        'is_customer': is_customer,
+    })
+
+@login_required
+@user_passes_test(is_customer)
+def checkout(request):
+    order_id = request.session.get('order_id')
+    order = None
+    cart = {}
+    total_price = 0
+    checkout_option = None
+    order_number = None
+    order_status = request.session.get('order_status', 'Pending')
+    if order_id:
+        order = get_object_or_404(Order, id=order_id)
+        order_number = order.id
+        # Reconstruct cart from order items
+        for item in order.order_items.all():
+            cart[str(item.menu_item.id)] = {
+                'name': item.menu_item.name,
+                'price': float(item.price),
+                'quantity': item.quantity,
+                'notes': item.notes,
+            }
+        total_price = order.total_price
+        # Try to get checkout_option from session or order (if you store it)
+        checkout_option = request.session.get('order_details', {}).get('checkout_option', None)
+    else:
+        messages.error(request, "No order found.")
+        return redirect('webpage_restaurant_site:cart')
+
+    if request.method == 'POST':
+        # Finalize order, show thank you or payment page
+        messages.success(request, "Thank you for your order!")
+        # Optionally clear order session info
+        request.session['order_id'] = None
+        request.session['order_status'] = None
+        return redirect('webpage_restaurant_site:menu', slug=order.restaurant.slug)
+
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
+    return render(request, 'webpage_restaurant_site/checkout.html', {
+        'order': order,
+        'cart': cart,
+        'total_price': total_price,
+        'checkout_option': checkout_option,
+        'order_number': order_number,
+        'order_status': order_status,
+        'is_customer': is_customer,
+    })
+
+@require_POST
+def add_to_cart(request, item_id):
+    # Check if user is authenticated and is a customer
+    if not request.user.is_authenticated or not is_customer(request.user):
+        # Save intended menu URL for redirect after signup
+        next_url = request.META.get('HTTP_REFERER', '/')
+        signup_url = reverse('register')  # Change 'signup' to your actual signup URL name
+        messages.info(request, "Please sign up or log in to add items to your cart.")
+        return redirect(f"{signup_url}?next={next_url}")
+
+    item = get_object_or_404(MenuItem, id=item_id)
+    cart = request.session.get('cart', {})
+    cart_item = cart.get(str(item_id), {'name': item.name, 'price': float(item.price), 'quantity': 0})
+    cart_item['quantity'] += 1
+    cart[str(item_id)] = cart_item
+    request.session['cart'] = cart
+    messages.success(request, f"Added {item.name} to cart.")
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+@user_passes_test(is_customer)
+def cart_display(request):
+    cart = request.session.get('cart', {})
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    # Do not fetch RestaurantProfile for the current user (customer)
+    return render(request, 'webpage_restaurant_site/cart.html', {'cart': cart, 'total': total})
+
+@login_required
+@user_passes_test(is_customer)
+@require_POST
+def remove_from_cart(request, item_id):
+    cart = request.session.get('cart', {})
+    if str(item_id) in cart:
+        del cart[str(item_id)]
+        request.session['cart'] = cart
+        messages.success(request, "Item removed from cart.")
+    return redirect('webpage_restaurant_site:cart')
+
+@login_required
+@user_passes_test(is_customer)
+@require_POST
+def update_cart(request, item_id):
+    cart = request.session.get('cart', {})
+    quantity = int(request.POST.get('quantity', 1))
+    if str(item_id) in cart:
+        cart[str(item_id)]['quantity'] = quantity
+        request.session['cart'] = cart
+        messages.success(request, "Cart updated.")
+    return redirect('webpage_restaurant_site:cart')
+
+
 # def restaurant_landing(request, slug):
 #     profile = get_object_or_404(
 #         RestaurantProfile.objects.select_related("user").prefetch_related("addresses", "social_links", "opening_hours"),
 #         slug=slug
 #     )
-
 def redirect_to_restaurant_slug(request, username):
     try:
         user = User.objects.get(username=username)
@@ -128,6 +401,7 @@ def restaurant_menu(request, slug):
     lng = float(address.longitude) if address and hasattr(address, 'longitude') and address.longitude is not None else None
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
 
+    is_customer = request.user.is_authenticated and request.user.groups.filter(name='Customer').exists()
     context = {
         "profile": profile,
         "menus": menus,
@@ -136,6 +410,7 @@ def restaurant_menu(request, slug):
         "status": status,
         "GOOGLE_MAPS_API_KEY": key,
         "map_center": {"lat": lat, "lng": lng},
+        "is_customer": is_customer,
     }
     return render(request, "webpage_restaurant_site/menu.html", context)
 

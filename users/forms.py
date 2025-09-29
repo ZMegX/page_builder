@@ -49,10 +49,15 @@ class RestaurantDetailsForm(forms.ModelForm):
 # User Registration Form (extend as needed)
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
+    ROLE_CHOICES = [
+        ('customer', 'Customer'),
+        ('restaurant', 'Restaurant Owner'),
+    ]
+    role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ("email",)
+        fields = UserCreationForm.Meta.fields + ("email", "role")
 
 # Custom Set Password Form (for password reset/change flows)
 class CustomSetPasswordForm(SetPasswordForm):

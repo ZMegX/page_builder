@@ -2,8 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.conf import settings
-
-from .models import RestaurantProfile, Profile
 from .restaurant_forms import (
     RestaurantProfileForm,
     SocialLinkFormSet,
@@ -13,9 +11,7 @@ from .restaurant_forms import (
 )
 from locations.models import UserAddress
 from django.db.models import Q
-from users.models import Review
-
-
+from users.models import RestaurantProfile, Order, Profile
 
 @login_required
 def restaurant_profile(request):
@@ -97,3 +93,43 @@ def leave_review(request, restaurant_pk):
         else:
             messages.error(request, "There was an error with your review. Please check the form.")
     return redirect('home')
+
+@login_required
+def restaurant_orders_list(request):
+    if not hasattr(request.user, 'restaurant_profile') or not request.user.restaurant_profile:
+        return render(request, 'users/restaurant_orders_list.html', {'orders': []})
+
+    rp = request.user.restaurant_profile
+
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+        status = request.POST.get("status")
+        if order_id and status:
+            order = Order.objects.filter(id=order_id, restaurant=rp).first()
+            if order and status in dict(order.STATUS_CHOICES):
+                order.status = status
+                order.save()
+                messages.success(request, f"Order #{order.id} status updated to {order.get_status_display()}.")
+            else:
+                messages.error(request, "Invalid order or status.")
+        return redirect("restaurant_orders_list")
+
+    orders = Order.objects.filter(restaurant=rp).order_by('-created_at')
+    return render(request, 'users/restaurant_orders_list.html', {'orders': orders})
+
+@login_required
+def restaurant_order_detail(request, order_id):
+    rp = getattr(request.user, 'restaurant_profile', None)
+    order = get_object_or_404(Order, id=order_id, restaurant=rp)
+
+    if request.method == "POST":
+        status = request.POST.get("status")
+        if status and status in dict(order.STATUS_CHOICES):
+            order.status = status
+            order.save()
+            messages.success(request, f"Order status updated to {order.get_status_display()}.")
+        else:
+            messages.error(request, "Invalid status.")
+        return redirect("restaurant_order_detail", order_id=order.id)
+
+    return render(request, 'users/restaurant_order_detail.html', {'order': order})

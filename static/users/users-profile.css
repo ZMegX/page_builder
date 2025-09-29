@@ -1,0 +1,14 @@
+.users-profile.rounded-circle {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.users-profile.border {
+    border-width: 3px !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.users-profile.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}

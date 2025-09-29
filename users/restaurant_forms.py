@@ -40,13 +40,13 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
             "theme_choice": forms.Select(attrs={"class": "form-select"}), 
-            "hero_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "Hero headline"}),
-            "hero_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "Hero description", "rows": 2}),
+            "hero_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "Main headline"}),
+            "hero_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "Main description", "rows": 2}),
             "hero_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "about_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "About headline"}),
             "about_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "About description", "rows": 3}),
             "about_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
-            "about_highlight": forms.TextInput(attrs={"class": "form-control", "placeholder": "About highlight"}),
+            "about_highlight": forms.TextInput(attrs={"class": "form-control", "placeholder": "About highlight: say a fun fact or quote"}),
         }
     
 class SocialLinkForm(forms.ModelForm):
@@ -60,10 +60,11 @@ class SocialLinkForm(forms.ModelForm):
 
 class OpeningHourForm(forms.ModelForm):
     day_of_week = forms.ChoiceField(choices=DAYS_OF_WEEK, widget=forms.Select(attrs={"class": "form-select"}))
+    is_closed = forms.BooleanField(required=False, label="Closed")
 
     class Meta:
         model = OpeningHour
-        fields = ["day_of_week", "open_time", "close_time"]
+        fields = ["day_of_week", "is_closed", "open_time", "close_time"]
         widgets = {
             "open_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
             "close_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
@@ -71,10 +72,17 @@ class OpeningHourForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
+        is_closed = cleaned.get("is_closed")
         open_t = cleaned.get("open_time")
         close_t = cleaned.get("close_time")
-        if open_t and close_t and close_t <= open_t:
-            raise forms.ValidationError("Close time must be after open time.")
+        if not is_closed:
+            if not open_t or not close_t:
+                raise forms.ValidationError("Please enter both open and close times or mark as closed.")
+            if close_t <= open_t:
+                raise forms.ValidationError("Close time must be after open time.")
+        else:
+            cleaned["open_time"] = None
+            cleaned["close_time"] = None
         return cleaned
 
 SocialLinkFormSet = inlineformset_factory(
@@ -89,7 +97,7 @@ OpeningHourFormSet = inlineformset_factory(
     parent_model=RestaurantProfile,
     model=OpeningHour,
     form=OpeningHourForm,
-    extra=7,
+    extra=3,
     max_num=7,
     can_delete=False,
 )

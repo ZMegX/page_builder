@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'webpage_restaurant_site',
     'locations',
     'rest_framework',
-    
 ]
 
 MIDDLEWARE = [
@@ -89,6 +88,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'page_builder.context_processors.google_maps_api_key',
+                'page_builder.context_processors.customer_context',
+                'users.context_processors.cart_context',
             ],
         },
     },

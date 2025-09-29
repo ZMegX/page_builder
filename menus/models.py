@@ -29,6 +29,7 @@ class Menu(models.Model):
 class MenuItem(models.Model):
     SECTION_CHOICES = [
         ('breakfast', 'Breakfast'),
+        ('main', 'Main Courses'),
         ('lunch', 'Lunch'),
         ('dinner', 'Dinner'),
         ('dessert', 'Dessert'),
@@ -44,6 +45,7 @@ class MenuItem(models.Model):
     
     menu = models.ForeignKey(Menu, related_name="items", on_delete=models.CASCADE)
     section = models.CharField(max_length=20, choices=SECTION_CHOICES)
+    order = models.PositiveIntegerField(default=0, help_text="Order of this item within its section")
     name = models.CharField(max_length=80)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     ingredients = models.TextField(max_length=200, default="Fresh ingredients", help_text="List main ingredients")
@@ -62,4 +64,4 @@ class MenuItem(models.Model):
         return f"{self.name} - ${self.price}"
 
     class Meta:
-        ordering = ['section', 'name']
+        ordering = ['section', 'order', 'name']

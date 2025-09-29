@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 from django.urls import path, include
 from users import views as user_views
@@ -5,23 +6,25 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # React catch-all route for menu-editor (must be before slug catch-alls)
+    path('menu-editor/', TemplateView.as_view(template_name='users/index.html'), name='react_menu_editor'),
+    path('menu-editor/<path:path>/', TemplateView.as_view(template_name='users/index.html')),
+
     # Home page
-path('', user_views.home, name='home'),
+    path('', user_views.home, name='home'),
     # Registration flow
     path('register/', user_views.register, name='register'),
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
+    path('', include('webpage_restaurant_site.urls')),
     path("", include('menus.urls', namespace='menus')),
-    path('r/', include('webpage_restaurant_site.urls')),
     path("", include("menus.public_urls")),
     path('locations/', include('locations.urls')),
-    path('docs/', user_views.documentation, name='docs')
-
+    path('docs/', user_views.documentation, name='docs'),
 ]
 
 if settings.DEBUG:

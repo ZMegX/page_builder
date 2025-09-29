@@ -1,3 +1,66 @@
+/* Restrict logo preview container width and center it */
+.logo-preview-container {
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+#place-picker {
+  width: 100%;
+}
+
+.btn-save-custom {
+  color: #222 !important;
+  border: 1.5px solid #222 !important;
+  background: #fff !important;
+  border-radius: 0.6rem !important;
+  font-size: 1.12rem !important;
+  font-weight: 600;
+  width: 100%;
+  transition: color .2s, background .2s;
+}
+.btn-save-custom:hover, .btn-save-custom:focus {
+  color: #fff !important;
+  background: #222 !important;
+  border: 1.5px solid #222 !important;
+}
+
+
+.preview-logo {
+  max-height: 120px;
+  max-width: 180px;
+  width: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.logo-preview {
+  max-height: 250px;
+  max-width: 300px;
+  width: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.theme-preview-img {
+  height: 48px;
+  width: auto;
+  max-width: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.address-edit-input {
+  max-width: 60%;
+}
+
+.sticky-save-btn {
+  bottom: 32px;
+  right: 32px;
+  z-index: 1050;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
 .restaurant-hero {
   min-height: 180px;
   background: radial-gradient(1200px 400px at -10% -10%, #4f46e5 0%, #312e81 40%, #111827 100%);

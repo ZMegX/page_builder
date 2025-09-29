@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block body_class %}{{ profile.theme_choice }}-theme{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">
+{% endblock %}
+{% load cloudinary %}
+{% block title %}{{ profile.name }} — Menu{% endblock %}
+
+<div class="menu-bg-overlay"></div>
+  {% block content %}
+  <div class="container py-4">
+    <div class="mb-3">
+      <a href="{% url 'webpage_restaurant_site:landing' slug=profile.slug %}" class="btn btn-outline-secondary">
+        &larr; Back to Restaurant
+      </a>
+    </div>
+    <section class="menu-selection-card mb-5">
+      <div class="row g-0 align-items-stretch">
+        <!-- Left Column: Restaurant Details -->
+        <div class="col-lg-6 d-flex flex-column justify-content-between p-4">
+          <div>
+            <div class="d-flex align-items-center mb-3">
+              {% if profile.logo %}
+                <img src="{{ profile.logo.url }}" class="img-fluid rounded shadow-sm me-3 logo-animate" style="max-height: 80px; border: 4px solid #fff;" alt="{{ profile.name }} logo">
+              {% endif %}
+              <div>
+                <h1 class="display-6 mb-0">{{ profile.name }}</h1>
+                {% if status.open_now %}
+                  <span class="badge text-bg-success ms-auto">Open now</span>
+                {% else %}
+                  <span class="badge text-bg-secondary ms-auto">Closed</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-2">
+              {% if profile.cuisine_type %}
+                <div class="mb-2">
+                  <i class="bi bi-egg-fried me-2 text-muted"></i>
+                  <strong>Cuisine:</strong> {{ profile.cuisine_type }}
+                </div>
+              {% endif %}
+              {% if profile.phone_number %}
+                <div class="mb-2">
+                  <i class="bi bi-telephone me-2 text-muted"></i>
+                  <strong>Phone:</strong> <a href="tel:{{ profile.phone_number }}">{{ profile.phone_number }}</a>
+                </div>
+              {% endif %}
+              {% if address.formatted_address %}
+                <div class="mb-2">
+                  <i class="bi bi-geo-alt me-2 text-muted"></i>
+                  <strong>Address:</strong> {{ address.formatted_address }}
+                </div>
+              {% endif %}
+            </div>
+            {% if profile.social_links.all %}
+              <section class="mt-auto pt-3">
+                <strong>Follow us:</strong>
+                <div class="d-flex gap-2 mt-2 flex-wrap">
+                  {% for sl in profile.social_links.all %}
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ sl.url }}" target="_blank" rel="noopener">
+                      <i class="bi bi-box-arrow-up-right me-1"></i>{{ sl.name }}
+                    </a>
+                  {% endfor %}
+                </div>
+              </section>
+            {% endif %}
+          </div>
+        </div>
+        <!-- Right Column: Map -->
+        <div class="col-lg-6 p-0">
+          <div class="h-100 w-100 d-flex align-items-center justify-content-center">
+            {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+              <div id="menu-map" class="rounded w-100" style="height: 320px;"></div>
+            {% else %}
+              <div class="p-5 h-100 d-flex justify-content-center align-items-center text-center text-muted">
+                <div>
+                  <i class="bi bi-geo-alt" style="font-size: 2.5rem;"></i>
+                  <div class="mt-2">No address has been set for this restaurant.</div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Menu Items Section -->
+    {% for menu in menus %}
+    <div class="menu-modern-card mb-5">
+      <div class="menu-modern-section-title">{{ menu.name }}</div>
+        <div class="menu-modern-list">
+          {% for item in menu.items.all %}
+            <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2" style="border-radius: 1rem; background: #fff;">
+              <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
+                <img src="{{ item.image.url|default:'/static/default_profile_pic.png' }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
+              </div>
+              <div class="menu-modern-item-info flex-grow-1">
+                <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
+                {% if item.description %}
+                  <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.description }}</div>
+                {% endif %}
+              </div>
+              <div class="menu-modern-item-price ms-3" style="font-weight:700; color:#EB236F; font-size:1.1rem;">
+                ${{ item.price }}
+              </div>
+              <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="ms-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+              </form>
+            </div>
+          {% empty %}
+            <div class="text-muted text-center py-4">This menu currently has no items.</div>
+          {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_js %}
+{% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
+<script>
+  function initMenuMap() {
+    var lat = parseFloat("{{ map_center.lat }}");
+    var lng = parseFloat("{{ map_center.lng }}");
+    var mapDiv = document.getElementById("menu-map");
+    if (!mapDiv) return;
+    var map = new google.maps.Map(mapDiv, {
+      zoom: 15,
+      center: {lat: lat, lng: lng},
+      mapTypeControl: false,
+      streetViewControl: false
+    });
+    // Use AdvancedMarkerElement if available, fallback to Marker
+    if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+      new google.maps.marker.AdvancedMarkerElement({
+        map: map,
+        position: {lat: lat, lng: lng},
+        title: "{{ profile.name|escapejs }}"
+      });
+    } else {
+      new google.maps.Marker({
+        position: {lat: lat, lng: lng},
+        map: map,
+        title: "{{ profile.name|escapejs }}"
+      });
+    }
+  }
+  // Google Maps API will call this when loaded
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMenuMap"></script>
+{% endif %}
+{% endblock %}
