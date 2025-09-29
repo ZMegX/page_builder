@@ -100,9 +100,14 @@ def home(request):
 
     # Prepare addresses for map
     import json
+    from django.urls import reverse
     addresses = []
     for r in restaurants:
         for addr in r.addresses.all():
+            if r.slug:
+                restaurant_url = reverse('webpage_restaurant_site:landing', kwargs={'slug': r.slug})
+            else:
+                restaurant_url = '#'
             addresses.append({
                 'name': r.name,
                 'address': addr.formatted_address,
@@ -111,7 +116,7 @@ def home(request):
                 'cuisine': r.cuisine_type,
                 'slug': r.slug,
                 'logo': r.logo.url if getattr(r.logo, 'url', None) else '',
-                'url': f"/restaurant/{r.slug}/" if r.slug else '#',
+                'url': restaurant_url
             })
     print(f"Addresses for map: {addresses}")
     addresses_json = json.dumps(addresses)

@@ -33,7 +33,7 @@ async function loadGoogleMaps() {
             <strong>${r.name}</strong><br>
             ${r.address}<br>
             ${r.url !== '#' ? `<a href="${r.url}" class="btn btn-sm btn-primary mt-2 homepage">View Page</a>` : ''}
-          </div>
+            </div>
         `
       });
       marker.addListener('click', function() {
