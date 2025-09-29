@@ -1,0 +1,160 @@
+/* landing-restaurant-page.css: Styles moved from inline in landing.html */
+
+/* Header logo image */
+.landing-restaurant-page.logo-avatar {
+  height: 56px;
+  width: 56px;
+  object-fit: cover;
+}
+
+/* Hero section background */
+.hero-section.landing-restaurant-page {
+  min-height: 480px;
+  background: var(--hero-bg, #222);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+/* JS will set background from data-bg attribute */
+
+/* Hero section container */
+.hero-section .container.landing-restaurant-page {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero headline shadow */
+.hero-section h1.landing-restaurant-page {
+  text-shadow: 0 2px 16px #0008;
+}
+
+/* Hero description shadow and max width */
+.hero-section p.landing-restaurant-page {
+  max-width: 600px;
+  text-shadow: 0 2px 8px #0006;
+}
+
+/* Hero overlay */
+.hero-overlay.landing-restaurant-page {
+  background: rgba(30,41,59,0.45);
+  z-index: 1;
+}
+
+/* About section headline */
+#about h2.landing-restaurant-page,
+#popular-items h2.landing-restaurant-page {
+  font-size: 2rem;
+}
+
+/* About section lead and description */
+#about p.landing-restaurant-page {
+  font-size: 1.15rem;
+}
+
+/* About image */
+#about img.landing-restaurant-page {
+  max-height: 320px;
+  object-fit: cover;
+}
+
+/* About fallback image */
+#about .bg-secondary.landing-restaurant-page {
+  height: 220px;
+}
+
+/* Popular items image */
+#popular-items img.landing-restaurant-page {
+  height: 220px;
+  object-fit: cover;
+}
+#popular-items .bg-light.landing-restaurant-page {
+  height: 220px;
+}
+
+/* Contact section logo */
+#contact .logo-animate.landing-restaurant-page {
+  max-height: 80px;
+  border: 4px solid #fff;
+}
+
+/* Map container */
+#map.landing-restaurant-page {
+  height: 320px;
+}
+
+/* No address icon */
+#contact .bi-geo-alt.landing-restaurant-page {
+  font-size: 2.5rem;
+}
+
+/* --- HERO SECTION IMPROVEMENTS --- */
+/* Gradient overlay for hero section */
+.hero-overlay.landing-restaurant-page {
+  background: linear-gradient(180deg, rgba(30,41,59,0.65) 0%, rgba(30,41,59,0.45) 60%, rgba(30,41,59,0.15) 100%);
+  z-index: 1;
+}
+
+/* Responsive vertical padding for hero section */
+.hero-section.landing-restaurant-page {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+@media (max-width: 576px) {
+  .hero-section.landing-restaurant-page {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+}
+
+/* Hero buttons animation */
+.hero-section .btn {
+  transition: transform 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s cubic-bezier(.4,0,.2,1), background 0.18s;
+  box-shadow: 0 2px 8px #0002;
+}
+.hero-section .btn:hover, .hero-section .btn:focus {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 16px #0003;
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc80 100%);
+  color: #222;
+}
+.hero-section .btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px #0001;
+}
+
+/* --- CONTACT SECTION MAP IMPROVEMENTS --- */
+.contact-map-desktop {
+  min-height: 320px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.contact-map-box {
+  min-height: 220px;
+  max-height: 320px;
+  height: 100%;
+  width: 100%;
+}
+@media (max-width: 991.98px) {
+  .contact-map-desktop {
+    min-height: 180px !important;
+    height: 180px !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  .contact-map-box {
+    min-height: 140px !important;
+    max-height: 220px !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  #map {
+    min-height: 140px !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: block !important;
+  }
+}

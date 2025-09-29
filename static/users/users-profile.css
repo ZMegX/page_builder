@@ -12,3 +12,37 @@
 .users-profile.shadow-sm {
     box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
 }
+
+/* Responsive profile header actions */
+.profile-header-animated {
+    opacity: 0;
+    transform: translateY(-40px);
+    transition: all 0.7s cubic-bezier(.77,0,.18,1);
+}
+.profile-header-animated.animated {
+    opacity: 1;
+    transform: translateY(0);
+}
+.profile-header-action {
+    min-width: 120px;
+}
+@media (max-width: 576px) {
+    .profile-header-animated {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding-left: 0.7rem !important;
+        padding-right: 0.7rem !important;
+    }
+    .profile-header-animated > .d-flex {
+        margin-bottom: 0.7rem !important;
+    }
+    .profile-header-action {
+        width: 100%;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+    }
+    .profile-header-animated h2 {
+        font-size: 1.15rem;
+    }
+}
