@@ -65,7 +65,6 @@ def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
 def home(request):
-    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     q = request.GET.get('q', '')
     restaurants_qs = RestaurantProfile.objects.prefetch_related('addresses')
     if q:
@@ -83,19 +82,40 @@ def home(request):
     for r in restaurants_qs:
         print(f"- {r.name} | Cuisine: {r.cuisine_type} | Slug: {r.slug} | Addresses: {r.addresses.count()}")
         for addr in r.addresses.all():
-            print(f"  Address: {addr.formatted_address} | lat={addr.latitude} | lng={addr.longitude}")
+            print(f"  Formatted Address: {addr.formatted_address}")
     print("--- DEBUG: END ---")
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
 
-    # Pagination
-    paginator = Paginator(restaurants_qs, 10)
-    page = request.GET.get('page')
-    try:
-        restaurants = paginator.page(page)
-    except PageNotAnInteger:
-        restaurants = paginator.page(1)
-    except EmptyPage:
-        restaurants = paginator.page(paginator.num_pages)
+    # No pagination: get all restaurants
+    restaurants = list(restaurants_qs)
+
+    print('--- DEBUG: All restaurants and their addresses ---')
+    for r in restaurants:
+        print(f'Restaurant: {r.name}')
+        for addr in r.addresses.all():
+            print(f'  Address: {addr.formatted_address}, lat={addr.latitude}, lng={addr.longitude}')
+
+    # Update restaurant_reviews to work with list
+    restaurant_reviews = {r.pk: r.reviews.filter(is_approved=True) for r in restaurants}
+
+    # Prepare addresses for map
+    import json
+    addresses = []
+    for r in restaurants:
+        for addr in r.addresses.all():
+            addresses.append({
+                'name': r.name,
+                'address': addr.formatted_address,
+                'lat': addr.latitude if addr.latitude is not None else None,
+                'lng': addr.longitude if addr.longitude is not None else None,
+                'cuisine': r.cuisine_type,
+                'slug': r.slug,
+                'logo': r.logo.url if getattr(r.logo, 'url', None) else '',
+                'url': f"/restaurant/{r.slug}/" if r.slug else '#',
+            })
+    print(f"Addresses for map: {addresses}")
+    addresses_json = json.dumps(addresses)
+    print(f"addresses_json for JS: {addresses_json}")
 
     review_form = ReviewForm(request.POST or None)
     if request.method == "POST" and review_form.is_valid():
@@ -114,6 +134,7 @@ def home(request):
         'GOOGLE_MAPS_API_KEY': key,
         'review_form': review_form,
         'restaurant_reviews': restaurant_reviews,
+        'addresses_json': addresses_json,
     })
 
 def register(request):
