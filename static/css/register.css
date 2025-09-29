@@ -1,0 +1,11 @@
+/* register.css */
+.register {
+  padding-top: 56px;
+}
+.register.card {
+  max-width: 440px;
+  width: 100%;
+}
+.register h2 {
+  letter-spacing: .5px;
+}

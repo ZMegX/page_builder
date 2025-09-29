@@ -1,0 +1,18 @@
+/* login-page.css */
+.login-page.container {
+  padding-top: 48px;
+  max-width: 440px;
+}
+.login-page h3 {
+  color: #222;
+}
+.login-page.btn {
+  border-radius: 0.6rem;
+  background: #fff;
+}
+.login-page.btn-login {
+  font-size: 1.12rem;
+}
+.login-page.btn-outline-secondary {
+  border-radius: 0.6rem;
+}

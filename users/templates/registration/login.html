@@ -1,59 +1,37 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% block title %}Login{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login-page.css' %}">
+{% endblock %}
 {% block content %}
-<div class="container" style="padding-top: 48px; max-width: 440px;">
+<div class="container login-page">
     <div class="card shadow border-0 rounded-4 p-5">
         <div class="text-center mb-3">
           <div class="logo-avatar">
               <img src="{% static 'images/logo.png' %}" alt="Logo">
           </div>
         </div>
-            <h3 class="fw-bold mb-0" style="color:#222;">Login</h3>
-      
+            <h3 class="fw-bold mb-0 login-page">Login</h3>
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
                 {{ form|crispy }}
             </fieldset>
-            <button class="btn btn-outline-dark w-100 mt-3 fw-semibold" style="border-radius:0.6rem; font-size:1.12rem; background:#fff;">
+            <button class="btn btn-outline-dark w-100 mt-3 fw-semibold login-page">
                 Login
             </button>
             <input type="hidden" name="next" value="{% url 'profile' %}" />
         </form>
         <div class="border-top pt-3 mt-4">
-            <a href="{% url 'register' %}" class="btn btn-outline-dark w-100 mb-2 fw-semibold" style="border-radius:0.6rem; background:#fff;">
+            <a href="{% url 'register' %}" class="btn btn-outline-dark w-100 mb-2 fw-semibold login-page">
                 Sign Up Now
             </a>
-            <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary w-100 fw-semibold" style="border-radius:0.6rem;">
+            <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary w-100 fw-semibold login-page">
                 Forgot your password?
             </a>
         </div>
     </div>
 </div>
-<style>
-  body { background: #fff !important; }
-  .btn-outline-dark {
-    color: #222 !important;
-    border: 1.5px solid #222 !important;
-    background: #fff !important;
-    transition: color .2s, background .2s;
-  }
-  .btn-outline-dark:hover, .btn-outline-dark:focus {
-    color: #fff !important;
-    background: #222 !important;
-    border: 1.5px solid #222 !important;
-  }
-  .btn-outline-secondary {
-    color: #555 !important;
-    border: 1.5px solid #bbb !important;
-    background: #fff !important;
-    transition: color .2s, background .2s;
-  }
-  .btn-outline-secondary:hover, .btn-outline-secondary:focus {
-    color: #fff !important;
-    background: #bbb !important;
-    border: 1.5px solid #bbb !important;
-  }
-</style>
 {% endblock content %}
