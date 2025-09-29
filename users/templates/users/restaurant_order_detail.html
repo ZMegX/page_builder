@@ -1,48 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
 {% load math_filters %}
 {% block title %}Order #{{ order.id }} Details{% endblock %}
 {% block extra_css %}
-<style>
-  .order-detail-card {
-    border-radius: 18px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    background: #fff;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-  .order-status {
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 0.35em 0.8em;
-    font-size: 0.98rem;
-    display: inline-block;
-  }
-  .order-status.pending { background: #ffe082; color: #7c6f00; }
-  .order-status.completed { background: #c8e6c9; color: #256029; }
-  .order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
-  .order-status.in_progress { background: #bbdefb; color: #0d47a1; }
-  .order-items-table th, .order-items-table td {
-    vertical-align: middle;
-    padding: 0.75rem 0.5rem;
-    font-size: 1.05rem;
-  }
-  .order-items-table th {
-    background: #f5f5f5;
-    font-weight: 600;
-    color: #222;
-    border-bottom: 2px solid #eee;
-  }
-  .order-items-table tbody tr:hover {
-    background: #f8f9fa;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'users/restaurant-order-detail.css' %}">
 {% endblock %}
 {% block content %}
-
 <div class="container py-5">
   <div id="print-area">
     <h1 class="fw-bold mb-4 text-center">Order #{{ order.id }} Details</h1>
-    <div class="order-detail-card">
+    <div class="order-detail-card restaurant-order-detail">
       <div class="row mb-3">
         <div class="col-md-6">
           <h5>Customer</h5>
@@ -59,13 +26,13 @@
         </div>
         <div class="col-md-6 text-md-end">
           <h5>Status</h5>
-          <span class="order-status {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
+          <span class="order-status restaurant-order-detail {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
           <p class="mb-1 mt-2"><strong>Date:</strong> {{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</p>
         </div>
       </div>
       <h5 class="mt-4">Items</h5>
       <div class="table-responsive">
-        <table class="table order-items-table">
+        <table class="table order-items-table restaurant-order-detail">
           <thead>
             <tr>
               <th scope="col">Item</th>
@@ -119,7 +86,6 @@
     </div>
   </div>
 </div>
-
 <div class="d-flex align-items-center mt-3">
   <!-- Status Dropdown Form -->
   <form method="post" action="" class="me-3" id="statusForm">
@@ -138,17 +104,7 @@
     Print Order
   </button>
 </div>
-</div>
-<style>
-@media print {
-  body * { visibility: hidden !important; }
-  #print-area, #print-area * { visibility: visible !important; }
-  #print-area { position: absolute; left: 0; top: 0; width: 100vw; background: #fff; z-index: 9999; }
-}
-</style>
-
 <!-- Print Modal -->
-
 <div class="modal fade" id="printModal" tabindex="-1" aria-labelledby="printModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -166,33 +122,7 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var printBtn = document.getElementById('confirmPrintBtn');
-    var statusDropdown = document.getElementById('statusDropdown');
-    var statusForm = document.getElementById('statusForm');
-    if (printBtn) {
-      printBtn.addEventListener('click', function() {
-        // Before printing, set status to Confirmed if not already
-        if (statusDropdown && statusDropdown.value !== 'confirmed') {
-          statusDropdown.value = 'confirmed';
-          if (statusForm) {
-            statusForm.submit();
-          }
-        }
-        // Hide modal before printing
-        var modal = document.getElementById('printModal');
-        if (modal) {
-          var modalInstance = bootstrap.Modal.getInstance(modal);
-          if (modalInstance) modalInstance.hide();
-        }
-        setTimeout(function() {
-          window.print();
-        }, 300);
-      });
-    }
-  });
-</script>
-</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/restaurantOrderDetail.js' %}"></script>
 {% endblock %}

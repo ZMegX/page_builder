@@ -1,46 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
 {% load math_filters %}
 {% block title %}Order Details{% endblock %}
 {% block extra_css %}
-<style>
-  .order-detail-card {
-    border-radius: 18px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    background: #fff;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-  .order-status {
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 0.35em 0.8em;
-    font-size: 0.98rem;
-    display: inline-block;
-  }
-  .order-status.pending { background: #ffe082; color: #7c6f00; }
-  .order-status.completed { background: #c8e6c9; color: #256029; }
-  .order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
-  .order-status.in_progress { background: #bbdefb; color: #0d47a1; }
-  .order-items-table th, .order-items-table td {
-    vertical-align: middle;
-    padding: 0.75rem 0.5rem;
-    font-size: 1.05rem;
-  }
-  .order-items-table th {
-    background: #f5f5f5;
-    font-weight: 600;
-    color: #222;
-    border-bottom: 2px solid #eee;
-  }
-  .order-items-table tbody tr:hover {
-    background: #f8f9fa;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'users/customers-order-detail.css' %}">
 {% endblock %}
 {% block content %}
 <div class="container py-5">
   <h1 class="fw-bold mb-4 text-center">Order #{{ order.id }}</h1>
-  <div class="order-detail-card">
+  <div class="order-detail-card customers-order-detail">
     <div class="row mb-3">
       <div class="col-md-6">
         <h5>Restaurant</h5>
@@ -49,12 +17,12 @@
       </div>
       <div class="col-md-6 text-md-end">
         <h5>Status</h5>
-        <span class="order-status {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
+        <span class="order-status customers-order-detail {{ order.status|lower|slugify }}">{{ order.get_status_display }}</span>
         <p class="mb-1 mt-2"><strong>Date:</strong> {{ order.created_at|date:"SHORT_DATETIME_FORMAT" }}</p>
       </div>
     </div>
     <div class="table-responsive">
-      <table class="table order-items-table">
+      <table class="table order-items-table customers-order-detail">
         <thead>
           <tr>
             <th>Item</th>
