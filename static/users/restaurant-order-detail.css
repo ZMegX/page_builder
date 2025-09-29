@@ -1,0 +1,37 @@
+.restaurant-order-detail.order-detail-card {
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.restaurant-order-detail.order-status {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35em 0.8em;
+    font-size: 0.98rem;
+    display: inline-block;
+}
+.restaurant-order-detail.order-status.pending { background: #ffe082; color: #7c6f00; }
+.restaurant-order-detail.order-status.completed { background: #c8e6c9; color: #256029; }
+.restaurant-order-detail.order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
+.restaurant-order-detail.order-status.in_progress { background: #bbdefb; color: #0d47a1; }
+.restaurant-order-detail.order-items-table th, .restaurant-order-detail.order-items-table td {
+    vertical-align: middle;
+    padding: 0.75rem 0.5rem;
+    font-size: 1.05rem;
+}
+.restaurant-order-detail.order-items-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #222;
+    border-bottom: 2px solid #eee;
+}
+.restaurant-order-detail.order-items-table tbody tr:hover {
+    background: #f8f9fa;
+}
+@media print {
+  body * { visibility: hidden !important; }
+  #print-area, #print-area * { visibility: visible !important; }
+  #print-area { position: absolute; left: 0; top: 0; width: 100vw; background: #fff; z-index: 9999; }
+}
