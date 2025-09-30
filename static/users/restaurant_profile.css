@@ -1,3 +1,85 @@
+.redesigned-tabs {
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  gap: 0.5rem;
+}
+.redesigned-tabs .nav-item {
+  flex: 1 1 0;
+  text-align: center;
+  min-width: 140px;
+}
+.redesigned-tab-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #222;
+  font-weight: 500;
+  padding: 1rem 0.5rem;
+  border-radius: 0;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  white-space: nowrap;
+}
+.redesigned-tab-btn.active,
+.redesigned-tab-btn:focus {
+  background: #e0e0e0;
+  color: #111;
+  font-weight: 600;
+  box-shadow: 0 2px 0 #888 inset;
+}
+.redesigned-tab-btn:hover {
+  background: #ececec;
+  color: #111;
+}
+@media (max-width: 768px) {
+  .redesigned-tabs {
+    font-size: 0.95rem;
+    padding-bottom: 2px;
+  }
+  .redesigned-tabs {
+    gap: 0.4rem;
+  }
+  .redesigned-tabs .nav-item {
+    min-width: 120px;
+  }
+  .redesigned-tab-btn {
+    padding: 0.75rem 0.25rem;
+  }
+}
+@media (max-width: 480px) {
+  .redesigned-tabs {
+    font-size: 0.9rem;
+    padding-bottom: 1px;
+  }
+  .redesigned-tabs {
+    gap: 0.3rem;
+  }
+  .redesigned-tabs .nav-item {
+    min-width: 100px;
+  }
+  .redesigned-tab-btn {
+    padding: 0.5rem 0.1rem;
+  }
+}
+/* Consistent style for all tables */
+.table-business-hours {
+  background: #fff;
+}
+.table-business-header {
+  background: #000;
+  color: #fff;
+}
+/* Button width for business hours actions */
+.hours-action-btn {
+  width: 80px;
+}
 /* Restrict logo preview container width and center it */
 .logo-preview-container {
   max-width: 200px;

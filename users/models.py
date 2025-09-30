@@ -98,25 +98,32 @@ class RestaurantProfile(models.Model):
     max_capacity = models.PositiveIntegerField(default=40, help_text="Maximum number of guests the restaurant can accommodate at once")
     slug = models.SlugField(unique=True, blank=True)
     hero_headline = models.CharField(max_length=120, blank=True, null=True,
-        help_text="Headline for the hero section on the landing page."
+        verbose_name="Main headline",
+        help_text="Headline for the main section on the landing page."
     )
     hero_description = models.TextField(blank=True, null=True,
-        help_text="Short description for the hero section."
+        verbose_name="Short description for the top of your page",
+        help_text="Write a brief description that captures the essence of your restaurant."
     )
-    hero_image = CloudinaryField('Hero image', blank=True, null=True, 
+    hero_image = CloudinaryField('Background image for the top of your page', blank=True, null=True, 
         help_text="Background image for the hero section."
     )
     about_headline = models.CharField(max_length=120, blank=True, null=True,
-        help_text="Headline for the About Us section."
+        verbose_name="Your About Section Headline",
+        help_text="A short, punchy headline that introduces your restaurant in the About section."\
+                    "Make it inviting and memorable,it’s the first thing guests will read!"
     )
     about_description = models.TextField(blank=True, null=True,
-        help_text="Description for the About Us section."
+        verbose_name="About Your Restaurant",
+        help_text="Write a few sentences describing your restaurant’s story, atmosphere, cuisine, or what makes it special."\
+            "Keep it engaging and easy to read."
     )
     about_image = CloudinaryField('About image', blank=True, null=True,
         help_text="Image for the About Us section."
     )
     about_highlight = models.CharField(max_length=120, blank=True, null=True,
-        help_text="Highlighted quote or fact for the About Us section."
+        verbose_name="Share your restaurant’s standout features",
+        help_text="signature dishes, awards, unique experiences, or anything that sets you apart."
     )
     theme_choice = models.CharField(max_length=32, choices=THEME_CHOICES, default='default',
         help_text="Select the theme for your restaurant page."

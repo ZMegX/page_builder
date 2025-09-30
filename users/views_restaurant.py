@@ -24,16 +24,37 @@ def restaurant_profile(request):
         social_fs = SocialLinkFormSet(request.POST, instance=rp, prefix="social")
         hours_fs = OpeningHourFormSet(request.POST, instance=rp, prefix="hours")
 
-        # Validate all forms together.
-        if rp_form.is_valid() and social_fs.is_valid() and hours_fs.is_valid():
+        # Validate and save each form independently
+        saved_any = False
+        if rp_form.is_valid():
             rp_form.save()
+            messages.success(request, "Profile details saved.")
+            saved_any = True
+        elif rp_form.errors:
+            messages.error(request, "Please correct errors in profile details.")
+
+        if social_fs.is_valid():
             social_fs.save()
+            messages.success(request, "Social links saved.")
+            saved_any = True
+        elif social_fs.non_form_errors() or any(f.errors for f in social_fs):
+            messages.error(request, "Please correct errors in social links.")
+
+        if hours_fs.is_valid():
             hours_fs.save()
-            messages.success(request, "Your profile has been saved successfully.")
+            messages.success(request, "Opening hours saved.")
+            saved_any = True
+        elif hours_fs.non_form_errors() or any(f.errors for f in hours_fs):
+            error_msgs = []
+            error_msgs += [str(e) for e in hours_fs.non_form_errors()]
+            for f in hours_fs:
+                for field, errors in f.errors.items():
+                    for error in errors:
+                        error_msgs.append(f"{field}: {error}")
+            messages.error(request, "Opening hours errors: " + "; ".join(error_msgs))
+
+        if saved_any:
             return redirect("restaurant_profile")
-        else:
-            # If any form is invalid, show an error.
-            messages.error(request, "Please correct the errors below.")
     else:
         # On a GET request, create unbound instances of the forms.
         rp_form = RestaurantProfileForm(instance=rp)

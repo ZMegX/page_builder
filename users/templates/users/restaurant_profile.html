@@ -32,68 +32,35 @@
     </div>
   </div>
   <!-- Profile Completeness Progress Bar & Checklist -->
-  <div class="mb-4">
-    <div class="card border-0 shadow-sm rounded-4">
-      <div class="card-body">
-        {% with logo_ok=rp_form.instance.logo.url|default_if_none:'' address_ok=saved_addresses.0.formatted_address|default_if_none:'' hours_ok=hours_fs.0.open_time.value|default_if_none:'' %}
-        {% with completeness=0 %}
-          {% if logo_ok %}{% with completeness=completeness|add:33 %}{% endwith %}{% endif %}
-          {% if address_ok %}{% with completeness=completeness|add:33 %}{% endwith %}{% endif %}
-          {% if hours_ok %}{% with completeness=completeness|add:34 %}{% endwith %}{% endif %}
-          <div class="d-flex align-items-center mb-2">
-            <span class="fw-bold me-2">Profile Completeness</span>
-            <div class="progress flex-grow-1 profile-progress">
-              <div class="progress-bar bg-success" role="progressbar" style="width: {{ completeness }}%;" aria-valuenow="{{ completeness }}" aria-valuemin="0" aria-valuemax="100">{{ completeness }}%</div>
-            </div>
-          </div>
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item">
-              <i class="bi bi-image profile-icon"></i>
-              <span {% if logo_ok %}class="text-success"{% else %}class="text-muted"{% endif %}>Logo {% if logo_ok %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}</span>
-            </li>
-            <li class="list-inline-item">
-              <i class="bi bi-geo-alt profile-icon"></i>
-              <span {% if address_ok %}class="text-success"{% else %}class="text-muted"{% endif %}>Address {% if address_ok %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}</span>
-            </li>
-            <li class="list-inline-item">
-              <i class="bi bi-clock profile-icon"></i>
-              <span {% if hours_ok %}class="text-success"{% else %}class="text-muted"{% endif %}>Opening Hours {% if hours_ok %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}</span>
-            </li>
-          </ul>
-        {% endwith %}
-        {% endwith %}
-      </div>
-    </div>
-  </div>
   <form id="restaurant-profile-form" method="POST" enctype="multipart/form-data" autocomplete="off">
     {% csrf_token %}
-  <ul class="nav nav-tabs mb-4 flex-nowrap overflow-auto mobile-scroll-tabs" id="profileTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
-          <i class="bi bi-info-circle me-1"></i> Details
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
-          <i class="bi bi-share me-1"></i> Social Links
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="hours-tab" data-bs-toggle="tab" data-bs-target="#hours" type="button" role="tab" aria-controls="hours" aria-selected="false">
-          <i class="bi bi-clock me-1"></i> Opening Hours
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="logo-tab" data-bs-toggle="tab" data-bs-target="#logo" type="button" role="tab" aria-controls="logo" aria-selected="false">
-          <i class="bi bi-image me-1"></i> Logo
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">
-          <i class="bi bi-geo-alt me-1"></i> Location
-        </button>
-      </li>
-    </ul>
+  <ul class="nav nav-tabs redesigned-tabs w-100 mb-4" id="profileTab" role="tablist">
+    <li class="nav-item flex-fill" role="presentation">
+      <button class="nav-link active redesigned-tab-btn" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+        <i class="bi bi-info-circle me-1"></i> Details
+      </button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+      <button class="nav-link redesigned-tab-btn" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
+        <i class="bi bi-share me-1"></i> Social Links
+      </button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+      <button class="nav-link redesigned-tab-btn" id="hours-tab" data-bs-toggle="tab" data-bs-target="#hours" type="button" role="tab" aria-controls="hours" aria-selected="false">
+        <i class="bi bi-clock me-1"></i> Opening Hours
+      </button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+      <button class="nav-link redesigned-tab-btn" id="logo-tab" data-bs-toggle="tab" data-bs-target="#logo" type="button" role="tab" aria-controls="logo" aria-selected="false">
+        <i class="bi bi-image me-1"></i> Logo
+      </button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+      <button class="nav-link redesigned-tab-btn" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">
+        <i class="bi bi-geo-alt me-1"></i> Location
+      </button>
+    </li>
+  </ul>
     <div class="tab-content" id="profileTabContent">
       <!-- Staging tab content removed -->
       <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
@@ -112,17 +79,32 @@
                 {% endfor %}
               </div>
             {% endif %}
+            <!-- Basic Info Fields -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                {{ rp_form.name|as_crispy_field }}
+                {% if rp_form.name.help_text %}
+                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.name.help_text }}"></i>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                {{ rp_form.cuisine_type|as_crispy_field }}
+                {% if rp_form.cuisine_type.help_text %}
+                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.cuisine_type.help_text }}"></i>
+                {% endif %}
+              </div>
+            </div>
             <!-- Theme Choice Card -->
-            <div class="card mb-4">
-              <div class="card-header">
+            <div class="card text-center mb-3">
+              <div class="card-header bg-black text-white">
                 <h6 class="mb-0"><i class="bi bi-palette me-2"></i> Theme</h6>
               </div>
               <div class="card-body">
-                <div class="row g-3">
+                <div class="row g-3 justify-content-around">
                   {% for value, label in rp_form.theme_choice.field.choices %}
                   <div class="col-auto">
                     <label class="theme-option d-flex flex-column align-items-center p-2 border rounded {% if rp_form.theme_choice.value == value %}border-primary{% endif %}">
-                      <input type="radio" name="theme_choice" value="{{ value }}" {% if rp_form.theme_choice.value == value %}checked{% endif %} class="mb-2">
+                      <input type="radio" name="theme_choice" value="{{ value }}" {% if rp_form.theme_choice.value == value %}checked="checked"{% endif %} class="mb-2">
                       <img src="{% static 'themes/previews/' %}{{ value }}-preview.png" alt="{{ label }} preview" class="theme-preview-img">
                       <span>{{ label }}</span>
                     </label>
@@ -132,52 +114,95 @@
                 <small class="text-muted mt-2 d-block">Choose a color theme for your restaurant page.</small>
               </div>
             </div>
+
             <!-- Hero Section Card -->
-            <div class="card mb-4">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-image me-2"></i> Hero Section</h6>
+            <div class="card mb-4 shadow-sm border-0 rounded-4">
+              <div class="card-header bg-black text-white d-flex align-items-center gap-2 rounded-top-4">
+                <i class="bi bi-image fs-4"></i>
+                <h6 class="mb-0 fs-5">Main</h6>
               </div>
-              <div class="card-body">
-                <div class="row g-3 align-items-center">
-                  <div class="col-md-7">
-                    {{ rp_form.hero_headline|as_crispy_field }}
-                    {{ rp_form.hero_description|as_crispy_field }}
+              <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
+                <div class="flex-grow-1">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Hero headline
+                      {% if rp_form.hero_headline.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.hero_headline.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    <input type="text" class="form-control form-control-lg" placeholder="Your Daily Bagel">
+                    <small class="text-muted">Headline for the hero section on the landing page.</small>
                   </div>
-                  <div class="col-md-5 text-center">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Hero description
+                      {% if rp_form.hero_description.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.hero_description.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    <textarea class="form-control" rows="2" placeholder="Short description for the hero section."></textarea>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light">
                     {% if rp_form.hero_image.value %}
-                      <img src="{{ rp_form.hero_image.value.url }}" class="img-fluid rounded" alt="Hero preview" style="max-height:180px;object-fit:cover;">
+                      <img src="{{ rp_form.hero_image.value.url }}" class="object-fit-cover w-100 h-100" alt="Hero preview">
                     {% else %}
-                      <div class="text-muted">No hero image selected</div>
+                      <span class="text-muted d-flex align-items-center justify-content-center w-100 h-100">No hero image selected</span>
                     {% endif %}
-                    <div class="mt-3">
-                      {{ rp_form.hero_image|as_crispy_field }}
-                    </div>
+                  </div>
+                  <button class="btn btn-outline-primary btn-sm rounded-pill mt-2" type="button">
+                    <i class="bi bi-upload me-1"></i> Upload Image
+                  </button>
+                  <div class="mt-3">
+                    {{ rp_form.hero_image|as_crispy_field }}
                   </div>
                 </div>
               </div>
             </div>
             <!-- About Section Card -->
-            <div class="card mb-4">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i> About Section</h6>
+            <div class="card mb-4 shadow-sm border-0 rounded-4">
+              <div class="card-header bg-black text-white d-flex align-items-center gap-2 rounded-top-4">
+                <i class="bi bi-info-circle fs-4"></i>
+                <h6 class="mb-0 fs-5">About us</h6>
               </div>
-              <div class="card-body">
-                <div class="row g-3 align-items-center">
-                  <div class="col-md-7">
-                    {{ rp_form.about_headline|as_crispy_field }}
-                    {{ rp_form.about_description|as_crispy_field }}
-                    {{ rp_form.about_highlight|as_crispy_field }}
+              <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
+                <div class="flex-grow-1">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">About headline
+                      {% if rp_form.about_headline.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_headline.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    <input type="text" class="form-control form-control-lg" placeholder="Our Story">
+                    <small class="text-muted">Headline for the about section.</small>
                   </div>
-                  <div class="col-md-5 text-center">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">About description
+                      {% if rp_form.about_description.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_description.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    <textarea class="form-control" rows="2" placeholder="Share your restaurant's story and values."></textarea>
+                  </div>
+                  <div>
+                    <label class="form-label fw-bold">About highlight
+                      {% if rp_form.about_highlight.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_highlight.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    <input type="text" class="form-control" placeholder="Highlight (e.g. Family-owned since 1980)">
+                  </div>
+                </div>
+                <div class="text-center">
+                  <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light">
                     {% if rp_form.about_image.value %}
-                      <img src="{{ rp_form.about_image.value.url }}" class="img-fluid rounded" alt="About preview" style="max-height:180px;object-fit:cover;">
+                      <img src="{{ rp_form.about_image.value.url }}" class="object-fit-cover w-100 h-100" alt="About preview">
                     {% else %}
-                      <div class="text-muted">No about image selected</div>
+                      <span class="text-muted d-flex align-items-center justify-content-center w-100 h-100">No about image selected</span>
                     {% endif %}
-                    <div class="mt-3">
-                      {{ rp_form.about_image|as_crispy_field }}
-                    </div>
                   </div>
+                  <button class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                    <i class="bi bi-upload me-1"></i> Upload Image
+                  </button>
                 </div>
               </div>
             </div>
@@ -185,72 +210,99 @@
         </div>
       </div>
       <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-          <div class="card-header bg-white border-bottom-0 rounded-top-4">
-            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-share me-2"></i> Social Links</h5>
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+          <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
+            <i class="bi bi-share fs-4 text-primary-emphasis"></i>
+            <h5 class="mb-0 fs-5 text-primary-emphasis">Social Links</h5>
           </div>
-          <div class="card-body">
+          <div class="card-body p-4">
             {{ social_fs.management_form }}
             {% if social_fs.non_form_errors %}
-              <div class="alert alert-danger">
+              <div class="alert alert-danger mb-3">
                 {{ social_fs.non_form_errors }}
               </div>
             {% endif %}
-            {% for form in social_fs %}
-              {{ form.id }}
-              {% if form.errors %}
-                <div class="alert alert-danger">
-                  {% for field in form %}
-                    {% for error in field.errors %}
-                      <div>{{ field.label }}: {{ error }}</div>
+            <div class="d-flex justify-content-end mb-3">
+              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" id="add-social-link-btn">
+                <i class="bi bi-plus-lg me-1"></i> Add Social Link
+              </button>
+            </div>
+            <div class="d-flex flex-column gap-3">
+              {% for form in social_fs %}
+                {{ form.id }}
+                {% if form.errors %}
+                  <div class="alert alert-danger mb-2">
+                    {% for field in form %}
+                      {% for error in field.errors %}
+                        <div>{{ field.label }}: {{ error }}</div>
+                      {% endfor %}
                     {% endfor %}
-                  {% endfor %}
+                  </div>
+                {% endif %}
+                <div class="d-flex flex-column flex-md-row align-items-center gap-3 p-3 rounded bg-light">
+                  <div class="flex-grow-1 w-100">
+                    <label class="form-label fw-bold mb-1">Platform
+                      {% if form.name.help_text %}
+                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.name.help_text }}"></i>
+                      {% endif %}
+                    </label>
+                    {{ form.name|as_crispy_field }}
+                    {% if form.name.errors %}
+                      <div class="text-danger small mt-1">
+                        {% for error in form.name.errors %}
+                          <span class="badge bg-danger">{{ error }}</span>
+                        {% endfor %}
+                      </div>
+                    {% elif form.name.value and not form.name.errors %}
+                      <div class="text-success small mt-1">
+                        <span class="badge bg-success">Looks good!</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex align-items-center gap-2 w-100">
+                    <span class="social-icon" data-url="{{ form.url.value|default:'' }}"></span>
+                    <div class="flex-grow-1">
+                      <label class="form-label fw-bold mb-1">URL
+                        {% if form.url.help_text %}
+                          <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.url.help_text }}"></i>
+                        {% endif %}
+                      </label>
+                      {{ form.url|as_crispy_field }}
+                      {% if form.url.errors %}
+                        <div class="text-danger small mt-1">
+                          {% for error in form.url.errors %}
+                            <span class="badge bg-danger">{{ error }}</span>
+                          {% endfor %}
+                        </div>
+                      {% elif form.url.value and not form.url.errors %}
+                        <div class="text-success small mt-1">
+                          <span class="badge bg-success">Looks good!</span>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="ms-md-2 mt-2 mt-md-0">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill remove-social-link-btn" data-form-index="{{ forloop.counter0 }}" aria-label="Remove social link">
+                      <span class="visually-hidden">Remove</span>
+                      <i class="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
                 </div>
-              {% endif %}
-              <div class="row g-3 mb-2 align-items-center">
-                <div class="col-md-5">
-                  {{ form.name|as_crispy_field }}
-                  {% if form.name.errors %}
-                    <div class="text-danger small mt-1">
-                      {% for error in form.name.errors %}
-                        <span class="badge bg-danger">{{ error }}</span>
-                      {% endfor %}
-                    </div>
-                  {% elif form.name.value and not form.name.errors %}
-                    <div class="text-success small mt-1">
-                      <span class="badge bg-success">Looks good!</span>
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="col-md-7 d-flex align-items-center gap-2">
-                  <span class="social-icon" data-url="{{ form.url.value|default:'' }}"></span>
-                  {{ form.url|as_crispy_field }}
-                  {% if form.url.errors %}
-                    <div class="text-danger small mt-1">
-                      {% for error in form.url.errors %}
-                        <span class="badge bg-danger">{{ error }}</span>
-                      {% endfor %}
-                    </div>
-                  {% elif form.url.value and not form.url.errors %}
-                    <div class="text-success small mt-1">
-                      <span class="badge bg-success">Looks good!</span>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
+      <!-- Business Hours -->
       <div class="tab-pane fade" id="hours" role="tabpanel" aria-labelledby="hours-tab">
         <div class="card shadow-sm border-0 rounded-4 mb-4">
-          <div class="card-header bg-white border-bottom-0 rounded-top-4 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-clock me-2"></i> Opening Hours</h5>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-hours-btn">
-              <i class="bi bi-clipboard me-1"></i> Copy to All Days
+          <div class="card-header bg-black text-white border-bottom-0 rounded-top-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 py-2 fs-5"><i class="bi bi-clock me-2"></i> Add your business hours</h5>
+            <button type="button" class="btn btn-light btn-sm" id="add-hours-row-btn">
+              <i class="bi bi-plus-lg me-1"></i> Add
             </button>
           </div>
-          <div class="card-body">
+          <div class="card-body bg-white">
             {{ hours_fs.management_form }}
             {% if hours_fs.non_form_errors %}
               <div class="alert alert-danger">
@@ -258,46 +310,29 @@
               </div>
             {% endif %}
             <div class="table-responsive">
-              <table class="table table-bordered align-middle text-center">
-                <thead class="table-light">
-                  <tr>
-                    <th>Day</th>
-                    <th>Open Time</th>
-                    <th>Close Time</th>
-                    <th>Quick Set</th>
-                    <th>Action</th>
+              <table class="table table-business-hours align-middle text-center mb-0">
+                <thead>
+                  <tr class="table-business-header">
+                    <th class="fw-bold">Weekday</th>
+                    <th class="fw-bold">Open Time</th>
+                    <th class="fw-bold">Close Time</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for form in hours_fs %}
-                  {% with day=form.day_of_week.value|default:'' %}
-                  <tr class="hours-row {% if day|lower == now|date:'l'|lower %}table-info{% endif %}">
-                    <td class="fw-bold">
-                      {{ form.day_of_week|as_crispy_field }}
-                    </td>
-                    <td>
-                      <input type="time" name="{{ form.open_time.html_name }}" id="{{ form.open_time.id_for_label }}" class="form-control open-time-input" value="{{ form.open_time.value|default:'' }}" {% if form.is_closed.value %}style="display:none;"{% endif %}>
-                    </td>
-                    <td>
-                      <input type="time" name="{{ form.close_time.html_name }}" id="{{ form.close_time.id_for_label }}" class="form-control close-time-input" value="{{ form.close_time.value|default:'' }}" {% if form.is_closed.value %}style="display:none;"{% endif %}>
-                    </td>
-                    <td>
-                      <div class="d-flex gap-1 justify-content-center align-items-center">
-                        <button type="button" class="btn btn-outline-secondary btn-sm set-closed-btn" title="Set Closed">Closed</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm set-24h-btn" title="Set 24h">24h</button>
-                        <div class="form-check ms-2">
-                          <input class="form-check-input is-closed-checkbox" type="checkbox" name="{{ form.is_closed.html_name }}" id="{{ form.is_closed.id_for_label }}" value="true" {% if form.is_closed.value %}checked{% endif %}>
-                          <label class="form-check-label" for="{{ form.is_closed.id_for_label }}">Closed</label>
-                        </div>
+                  <tr class="hours-row">
+                    {{ form.id }}
+                    <td>{{ form.day_of_week }}</td>
+                    <td>{{ form.open_time }}</td>
+                    <td>{{ form.close_time }}</td>
+                    <td class="d-flex flex-column gap-2 align-items-center">
+                      <div class="d-flex align-items-center gap-2">
+                        {{ form.is_closed }}
+                        <span class="ms-1">Mark as closed</span>
                       </div>
                     </td>
-                    <td>
-                      <button type="button" class="btn btn-outline-danger btn-sm clear-hours-btn" title="Clear this row">
-                        <i class="bi bi-x-circle"></i> Clear
-                      </button>
-                    </td>
                   </tr>
-                  {% endwith %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -306,16 +341,29 @@
         </div>
       </div>
       <div class="tab-pane fade" id="logo" role="tabpanel" aria-labelledby="logo-tab">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-          <div class="card-header bg-white border-bottom-0 rounded-top-4">
-            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-image me-2"></i> Logo</h5>
+        <div class="card mb-4 shadow-sm border-0 rounded-4">
+          <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
+            <i class="bi bi-image fs-4 text-primary-emphasis"></i>
+            <h5 class="mb-0 fs-5 text-primary-emphasis">Logo</h5>
           </div>
-          <div class="card-body text-center">
-            <img id="logoPreview" src="{{ rp_form.instance.logo.url|default:'https://via.placeholder.com/300x200.png?text=No+Logo' }}" class="img-fluid rounded mb-3 logo-preview" alt="Logo preview">
-            <div class="mb-2">
-              <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="Recommended logo size: 300x200px. Supported formats: PNG, JPG. Transparent backgrounds look best."></i>
+          <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
+            <div class="text-center w-100">
+              <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light d-flex align-items-center justify-content-center" style="max-width:400px; margin:auto;">
+                <img id="logoPreview" src="{{ rp_form.instance.logo.url|default:'https://via.placeholder.com/300x200.png?text=No+Logo' }}" class="object-fit-cover w-100 h-100 logo-preview" alt="Logo preview">
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                <i class="bi bi-upload me-1"></i> Upload Logo
+              </button>
+                <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="Recommended logo size: 300x200px. Supported formats: PNG, JPG. Transparent backgrounds look best."></i>
             </div>
-            {{ rp_form.logo|as_crispy_field }}
+            <div class="flex-grow-1 w-100 mt-4 mt-md-0">
+              <label class="form-label fw-bold">
+                {% if rp_form.logo.help_text %}
+                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.logo.help_text }}"></i>
+                {% endif %}
+              </label>
+              {{ rp_form.logo|as_crispy_field }}
+            </div>
           </div>
         </div>
       </div>
@@ -339,12 +387,13 @@
             <ul id="address-list" class="list-group list-group-flush">
               {% if saved_addresses %}
                 {% for address in saved_addresses %}
-                  <li id="address-{{ address.id }}" class="list-group-item d-flex justify-content-between align-items-center">
+                  <li id="address_{{ address.id }}" class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="flex-grow-1 address-text">{{ address.formatted_address }}</span>
                     <input type="text" class="form-control d-none address-edit-input" value="{{ address.formatted_address }}">
                     <!-- Edit button removed -->
-                    <button type="button" class="btn btn-outline-danger btn-sm delete-address-btn ms-2" data-address-id="{{ address.id }}">
-                      <i class="bi bi-trash"></i>
+                    <button type="button" class="btn btn-outline-danger btn-sm delete-address-btn ms-2" data-address-id="{{ address.id }}" aria-label="Delete address {{ address.formatted_address }}">
+                      <span class="visually-hidden">Delete</span>
+                      <i class="bi bi-trash" aria-hidden="true"></i>
                     </button>
                   </li>
                 {% endfor %}
@@ -354,13 +403,6 @@
             </ul>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="card shadow-sm border-0 rounded-4 mt-4">
-      <div class="card-body text-end">
-        <button type="submit" class="btn btn-primary btn-lg px-4 d-none d-md-inline">
-          <i class="bi bi-save me-2"></i> Save All Profile Changes
-        </button>
       </div>
     </div>
     <!-- Sticky Save Button -->
@@ -375,6 +417,6 @@
   <script src="{% static 'js/restaurant_profile.js' %}"></script>
   <script src="{% static 'js/tooltips.js' %}"></script>
   <script>
-  window.ADDRESS_LIST_CREATE_URL = "{% url 'locations:address-list-create' %}";
-</script>
+    window.ADDRESS_LIST_CREATE_URL = "{% url 'locations:address-list-create' %}";
+  </script>
 {% endblock %}

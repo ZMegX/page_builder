@@ -60,14 +60,14 @@ class SocialLinkForm(forms.ModelForm):
 
 class OpeningHourForm(forms.ModelForm):
     day_of_week = forms.ChoiceField(choices=DAYS_OF_WEEK, widget=forms.Select(attrs={"class": "form-select"}))
-    is_closed = forms.BooleanField(required=False, label="Closed")
+    is_closed = forms.BooleanField(required=False, label="Closed", widget=forms.CheckboxInput(attrs={"class": "is-closed-checkbox"}))
 
     class Meta:
         model = OpeningHour
         fields = ["day_of_week", "is_closed", "open_time", "close_time"]
         widgets = {
-            "open_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
-            "close_time": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "open_time": forms.TimeInput(attrs={"type": "time", "class": "open-time-input form-control"}),
+            "close_time": forms.TimeInput(attrs={"type": "time", "class": "close-time-input form-control"}),
         }
 
     def clean(self):
