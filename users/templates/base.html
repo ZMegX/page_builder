@@ -16,6 +16,12 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'home' %}">Gastro Grid</a>
         <div class="d-flex align-items-center d-lg-none" style="gap:0.5rem;">
+          <button class="nav-link cart-btn btn btn-link p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar" aria-label="View cart">
+            <i class="bi bi-cart3" style="font-size:1.5rem;"></i>
+            {% if cart and cart|length > 0 %}
+              <span class="badge bg-danger ms-1">{{ cart|length }}</span>
+            {% endif %}
+          </button>
           <button class="navbar-toggler" type="button" id="navbarSidebarToggle" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -37,7 +43,7 @@
               <a class="nav-link" href="{% url 'webpage_restaurant_site:browse_restaurants' %}">Browse Restaurants</a>
             </li>
             {% if user.is_authenticated and user.restaurant_profile and user.restaurant_profile.slug and not is_customer %}
-              <li class="nav-item dropdown">
+              <li class="nav-item dropdown-center">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Menus
                 </a>
@@ -51,7 +57,7 @@
               </li>
             {% endif %}
             {% if user.is_authenticated %}
-                <li class="nav-item ms-auto">
+                <li class="nav-item">
                   <a class="nav-link cart-btn" href="#" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar">
                     <i class="bi bi-cart3"></i> Cart
                     {% if cart and cart|length > 0 %}
@@ -112,15 +118,15 @@
               <a class="nav-link" href="{% url 'webpage_restaurant_site:browse_restaurants' %}">Browse Restaurants</a>
             </li>
             {% if user.is_authenticated and user.restaurant_profile and user.restaurant_profile.slug and not is_customer %}
-              <li class="nav-item dropdown justify-content-center">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Menus
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item d-flex justify-content-center" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
-                  <li><a class="dropdown-item d-flex justify-content-center" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
+              <li class="nav-item dropdown-center">
+                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Menu
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark">
+                  <li><a class="dropdown-item" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
+                  <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item d-flex justify-content-center" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
+                  <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                 </ul>
               </li>
             {% endif %}

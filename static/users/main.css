@@ -678,11 +678,15 @@ body.menu-dark-bg {
     margin-bottom: 0.5rem;
   }
   .navbar-sidebar .dropdown-menu {
-    position: static;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
     box-shadow: none;
     border: none;
     background: #f9f9f9;
     padding: 0.2rem 0.2rem;
+    z-index: 1070;
   }
   .navbar-sidebar .dropdown-item {
     padding: 0.7rem 1rem;

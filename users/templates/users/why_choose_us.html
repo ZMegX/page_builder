@@ -87,8 +87,55 @@
 
     <div class="tab-pane fade" id="customer" role="tabpanel" aria-labelledby="customer-tab">
       <div class="card bg-light p-5 text-center">
-        <h2 class="fw-bold mb-3">For Customers</h2>
-        <p class="lead text-secondary">Discover and order from your favorite restaurants. This section is coming soon!</p>
+          <!-- Hero Banner Section -->
+          <div class="hero-banner position-relative mb-5 fade-in-element">
+            <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center">
+              <h1 class="fw-bold display-5 text-white text-shadow mb-3">Order Smarter, Save More</h1>
+              <p class="lead text-light text-shadow mb-4">Enjoy faster orders, tip-based delivery, and exclusive deals — all for free.</p>
+              <div>
+                <a href="{% url 'register' %}" class="btn btn-dark px-4 py-2 me-2">
+                  <i class="bi bi-lightning-charge me-1"></i> Start Ordering
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light px-4 py-2">
+                  <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                </a>
+              </div>
+            </div>
+            <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+          </div>
+
+          <!-- Features Section -->
+          <div class="row text-center my-5 fade-in-element">
+            <h2 class="fw-bold mb-4">Why Choose Us?</h2>
+            <div class="col-md-4 mb-4 feature-card">
+              <i class="bi bi-lightning-charge display-5 text-dark mb-3"></i>
+              <h5 class="fw-semibold">Faster Orders</h5>
+              <p class="text-secondary">Direct deals with restaurants mean your food gets to you quicker.</p>
+            </div>
+
+            <div class="col-md-4 mb-4 feature-card">
+              <i class="bi bi-cash-coin display-5 text-dark mb-3"></i>
+              <h5 class="fw-semibold">Always Free</h5>
+              <p class="text-secondary">No hidden fees — you only tip for delivery.</p>
+            </div>
+
+            <div class="col-md-4 mb-4 feature-card">
+              <i class="bi bi-gift display-5 text-dark mb-3"></i>
+              <h5 class="fw-semibold">Exclusive Deals</h5>
+              <p class="text-secondary">Unlock special offers only available here.</p>
+            </div>
+          </div>
+
+          <!-- CTA Section -->
+          <div class="card text-center bg-dark text-white rounded-4 shadow p-5 mt-5 fade-in-element">
+            <h2 class="fw-bold mb-3">Ready to Order?</h2>
+            <p class="mb-4">Get faster delivery, pay only tips, and enjoy exclusive perks today.</p>
+            <a href="{% url 'register' %}" class="btn btn-light px-4 py-2 fw-semibold">
+              Start Ordering Now
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
