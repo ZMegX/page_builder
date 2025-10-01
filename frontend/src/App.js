@@ -9,7 +9,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/menu-editor/create" element={<MenuWizard />} />
-        <Route path="/menu-editor/*" element={<MenuEditor />} />
+        <Route path="/menu-editor/:menuId/*" element={<MenuEditor />} />
         {/* Optionally, add a default route */}
         {/* <Route path="*" element={<MenuEditor />} /> */}
       </Routes>

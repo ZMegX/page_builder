@@ -1,15 +1,17 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { Tabs, Tab, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import MenuItemModal from './MenuItemModal';
 
 function MenuEditor({ menu }) {
+  const { menuId } = useParams();
   // Toast state
   const [toast, setToast] = React.useState({ show: false, message: '', variant: 'success' });
   const [savingOrder, setSavingOrder] = React.useState(false);
   const [lastReorderedIds, setLastReorderedIds] = React.useState([]);
   const [menus, setMenus] = React.useState(menu ? [menu] : []);
-  const [selectedMenuId, setSelectedMenuId] = React.useState(menu ? menu.id : null);
+  const [selectedMenuId, setSelectedMenuId] = React.useState(menu ? menu.id : menuId ? Number(menuId) : null);
   const [items, setItems] = React.useState([]);
   const selectedMenu = menus.find(m => m.id === selectedMenuId);
   const [menuName, setMenuName] = React.useState(selectedMenu ? selectedMenu.name : '');
@@ -19,6 +21,14 @@ function MenuEditor({ menu }) {
       setMenus([menu]);
       setSelectedMenuId(menu.id);
       setItems(menu.items || []);
+    } else if (menuId) {
+      fetch(`/menus/api/menus/${menuId}/`)
+        .then(res => res.json())
+        .then(data => {
+          setMenus([data]);
+          setSelectedMenuId(data.id);
+          setItems(data.items || []);
+        });
     } else {
       fetch('http://localhost:8000/menus/api/menus/')
         .then(res => res.json())
@@ -37,7 +47,7 @@ function MenuEditor({ menu }) {
           }
         });
     }
-  }, [menu]);
+  }, [menu, menuId]);
 
   React.useEffect(() => {
     const menu = menus.find(m => m.id === selectedMenuId);

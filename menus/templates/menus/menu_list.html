@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 {% load cloudinary %}
@@ -54,8 +53,7 @@
             </span>
           </p>
             <div class="d-flex gap-2">
-              <a href="{% url 'menus:menu_detail' menu.pk %}" class="btn btn-outline-secondary btn-sm">View</a>
-              <a href="{% url 'menus:edit_menu' menu.pk %}" class="btn btn-outline-primary btn-sm flex-grow-1">Edit</a>
+              <a href="/menu-editor/{{ menu.pk }}/" class="btn btn-outline-primary btn-sm flex-grow-1">View/Edit</a>
               <form method="post" action="{% url 'menus:menu_toggle_status' menu.pk %}">
                 {% csrf_token %}
                 {% if menu.is_active %}

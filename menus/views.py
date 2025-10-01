@@ -119,38 +119,38 @@ def public_menu_detail(request, slug: str):
     }
     return render(request, "restaurant_site/menus_list.html", context)
 
-class MenuUpdateView(LoginRequiredMixin, UpdateView):
-    model = Menu
-    form_class = MenuForm
-    template_name = "menus/edit_menu.html"
-    context_object_name = "menu"
+# class MenuUpdateView(LoginRequiredMixin, UpdateView):
+#     model = Menu
+#     form_class = MenuForm
+#     template_name = "menus/edit_menu.html"
+#     context_object_name = "menu"
 
-    def get_queryset(self):
-        # Only allow the owner to edit
-        return Menu.objects.filter(owner=self.request.user)
+#     def get_queryset(self):
+#         # Only allow the owner to edit
+#         return Menu.objects.filter(owner=self.request.user)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        menu = self.object
-        if self.request.method == "POST":
-            context["formset"] = MenuItemFormSet(self.request.POST, instance=menu)
-        else:
-            context["formset"] = MenuItemFormSet(instance=menu)
-        context["title"] = f"Edit {menu.name}"
-        return context
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         menu = self.object
+#         if self.request.method == "POST":
+#             context["formset"] = MenuItemFormSet(self.request.POST, instance=menu)
+#         else:
+#             context["formset"] = MenuItemFormSet(instance=menu)
+#         context["title"] = f"Edit {menu.name}"
+#         return context
 
-    def form_valid(self, form):
-        menu = form.save()
-        formset = MenuItemFormSet(self.request.POST, instance=menu)
-        if formset.is_valid():
-            formset.save()
-            messages.success(self.request, f'Menu "{menu.name}" updated successfully!')
-            return super().form_valid(form)
-        else:
-            return self.form_invalid(form)
+#     def form_valid(self, form):
+#         menu = form.save()
+#         formset = MenuItemFormSet(self.request.POST, instance=menu)
+#         if formset.is_valid():
+#             formset.save()
+#             messages.success(self.request, f'Menu "{menu.name}" updated successfully!')
+#             return super().form_valid(form)
+#         else:
+#             return self.form_invalid(form)
     
-    def get_success_url(self):
-        return reverse_lazy("menus:menu_detail", kwargs={"pk": self.object.pk})
+#     def get_success_url(self):
+#         return reverse_lazy("menus:menu_detail", kwargs={"pk": self.object.pk})
 
 class MenuListView(LoginRequiredMixin, ListView):
     model = Menu
@@ -292,5 +292,8 @@ def menu_sections_api(request):
         for value, label in MenuItem.SECTION_CHOICES
     ]
     return JsonResponse(result, safe=False)
+
+def redirect_to_menu_editor(request, pk):
+    return redirect('/menu-editor')
 
 

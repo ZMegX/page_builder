@@ -2,8 +2,7 @@ from django.urls import path, re_path
 from .views import (
     MenuListView,
     MenuDetailView,
-    MenuUpdateView,
-    MenuDeleteView
+    MenuDeleteView,
 )
 from . import views
 from .views_menu_items import add_menu_item, menu_item_detail
@@ -19,7 +18,7 @@ router.register(r'api/menu-items', MenuItemViewSet)
 
 urlpatterns = [
     path('', MenuListView.as_view(), name='menu_list'),
-    path('<int:pk>/edit/', MenuUpdateView.as_view(), name='edit_menu'),    
+    path('<int:pk>/edit/', views.redirect_to_menu_editor, name='edit_menu'),
     path('<int:pk>/delete/', MenuDeleteView.as_view(), name='delete_menu'),    
     path('<int:pk>/toggle-status/', views.toggle_menu_status, name='menu_toggle_status'),
     path('<int:pk>/duplicate/', views.menu_duplicate, name='menu_duplicate'),
