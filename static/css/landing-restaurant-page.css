@@ -1,3 +1,8 @@
+/* Hero section background: very light black transparency */
+.hero-bg-trans {
+  background: rgba(0,0,0,0.2);
+  border-radius: 1rem;
+}
 /* landing-restaurant-page.css: Styles moved from inline in landing.html */
 
 /* Header logo image */
@@ -21,7 +26,7 @@
 /* Hero section container */
 .hero-section .container.landing-restaurant-page {
   position: relative;
-  z-index: 2;
+  /* z-index removed to allow modals to overlay properly */
 }
 
 /* Hero headline shadow */
@@ -157,4 +162,11 @@
     width: 100% !important;
     display: block !important;
   }
+}
+
+.hero-overlay.landing-restaurant-page {
+  pointer-events: none;
+}
+.d-flex.flex-wrap.gap-3.justify-content-center.position-relative {
+  z-index: 2;
 }

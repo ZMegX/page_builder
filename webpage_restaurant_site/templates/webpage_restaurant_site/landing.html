@@ -4,58 +4,30 @@
 <link rel="stylesheet" href="{% static 'themes/theme-' %}{{ profile.theme_choice }}.css">
 <link rel="stylesheet" href="{% static 'css/landing-restaurant-page.css' %}">
 {% block title %}{{ profile.name }} — Restaurant{% endblock %}
-{% block header %}
-<header class="bg-white shadow-sm py-3 mb-4">
-  <div class="container d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2 gap-md-0">
-    <!-- Logo and Name -->
-    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
-      {% if profile.logo %}
-        <img src="{{ profile.logo.url }}" alt="{{ profile.name }} logo"
-          class="img-fluid rounded logo-avatar me-3 landing-restaurant-page">
-      {% endif %}
-      <span class="fw-bold fs-4">{{ profile.name }}</span>
-    </div>
-    <!-- Navigation Links (below logo/name on mobile) -->
-    <nav class="w-100 w-md-auto order-3 order-md-2">
-      <ul class="nav justify-content-center justify-content-md-start">
-        <li class="nav-item">
-          <a class="nav-link fw-semibold" href="#about">About</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-semibold" href="{% url 'webpage_restaurant_site:menu' slug=slug %}">Menu</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link fw-semibold" href="#contact">Contact</a>
-        </li>
-      </ul>
-    </nav>
-    <!-- Call-to-Action Button -->
-    <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-gradient btn-lg px-4 d-flex align-items-center justify-content-center order-2 order-md-3 align-self-center align-self-md-auto">
-      <i class="bi bi-bag-fill me-2 fs-5"></i>
-      <span>Order</span>
-    </a>
-  </div>
-</header>
-{% endblock %}
 {% block hero %}
 <section class="hero-section position-relative text-white landing-restaurant-page"
   data-bg="{% if profile.hero_image %}{{ profile.hero_image.url }}{% else %}{% static 'img/hero-default.jpg' %}{% endif %}">
-  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center landing-restaurant-page">
+  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center landing-restaurant-page hero-bg-trans">
   <h1 class="display-4 fw-bold mb-3 landing-restaurant-page">{{ profile.hero_headline|default:"Welcome to " }}{{ profile.name }}</h1>
   <p class="lead mb-4 landing-restaurant-page">
       {{ profile.hero_description|default:"Enjoy authentic cuisine, friendly service, and a cozy atmosphere. Order online, view our menu, or book a table today!" }}
     </p>
-    <div class="d-flex flex-wrap gap-3 justify-content-center">
-      <a href="{% url 'webpage_restaurant_site:order_online' slug=slug %}" class="btn btn-gradient btn-lg px-4">
-        <i class="bi bi-bag-fill me-2"></i>Order Food
-      </a>
-      <a href="{% url 'webpage_restaurant_site:menu' slug=slug %}" class="btn btn-primary btn-lg px-4">
+    <div class="d-flex flex-wrap gap-3 justify-content-center position-relative" style="z-index:2;">
+      <a href="{% url 'webpage_restaurant_site:menu' slug=profile.slug %}" class="btn btn-primary btn-lg px-4">
         <i class="bi bi-book-fill me-2"></i>View Menu
       </a>
+      <a href="#about" class="btn btn-outline-dark btn-lg px-4 bg-white">
+        <i class="bi bi-info-circle me-2"></i>About
+      </a>
+      <a href="#contact" class="btn btn-outline-dark btn-lg px-4 bg-white">
+        <i class="bi bi-envelope me-2"></i>Contact
+      </a>
+      <button type="button" class="btn btn-outline-dark btn-lg px-4 bg-white" data-bs-toggle="modal" data-bs-target="#reviewsModal">
+        <i class="bi bi-chat-left-text me-2"></i>Reviews
+      </button>
     </div>
+    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 landing-restaurant-page" style="pointer-events:none;"></div>
   </div>
-  <!-- Optional: Overlay for better text contrast -->
-  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 landing-restaurant-page"></div>
 </section>
 {% endblock %}
 {% block about %}
@@ -157,6 +129,12 @@
                 </a>
               </div>
             {% endif %}
+            {% if owner_email %}
+              <div class="mb-2">
+                <i class="bi bi-envelope me-2 text-muted"></i>
+                <strong>Email:</strong> <a href="mailto:{{ owner_email }}">{{ owner_email }}</a>
+              </div>
+            {% endif %}
             {% if status.today_hours %}
               <div class="mb-2">
                 <i class="bi bi-clock me-2 text-muted"></i>
@@ -181,7 +159,7 @@
           </div>
           <div class="my-4">
             {% if slug %}
-              <a href="{% url 'menus:public_menu_detail' slug=slug %}" class="btn btn-primary btn-lg w-100">
+              <a href="{% url 'webpage_restaurant_site:menu' slug=profile.slug %}" class="btn btn-primary btn-lg px-4">
                 <i class="bi bi-book-fill me-2"></i>View Menus
               </a>
             {% else %}
@@ -260,6 +238,79 @@
     </div>
   </div>
 </section>
+<!-- Reviews Modal (moved outside hero section for proper Bootstrap behavior) -->
+<div class="modal fade" id="reviewsModal" tabindex="-1" aria-labelledby="reviewsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reviewsModalLabel">Reviews for {{ profile.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% with reviews=profile.reviews.all %}
+          {% if reviews %}
+            {% for review in reviews %}
+              {% if review.is_approved %}
+                <div class="card mb-2">
+                  <div class="card-body">
+                    <strong>{{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}</strong>
+                    <span class="badge bg-warning">{{ review.rating }}★</span>
+                    <p>{{ review.comment }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"SHORT_DATE_FORMAT" }}</small>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <p>No reviews yet for this restaurant.</p>
+          {% endif %}
+        {% endwith %}
+        <div class="text-center mt-3">
+          <button type="button" class="btn btn-modern-black btn-sm" data-bs-toggle="modal" data-bs-target="#reviewModal" data-bs-dismiss="modal">
+            <i class="bi bi-star me-1"></i> Leave a Review
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Leave a Review Modal (moved outside hero section for proper Bootstrap behavior) -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'leave_review' profile.pk %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="reviewModalLabel">Leave a Review for {{ profile.name }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Rating</label>
+            <div>
+              {% for i in "12345" %}
+                <input type="radio" class="btn-check" name="rating" id="star{{ i }}" value="{{ i }}">
+                <label class="btn btn-outline-warning" for="star{{ i }}"><i class="bi bi-star-fill"></i></label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reviewer_name" class="form-label">Your Name (optional)</label>
+            <input type="text" class="form-control" id="reviewer_name" name="reviewer_name" maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Comment</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3" maxlength="500" placeholder="Write your review..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

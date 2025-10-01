@@ -159,13 +159,13 @@
     {% endif %}
     {% block header %}{% endblock %}
     </header>
+  <main class="container py-4">
     {% block hero %}{% endblock %}
-    <main class="container py-4">
-        {% block about %}{% endblock %}
-        {% block services %}{% endblock %}
-        {% block popular_items %}{% endblock %}
-        {% block content %}{% endblock %}
-    </main>
+    {% block about %}{% endblock %}
+    {% block services %}{% endblock %}
+    {% block popular_items %}{% endblock %}
+    {% block content %}{% endblock %}
+  </main>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="cartSidebar" aria-labelledby="cartSidebarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="cartSidebarLabel">Your Cart</h5>

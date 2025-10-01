@@ -382,6 +382,8 @@ def restaurant_landing(request, slug):
         "about_highlight": getattr(profile, "about_highlight", None),
         # For menu section
         "popular_items": popular_items,
+        # Expose owner's email for contact section
+        "owner_email": profile.user.email if profile and profile.user and profile.user.email else None,
     }
     return render(request, "webpage_restaurant_site/landing.html", context)
 
