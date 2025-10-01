@@ -33,7 +33,7 @@
   </div>
   <!-- Profile Completeness Progress Bar & Checklist -->
     <!-- Responsive tab navigation: tabs for desktop, dropdown for mobile -->
-    <ul class="nav nav-tabs redesigned-tabs w-100 mb-4 d-none d-md-flex" id="profileTab" role="tablist">
+  <ul class="nav nav-tabs redesigned-tabs w-100 mb-4 d-none d-lg-flex" id="profileTab" role="tablist">
       <li class="nav-item flex-fill" role="presentation">
         <button class="nav-link redesigned-tab-btn" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="false" tabindex="-1">
           <i class="bi bi-info-circle me-1"></i> Details
@@ -312,7 +312,9 @@
                       {{ form.id }}
                       <td>{{ form.day_of_week }}</td>
                       <td>{{ form.open_time }}</td>
-                      <td>{{ form.close_time }}</td>
+                      <td>
+                        {{ form.close_time }}
+                      </td>
                       <td class="d-flex flex-column gap-2 align-items-center">
                         <div class="d-flex align-items-center gap-2">
                           {{ form.is_closed }}

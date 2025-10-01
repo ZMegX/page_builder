@@ -11,7 +11,27 @@ document.addEventListener('DOMContentLoaded', function() {
       if (tabButton) {
         var tab = new bootstrap.Tab(tabButton);
         tab.show();
+      } else {
+        // Directly show tab pane if tab button is hidden (mobile)
+        var tabContent = document.getElementById('profileTabContent');
+        var panes = tabContent.querySelectorAll('.tab-pane');
+        panes.forEach(function(pane) {
+          pane.classList.remove('show', 'active');
+        });
+        var activePane = document.getElementById(tabId);
+        if (activePane) {
+          activePane.classList.add('show', 'active');
+        }
       }
+    });
+
+    // Also update dropdown value when tab is changed by clicking tab buttons
+    var tabButtons = document.querySelectorAll('.redesigned-tab-btn');
+    tabButtons.forEach(function(btn) {
+      btn.addEventListener('shown.bs.tab', function(e) {
+        var tabId = btn.getAttribute('data-bs-target').replace('#', '');
+        dropdown.value = tabId;
+      });
     });
   }
 
