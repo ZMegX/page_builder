@@ -4,9 +4,10 @@ from django.contrib import messages
 from django.conf import settings
 from .restaurant_forms import (
     RestaurantProfileForm,
+    HeroForm,
+    AboutForm,
     SocialLinkFormSet,
     OpeningHourFormSet,
-    RestaurantProfileForm,
     ReviewForm,
 )
 from locations.models import UserAddress
@@ -19,45 +20,117 @@ def restaurant_profile(request):
     rp, _ = RestaurantProfile.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
-        # All forms are bound to the same POST data.
-        rp_form = RestaurantProfileForm(request.POST, request.FILES, instance=rp)
-        social_fs = SocialLinkFormSet(request.POST, instance=rp, prefix="social")
-        hours_fs = OpeningHourFormSet(request.POST, instance=rp, prefix="hours")
+        form_id = request.POST.get("form_id")
+        rp_saved = social_saved = hours_saved = logo_saved = about_saved = hero_saved = False
 
-        # Validate and save each form independently
-        saved_any = False
-        if rp_form.is_valid():
-            rp_form.save()
-            messages.success(request, "Profile details saved.")
-            saved_any = True
-        elif rp_form.errors:
-            messages.error(request, "Please correct errors in profile details.")
-
-        if social_fs.is_valid():
-            social_fs.save()
-            messages.success(request, "Social links saved.")
-            saved_any = True
-        elif social_fs.non_form_errors() or any(f.errors for f in social_fs):
-            messages.error(request, "Please correct errors in social links.")
-
-        if hours_fs.is_valid():
-            hours_fs.save()
-            messages.success(request, "Opening hours saved.")
-            saved_any = True
-        elif hours_fs.non_form_errors() or any(f.errors for f in hours_fs):
-            error_msgs = []
-            error_msgs += [str(e) for e in hours_fs.non_form_errors()]
-            for f in hours_fs:
-                for field, errors in f.errors.items():
-                    for error in errors:
-                        error_msgs.append(f"{field}: {error}")
-            messages.error(request, "Opening hours errors: " + "; ".join(error_msgs))
-
-        if saved_any:
+        if form_id == "details-form":
+            rp_form = RestaurantProfileForm(request.POST, request.FILES, instance=rp)
+            hero_form = HeroForm(instance=rp)
+            about_form = AboutForm(instance=rp)
+            if rp_form.is_valid():
+                rp_form.save()
+                messages.success(request, "Profile details saved.")
+                rp_saved = True
+            elif rp_form.errors:
+                messages.error(request, "Please correct errors in profile details.")
+            social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+            hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
+        elif form_id == "hero-form":
+            hero_form = HeroForm(request.POST, request.FILES, instance=rp)
+            rp_form = RestaurantProfileForm(instance=rp)
+            about_form = AboutForm(instance=rp)
+            if hero_form.is_valid():
+                hero_form.save()
+                messages.success(request, "Hero section saved.")
+                hero_saved = True
+            elif hero_form.errors:
+                messages.error(request, "Please correct errors in hero section.")
+            social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+            hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
+        elif form_id == "about-form":
+            about_form = AboutForm(request.POST, request.FILES, instance=rp)
+            rp_form = RestaurantProfileForm(instance=rp)
+            hero_form = HeroForm(instance=rp)
+            if about_form.is_valid():
+                about_form.save()
+                messages.success(request, "About section saved.")
+                about_saved = True
+            elif about_form.errors:
+                messages.error(request, "Please correct errors in about section.")
+            social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+            hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
+        elif form_id == "social-form":
+            social_fs = SocialLinkFormSet(request.POST, instance=rp, prefix="social")
+            rp_form = RestaurantProfileForm(instance=rp)
+            hero_form = HeroForm(instance=rp)
+            about_form = AboutForm(instance=rp)
+            if social_fs.is_valid():
+                social_fs.save()
+                messages.success(request, "Social links saved.")
+                social_saved = True
+            elif social_fs.non_form_errors() or any(f.errors for f in social_fs):
+                messages.error(request, "Please correct errors in social links.")
+            hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
+        elif form_id == "hours-form":
+            hours_fs = OpeningHourFormSet(request.POST, instance=rp, prefix="hours")
+            rp_form = RestaurantProfileForm(instance=rp)
+            hero_form = HeroForm(instance=rp)
+            about_form = AboutForm(instance=rp)
+            social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+            if hours_fs.is_valid():
+                hours_fs.save()
+                messages.success(request, "Opening hours saved.")
+                hours_saved = True
+            elif hours_fs.non_form_errors() or any(f.errors for f in hours_fs):
+                error_msgs = []
+                error_msgs += [str(e) for e in hours_fs.non_form_errors()]
+                for f in hours_fs:
+                    for field, errors in f.errors.items():
+                        for error in errors:
+                            error_msgs.append(f"{field}: {error}")
+                messages.error(request, "Opening hours errors: " + "; ".join(error_msgs))
+        elif form_id == "logo-form":
+            rp_form = RestaurantProfileForm(request.POST, request.FILES, instance=rp)
+            hero_form = HeroForm(instance=rp)
+            about_form = AboutForm(instance=rp)
+            if rp_form.is_valid():
+                rp_form.save()
+                messages.success(request, "Logo saved.")
+                logo_saved = True
+            elif rp_form.errors:
+                messages.error(request, "Please correct errors in logo upload.")
+            social_fs = SocialLinkFormSet(instance=rp, prefix="social")
+            hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
+        else:
+            # fallback: process all forms as before (should not happen)
+            rp_form = RestaurantProfileForm(request.POST, request.FILES, instance=rp)
+            hero_form = HeroForm(request.POST, request.FILES, instance=rp)
+            about_form = AboutForm(request.POST, request.FILES, instance=rp)
+            social_fs = SocialLinkFormSet(request.POST, instance=rp, prefix="social")
+            hours_fs = OpeningHourFormSet(request.POST, instance=rp, prefix="hours")
+            if rp_form.is_valid():
+                rp_form.save()
+                rp_saved = True
+            if hero_form.is_valid():
+                hero_form.save()
+                hero_saved = True
+            if about_form.is_valid():
+                about_form.save()
+                about_saved = True
+            if social_fs.is_valid():
+                social_fs.save()
+                social_saved = True
+            if hours_fs.is_valid():
+                hours_fs.save()
+                hours_saved = True
+        # If any form was saved, reload the page to show updated data and clear POST
+        if rp_saved or social_saved or hours_saved or logo_saved or about_saved or hero_saved:
             return redirect("restaurant_profile")
     else:
         # On a GET request, create unbound instances of the forms.
         rp_form = RestaurantProfileForm(instance=rp)
+        hero_form = HeroForm(instance=rp)
+        about_form = AboutForm(instance=rp)
         social_fs = SocialLinkFormSet(instance=rp, prefix="social")
         hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
 
@@ -66,6 +139,8 @@ def restaurant_profile(request):
 
     context = {
         "rp_form": rp_form,
+        "hero_form": hero_form,
+        "about_form": about_form,
         "social_fs": social_fs,
         "hours_fs": hours_fs,
         "saved_addresses": saved_addresses,

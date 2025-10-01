@@ -28,6 +28,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class MenuSerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many=True, read_only=True)
+    owner = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Menu

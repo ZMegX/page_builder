@@ -3,35 +3,41 @@ import { Tabs, Tab, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import MenuItemModal from './MenuItemModal';
 
-function MenuEditor() {
+function MenuEditor({ menu }) {
   // Toast state
   const [toast, setToast] = React.useState({ show: false, message: '', variant: 'success' });
   const [savingOrder, setSavingOrder] = React.useState(false);
   const [lastReorderedIds, setLastReorderedIds] = React.useState([]);
-  const [menus, setMenus] = React.useState([]);
-  const [selectedMenuId, setSelectedMenuId] = React.useState(null);
+  const [menus, setMenus] = React.useState(menu ? [menu] : []);
+  const [selectedMenuId, setSelectedMenuId] = React.useState(menu ? menu.id : null);
   const [items, setItems] = React.useState([]);
   const selectedMenu = menus.find(m => m.id === selectedMenuId);
   const [menuName, setMenuName] = React.useState(selectedMenu ? selectedMenu.name : '');
 
   React.useEffect(() => {
-    fetch('http://localhost:8000/api/menus/')
-      .then(res => res.json())
-      .then(data => {
-        const userMenus = data.filter(menu => menu.owner === window.userId);
-        setMenus(userMenus);
-        if (userMenus.length > 0) {
-          setSelectedMenuId(userMenus[0].id);
-          setItems(userMenus[0].items);
-        }
-        // Check for ?addItem=1 in URL
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('addItem') === '1') {
-          setEditingItem(null);
-          setShowModal(true);
-        }
-      });
-  }, []);
+    if (menu) {
+      setMenus([menu]);
+      setSelectedMenuId(menu.id);
+      setItems(menu.items || []);
+    } else {
+      fetch('http://localhost:8000/menus/api/menus/')
+        .then(res => res.json())
+        .then(data => {
+          const userMenus = data.filter(menu => menu.owner === window.userId);
+          setMenus(userMenus);
+          if (userMenus.length > 0) {
+            setSelectedMenuId(userMenus[0].id);
+            setItems(userMenus[0].items);
+          }
+          // Check for ?addItem=1 in URL
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('addItem') === '1') {
+            setEditingItem(null);
+            setShowModal(true);
+          }
+        });
+    }
+  }, [menu]);
 
   React.useEffect(() => {
     const menu = menus.find(m => m.id === selectedMenuId);
@@ -68,7 +74,7 @@ function MenuEditor() {
     const payload = { ...item, menu: selectedMenuId };
     if (item.id) {
       // Edit
-      fetch(`/api/menu-items/${item.id}/`, {
+  fetch(`/menus/api/menu-items/${item.id}/`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -89,7 +95,7 @@ function MenuEditor() {
         .catch(err => setToast({ show: true, message: 'Error saving item: ' + err.message, variant: 'danger' }));
     } else {
       // Create
-      fetch('/api/menu-items/', {
+  fetch('/menus/api/menu-items/', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -111,7 +117,7 @@ function MenuEditor() {
   }
 
   function handleDelete(id) {
-    fetch(`/api/menu-items/${id}/`, { 
+  fetch(`/menus/api/menu-items/${id}/`, { 
       method: 'DELETE',
       headers: { 'X-CSRFToken': csrftoken },
     })
@@ -148,7 +154,7 @@ function MenuEditor() {
   function handleSaveOrder(section, reorderedItems) {
     setSavingOrder(true);
     const orderPayload = (reorderedItems || (sectionMap[section] || [])).map((item, idx) => ({ id: item.id, order: idx }));
-    fetch('/api/menu-items/reorder/', {
+  fetch('/menus/api/menu-items/reorder/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -224,7 +230,7 @@ function MenuEditor() {
   const [sectionChoices, setSectionChoices] = React.useState([]);
 
   React.useEffect(() => {
-    fetch('/api/menu-sections/')
+  fetch('/menus/api/menu-sections/')
       .then(res => res.json())
       .then(data => {
         // Expecting [{ value: 'breakfast', label: 'Breakfast' }, ...]

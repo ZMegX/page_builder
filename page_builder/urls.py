@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('menus/', include('menus.urls', namespace='menus')),    path("", include("menus.public_urls")),
 
     # React catch-all route for menu-editor (must be before slug catch-alls)
     path('menu-editor/', TemplateView.as_view(template_name='users/index.html'), name='react_menu_editor'),
@@ -21,8 +22,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
     path('', include('webpage_restaurant_site.urls')),
-    path("", include('menus.urls', namespace='menus')),
-    path("", include("menus.public_urls")),
     path('locations/', include('locations.urls')),
     path('docs/', user_views.documentation, name='docs'),
 ]

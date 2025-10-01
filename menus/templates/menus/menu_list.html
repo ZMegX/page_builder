@@ -24,7 +24,7 @@
       <input type="text" class="form-control" placeholder="Search menus...">
     </div>
     <div class="col-md-4 col-12 text-md-end mt-2 mt-md-0">
-      <a href="{% url 'menus:menu_create' %}" class="btn btn-primary">
+      <a href="/menu-editor/create" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Create Menu
       </a>
     </div>
@@ -75,7 +75,7 @@
     {% empty %}
     <div class="col-12 text-center py-5">
       <p class="lead mb-4">No menus yet. Create your first menu to get started.</p>
-      <a href="{% url 'menus:menu_create' %}" class="btn btn-primary">Create Menu</a>
+      <a href="/menu-editor/create" class="btn btn-primary">Create Menu</a>
     </div>
     {% endfor %}
   </div>

@@ -32,8 +32,6 @@
     </div>
   </div>
   <!-- Profile Completeness Progress Bar & Checklist -->
-  <form id="restaurant-profile-form" method="POST" enctype="multipart/form-data" autocomplete="off">
-    {% csrf_token %}
   <ul class="nav nav-tabs redesigned-tabs w-100 mb-4" id="profileTab" role="tablist">
     <li class="nav-item flex-fill" role="presentation">
       <button class="nav-link active redesigned-tab-btn" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
@@ -62,310 +60,294 @@
     </li>
   </ul>
     <div class="tab-content" id="profileTabContent">
-      <!-- Staging tab content removed -->
       <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-          <div class="card-header bg-white border-bottom-0 rounded-top-4">
-            <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-info-circle me-2"></i> Restaurant Details</h5>
-          </div>
-          <div class="card-body">
-            {% if rp_form.errors %}
-              <div class="alert alert-danger">
-                {{ rp_form.non_field_errors }}
-                {% for field in rp_form %}
-                  {% for error in field.errors %}
-                    <div>{{ field.label }}: {{ error }}</div>
-                  {% endfor %}
-                {% endfor %}
-              </div>
-            {% endif %}
-            <!-- Basic Info Fields -->
-            <div class="row mb-4">
-              <div class="col-md-6">
-                {{ rp_form.name|as_crispy_field }}
-                {% if rp_form.name.help_text %}
-                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.name.help_text }}"></i>
-                {% endif %}
-              </div>
-              <div class="col-md-6">
-                {{ rp_form.cuisine_type|as_crispy_field }}
-                {% if rp_form.cuisine_type.help_text %}
-                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.cuisine_type.help_text }}"></i>
-                {% endif %}
-              </div>
+        <form id="details-form" method="POST" enctype="multipart/form-data" autocomplete="off">
+          <input type="hidden" name="form_id" value="details-form">
+          {% csrf_token %}
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-bottom-0 rounded-top-4">
+              <h5 class="mb-0 py-2 fs-5 text-primary-emphasis"><i class="bi bi-info-circle me-2"></i> Restaurant Details</h5>
             </div>
-            <!-- Theme Choice Card -->
-            <div class="card text-center mb-3">
-              <div class="card-header bg-black text-white">
-                <h6 class="mb-0"><i class="bi bi-palette me-2"></i> Theme</h6>
-              </div>
-              <div class="card-body">
-                <div class="row g-3 justify-content-around">
-                  {% for value, label in rp_form.theme_choice.field.choices %}
-                  <div class="col-auto">
-                    <label class="theme-option d-flex flex-column align-items-center p-2 border rounded {% if rp_form.theme_choice.value == value %}border-primary{% endif %}">
-                      <input type="radio" name="theme_choice" value="{{ value }}" {% if rp_form.theme_choice.value == value %}checked="checked"{% endif %} class="mb-2">
-                      <img src="{% static 'themes/previews/' %}{{ value }}-preview.png" alt="{{ label }} preview" class="theme-preview-img">
-                      <span>{{ label }}</span>
-                    </label>
-                  </div>
+            <div class="card-body">
+              {% if rp_form.errors %}
+                <div class="alert alert-danger">
+                  {{ rp_form.non_field_errors }}
+                  {% for field in rp_form %}
+                    {% for error in field.errors %}
+                      <div>{{ field.label }}: {{ error }}</div>
+                    {% endfor %}
                   {% endfor %}
                 </div>
-                <small class="text-muted mt-2 d-block">Choose a color theme for your restaurant page.</small>
-              </div>
-            </div>
-
-            <!-- Hero Section Card -->
-            <div class="card mb-4 shadow-sm border-0 rounded-4">
-              <div class="card-header bg-black text-white d-flex align-items-center gap-2 rounded-top-4">
-                <i class="bi bi-image fs-4"></i>
-                <h6 class="mb-0 fs-5">Main</h6>
-              </div>
-              <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
-                <div class="flex-grow-1">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Hero headline
-                      {% if rp_form.hero_headline.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.hero_headline.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    <input type="text" class="form-control form-control-lg" placeholder="Your Daily Bagel">
-                    <small class="text-muted">Headline for the hero section on the landing page.</small>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Hero description
-                      {% if rp_form.hero_description.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.hero_description.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    <textarea class="form-control" rows="2" placeholder="Short description for the hero section."></textarea>
-                  </div>
+              {% endif %}
+              <!-- Basic Info Fields -->
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  {{ rp_form.name|as_crispy_field }}
+                  {% if rp_form.name.help_text %}
+                    <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.name.help_text }}"></i>
+                  {% endif %}
                 </div>
-                <div class="text-center">
-                  <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light">
-                    {% if rp_form.hero_image.value %}
-                      <img src="{{ rp_form.hero_image.value.url }}" class="object-fit-cover w-100 h-100" alt="Hero preview">
-                    {% else %}
-                      <span class="text-muted d-flex align-items-center justify-content-center w-100 h-100">No hero image selected</span>
-                    {% endif %}
-                  </div>
-                  <button class="btn btn-outline-primary btn-sm rounded-pill mt-2" type="button">
-                    <i class="bi bi-upload me-1"></i> Upload Image
-                  </button>
-                  <div class="mt-3">
-                    {{ rp_form.hero_image|as_crispy_field }}
-                  </div>
+                <div class="col-md-6">
+                  {{ rp_form.cuisine_type|as_crispy_field }}
+                  {% if rp_form.cuisine_type.help_text %}
+                    <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.cuisine_type.help_text }}"></i>
+                  {% endif %}
                 </div>
               </div>
-            </div>
-            <!-- About Section Card -->
-            <div class="card mb-4 shadow-sm border-0 rounded-4">
-              <div class="card-header bg-black text-white d-flex align-items-center gap-2 rounded-top-4">
-                <i class="bi bi-info-circle fs-4"></i>
-                <h6 class="mb-0 fs-5">About us</h6>
-              </div>
-              <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
-                <div class="flex-grow-1">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">About headline
-                      {% if rp_form.about_headline.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_headline.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    <input type="text" class="form-control form-control-lg" placeholder="Our Story">
-                    <small class="text-muted">Headline for the about section.</small>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">About description
-                      {% if rp_form.about_description.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_description.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    <textarea class="form-control" rows="2" placeholder="Share your restaurant's story and values."></textarea>
-                  </div>
-                  <div>
-                    <label class="form-label fw-bold">About highlight
-                      {% if rp_form.about_highlight.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.about_highlight.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    <input type="text" class="form-control" placeholder="Highlight (e.g. Family-owned since 1980)">
-                  </div>
+              <!-- Theme Choice Card -->
+              <div class="card text-center mb-3">
+                <div class="card-header bg-black text-white">
+                  <h6 class="mb-0"><i class="bi bi-palette me-2"></i> Theme</h6>
                 </div>
-                <div class="text-center">
-                  <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light">
-                    {% if rp_form.about_image.value %}
-                      <img src="{{ rp_form.about_image.value.url }}" class="object-fit-cover w-100 h-100" alt="About preview">
-                    {% else %}
-                      <span class="text-muted d-flex align-items-center justify-content-center w-100 h-100">No about image selected</span>
-                    {% endif %}
-                  </div>
-                  <button class="btn btn-outline-primary btn-sm rounded-pill mt-2">
-                    <i class="bi bi-upload me-1"></i> Upload Image
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
-        <div class="card mb-4 shadow-sm border-0 rounded-4">
-          <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
-            <i class="bi bi-share fs-4 text-primary-emphasis"></i>
-            <h5 class="mb-0 fs-5 text-primary-emphasis">Social Links</h5>
-          </div>
-          <div class="card-body p-4">
-            {{ social_fs.management_form }}
-            {% if social_fs.non_form_errors %}
-              <div class="alert alert-danger mb-3">
-                {{ social_fs.non_form_errors }}
-              </div>
-            {% endif %}
-            <div class="d-flex justify-content-end mb-3">
-              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" id="add-social-link-btn">
-                <i class="bi bi-plus-lg me-1"></i> Add Social Link
-              </button>
-            </div>
-            <div class="d-flex flex-column gap-3">
-              {% for form in social_fs %}
-                {{ form.id }}
-                {% if form.errors %}
-                  <div class="alert alert-danger mb-2">
-                    {% for field in form %}
-                      {% for error in field.errors %}
-                        <div>{{ field.label }}: {{ error }}</div>
-                      {% endfor %}
+                <div class="card-body">
+                  <div class="row g-3 justify-content-around">
+                    {% for value, label in rp_form.theme_choice.field.choices %}
+                    <div class="col-auto">
+                      <label class="theme-option d-flex flex-column align-items-center p-2 border rounded {% if rp_form.theme_choice.value == value %}border-primary{% endif %}">
+                        <input type="radio" name="theme_choice" value="{{ value }}" {% if rp_form.theme_choice.value == value %}checked="checked"{% endif %} class="mb-2">
+                        <img src="{% static 'themes/previews/' %}{{ value }}-preview.png" alt="{{ label }} preview" class="theme-preview-img">
+                        <span>{{ label }}</span>
+                      </label>
+                    </div>
                     {% endfor %}
                   </div>
-                {% endif %}
-                <div class="d-flex flex-column flex-md-row align-items-center gap-3 p-3 rounded bg-light">
-                  <div class="flex-grow-1 w-100">
-                    <label class="form-label fw-bold mb-1">Platform
-                      {% if form.name.help_text %}
-                        <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.name.help_text }}"></i>
-                      {% endif %}
-                    </label>
-                    {{ form.name|as_crispy_field }}
-                    {% if form.name.errors %}
-                      <div class="text-danger small mt-1">
-                        {% for error in form.name.errors %}
-                          <span class="badge bg-danger">{{ error }}</span>
-                        {% endfor %}
-                      </div>
-                    {% elif form.name.value and not form.name.errors %}
-                      <div class="text-success small mt-1">
-                        <span class="badge bg-success">Looks good!</span>
-                      </div>
-                    {% endif %}
+                  <small class="text-muted mt-2 d-block">Choose a color theme for your restaurant page.</small>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg px-4 mt-3">Save Details</button>
+            </div>
+          </div>
+        </form>
+        <!-- Hero Section Card as its own form -->
+          <form method="post" enctype="multipart/form-data" id="hero-form" class="mb-4">
+              {% csrf_token %}
+              <input type="hidden" name="form_id" value="hero-form">
+              <div class="card mb-3">
+                  <div class="card-header d-flex align-items-center justify-content-between">
+                      <span class="h5 mb-0">Hero Section</span>
+                      <button type="submit" class="btn btn-primary btn-sm">Save</button>
                   </div>
-                  <div class="d-flex align-items-center gap-2 w-100">
-                    <span class="social-icon" data-url="{{ form.url.value|default:'' }}"></span>
-                    <div class="flex-grow-1">
-                      <label class="form-label fw-bold mb-1">URL
-                        {% if form.url.help_text %}
-                          <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.url.help_text }}"></i>
+                  <div class="card-body">
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          {{ hero_form.hero_image|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                          {{ hero_form.hero_headline|as_crispy_field }}
+                        </div>
+                        <div class="col-md-12">
+                          {{ hero_form.hero_description|as_crispy_field }}
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+        <!-- About Section Card as its own form -->
+          <form method="post" enctype="multipart/form-data" id="about-form" class="mb-4">
+              {% csrf_token %}
+              <input type="hidden" name="form_id" value="about-form">
+              <div class="card mb-3">
+                  <div class="card-header d-flex align-items-center justify-content-between">
+                      <span class="h5 mb-0">About Section</span>
+                      <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                  </div>
+                  <div class="card-body">
+                      <div class="row g-3">
+              <div class="col-md-6">
+                {{ about_form.about_image|as_crispy_field }}
+              </div>
+              <div class="col-md-6">
+                {{ about_form.about_headline|as_crispy_field }}
+              </div>
+              <div class="col-md-12">
+                {{ about_form.about_description|as_crispy_field }}
+              </div>
+              <div class="col-md-12">
+                {{ about_form.about_highlight|as_crispy_field }}
+              </div>
+                      </div>
+                  </div>
+              </div>
+          </form>
+      </div>
+      <div class="tab-pane fade" id="social" role="tabpanel" aria-labelledby="social-tab">
+        <form id="social-form" method="POST" autocomplete="off">
+          <input type="hidden" name="form_id" value="social-form">
+          {% csrf_token %}
+          <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
+              <i class="bi bi-share fs-4 text-primary-emphasis"></i>
+              <h5 class="mb-0 fs-5 text-primary-emphasis">Social Links</h5>
+            </div>
+            <div class="card-body p-4">
+              {{ social_fs.management_form }}
+              {% if social_fs.non_form_errors %}
+                <div class="alert alert-danger mb-3">
+                  {{ social_fs.non_form_errors }}
+                </div>
+              {% endif %}
+              <div class="d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" id="add-social-link-btn">
+                  <i class="bi bi-plus-lg me-1"></i> Add Social Link
+                </button>
+              </div>
+              <div class="d-flex flex-column gap-3">
+                {% for form in social_fs %}
+                  {{ form.id }}
+                  {% if form.errors %}
+                    <div class="alert alert-danger mb-2">
+                      {% for field in form %}
+                        {% for error in field.errors %}
+                          <div>{{ field.label }}: {{ error }}</div>
+                        {% endfor %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <div class="d-flex flex-column flex-md-row align-items-center gap-3 p-3 rounded bg-light">
+                    <div class="flex-grow-1 w-100">
+                      <label class="form-label fw-bold mb-1">Platform
+                        {% if form.name.help_text %}
+                          <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.name.help_text }}"></i>
                         {% endif %}
                       </label>
-                      {{ form.url|as_crispy_field }}
-                      {% if form.url.errors %}
+                      {{ form.name|as_crispy_field }}
+                      {% if form.name.errors %}
                         <div class="text-danger small mt-1">
-                          {% for error in form.url.errors %}
+                          {% for error in form.name.errors %}
                             <span class="badge bg-danger">{{ error }}</span>
                           {% endfor %}
                         </div>
-                      {% elif form.url.value and not form.url.errors %}
+                      {% elif form.name.value and not form.name.errors %}
                         <div class="text-success small mt-1">
                           <span class="badge bg-success">Looks good!</span>
                         </div>
                       {% endif %}
                     </div>
+                    <div class="d-flex align-items-center gap-2 w-100">
+                      <span class="social-icon" data-url="{{ form.url.value|default:'' }}"></span>
+                      <div class="flex-grow-1">
+                        <label class="form-label fw-bold mb-1">URL
+                          {% if form.url.help_text %}
+                            <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ form.url.help_text }}"></i>
+                          {% endif %}
+                        </label>
+                        {{ form.url|as_crispy_field }}
+                        {% if form.url.errors %}
+                          <div class="text-danger small mt-1">
+                            {% for error in form.url.errors %}
+                              <span class="badge bg-danger">{{ error }}</span>
+                            {% endfor %}
+                          </div>
+                        {% elif form.url.value and not form.url.errors %}
+                          <div class="text-success small mt-1">
+                            <span class="badge bg-success">Looks good!</span>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="ms-md-2 mt-2 mt-md-0">
+                      <button type="button" class="btn btn-outline-danger btn-sm rounded-pill remove-social-link-btn" data-form-index="{{ forloop.counter0 }}" aria-label="Remove social link">
+                        <span class="visually-hidden">Remove</span>
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                      </button>
+                    </div>
                   </div>
-                  <div class="ms-md-2 mt-2 mt-md-0">
-                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill remove-social-link-btn" data-form-index="{{ forloop.counter0 }}" aria-label="Remove social link">
-                      <span class="visually-hidden">Remove</span>
-                      <i class="bi bi-trash" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                </div>
-              {% endfor %}
+                {% endfor %}
+              </div>
+              <div class="card-footer bg-white border-top-0 rounded-bottom-4 text-end">
+                <button type="submit" class="btn btn-primary btn-lg px-4">Save Social Links</button>
+              </div>
             </div>
           </div>
-        </div>
+        </form>
       </div>
       <!-- Business Hours -->
       <div class="tab-pane fade" id="hours" role="tabpanel" aria-labelledby="hours-tab">
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-          <div class="card-header bg-black text-white border-bottom-0 rounded-top-4 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 py-2 fs-5"><i class="bi bi-clock me-2"></i> Add your business hours</h5>
-            <button type="button" class="btn btn-light btn-sm" id="add-hours-row-btn">
-              <i class="bi bi-plus-lg me-1"></i> Add
-            </button>
-          </div>
-          <div class="card-body bg-white">
-            {{ hours_fs.management_form }}
-            {% if hours_fs.non_form_errors %}
-              <div class="alert alert-danger">
-                {{ hours_fs.non_form_errors }}
+        <form id="hours-form" method="POST" autocomplete="off">
+          <input type="hidden" name="form_id" value="hours-form">
+          {% csrf_token %}
+          <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-black text-white border-bottom-0 rounded-top-4 d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 py-2 fs-5"><i class="bi bi-clock me-2"></i> Add your business hours</h5>
+              <button type="button" class="btn btn-light btn-sm" id="add-hours-row-btn">
+                <i class="bi bi-plus-lg me-1"></i> Add
+              </button>
+            </div>
+            <div class="card-body bg-white">
+              {{ hours_fs.management_form }}
+              {% if hours_fs.non_form_errors %}
+                <div class="alert alert-danger">
+                  {{ hours_fs.non_form_errors }}
+                </div>
+              {% endif %}
+              <div class="table-responsive">
+                <table class="table table-business-hours align-middle text-center mb-0">
+                  <thead>
+                    <tr class="table-business-header">
+                      <th class="fw-bold">Weekday</th>
+                      <th class="fw-bold">Open Time</th>
+                      <th class="fw-bold">Close Time</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for form in hours_fs %}
+                    <tr class="hours-row">
+                      {{ form.id }}
+                      <td>{{ form.day_of_week }}</td>
+                      <td>{{ form.open_time }}</td>
+                      <td>{{ form.close_time }}</td>
+                      <td class="d-flex flex-column gap-2 align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                          {{ form.is_closed }}
+                          <span class="ms-1">Mark as closed</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
-            {% endif %}
-            <div class="table-responsive">
-              <table class="table table-business-hours align-middle text-center mb-0">
-                <thead>
-                  <tr class="table-business-header">
-                    <th class="fw-bold">Weekday</th>
-                    <th class="fw-bold">Open Time</th>
-                    <th class="fw-bold">Close Time</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for form in hours_fs %}
-                  <tr class="hours-row">
-                    {{ form.id }}
-                    <td>{{ form.day_of_week }}</td>
-                    <td>{{ form.open_time }}</td>
-                    <td>{{ form.close_time }}</td>
-                    <td class="d-flex flex-column gap-2 align-items-center">
-                      <div class="d-flex align-items-center gap-2">
-                        {{ form.is_closed }}
-                        <span class="ms-1">Mark as closed</span>
-                      </div>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+            </div>
+            <div class="card-footer bg-white border-top-0 rounded-bottom-4 text-end">
+              <button type="submit" class="btn btn-primary btn-lg px-4">Save Business Hours</button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
       <div class="tab-pane fade" id="logo" role="tabpanel" aria-labelledby="logo-tab">
-        <div class="card mb-4 shadow-sm border-0 rounded-4">
-          <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
-            <i class="bi bi-image fs-4 text-primary-emphasis"></i>
-            <h5 class="mb-0 fs-5 text-primary-emphasis">Logo</h5>
-          </div>
-          <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
-            <div class="text-center w-100">
-              <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light d-flex align-items-center justify-content-center" style="max-width:400px; margin:auto;">
-                <img id="logoPreview" src="{{ rp_form.instance.logo.url|default:'https://via.placeholder.com/300x200.png?text=No+Logo' }}" class="object-fit-cover w-100 h-100 logo-preview" alt="Logo preview">
+        <form id="logo-form" method="POST" enctype="multipart/form-data" autocomplete="off">
+          <input type="hidden" name="form_id" value="logo-form">
+          {% csrf_token %}
+          <div class="card mb-4 shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white d-flex align-items-center gap-2 rounded-top-4 border-bottom-0">
+              <i class="bi bi-image fs-4 text-primary-emphasis"></i>
+              <h5 class="mb-0 fs-5 text-primary-emphasis">Logo</h5>
+            </div>
+            <div class="card-body d-flex flex-column flex-md-row align-items-center gap-4 p-4">
+              <div class="text-center w-100">
+                <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light d-flex align-items-center justify-content-center" style="max-width:400px; margin:auto;">
+                  <img id="logoPreview" src="{{ rp_form.instance.logo.url|default:'https://via.placeholder.com/300x200.png?text=No+Logo' }}" class="object-fit-cover w-100 h-100 logo-preview" alt="Logo preview">
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                  <i class="bi bi-upload me-1"></i> Upload Logo
+                </button>
+                  <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="Recommended logo size: 300x200px. Supported formats: PNG, JPG. Transparent backgrounds look best."></i>
               </div>
-              <button type="button" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
-                <i class="bi bi-upload me-1"></i> Upload Logo
-              </button>
-                <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="Recommended logo size: 300x200px. Supported formats: PNG, JPG. Transparent backgrounds look best."></i>
+              <div class="flex-grow-1 w-100 mt-4 mt-md-0">
+                <label class="form-label fw-bold">
+                  {% if rp_form.logo.help_text %}
+                    <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.logo.help_text }}"></i>
+                  {% endif %}
+                </label>
+                {{ rp_form.logo|as_crispy_field }}
+              </div>
             </div>
-            <div class="flex-grow-1 w-100 mt-4 mt-md-0">
-              <label class="form-label fw-bold">
-                {% if rp_form.logo.help_text %}
-                  <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.logo.help_text }}"></i>
-                {% endif %}
-              </label>
-              {{ rp_form.logo|as_crispy_field }}
+            <div class="card-footer bg-white border-top-0 rounded-bottom-4 text-end">
+              <button type="submit" class="btn btn-primary btn-lg px-4">Save Logo</button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
       <div class="tab-pane fade" id="location" role="tabpanel" aria-labelledby="location-tab">
         <div class="card shadow-sm border-0 rounded-4 mb-4">
@@ -405,11 +387,7 @@
         </div>
       </div>
     </div>
-    <!-- Sticky Save Button -->
-    <button type="submit" form="restaurant-profile-form" class="btn btn-primary btn-lg px-4 position-fixed sticky-save-btn">
-      <i class="bi bi-save me-2"></i> Save
-    </button>
-  </form>
+
 </div>
 {% endblock %}
 {% block extra_js %}

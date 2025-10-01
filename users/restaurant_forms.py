@@ -13,6 +13,8 @@ DAYS_OF_WEEK = [
     ("Sunday", "Sunday"),
 ]
 
+
+# Main Details Form
 class RestaurantProfileForm(forms.ModelForm):
     class Meta:
         model = RestaurantProfile
@@ -23,15 +25,6 @@ class RestaurantProfileForm(forms.ModelForm):
             "phone_number",
             "logo",
             "theme_choice",
-            # Hero section fields
-            "hero_headline",
-            "hero_description",
-            "hero_image",
-            # About section fields
-            "about_headline",
-            "about_description",
-            "about_image",
-            "about_highlight",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Restaurant name"}),
@@ -39,10 +32,35 @@ class RestaurantProfileForm(forms.ModelForm):
             "registration_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "Registration number"}),
             "phone_number": forms.TextInput(attrs={"class": "form-control", "placeholder": "+1 555 555 5555"}),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*", "id": "id_logo_input"}),
-            "theme_choice": forms.Select(attrs={"class": "form-select"}), 
+            "theme_choice": forms.Select(attrs={"class": "form-select"}),
+        }
+
+# Hero Section Form
+class HeroForm(forms.ModelForm):
+    class Meta:
+        model = RestaurantProfile
+        fields = [
+            "hero_headline",
+            "hero_description",
+            "hero_image",
+        ]
+        widgets = {
             "hero_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "Main headline"}),
             "hero_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "Main description", "rows": 2}),
             "hero_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+        }
+
+# About Section Form
+class AboutForm(forms.ModelForm):
+    class Meta:
+        model = RestaurantProfile
+        fields = [
+            "about_headline",
+            "about_description",
+            "about_image",
+            "about_highlight",
+        ]
+        widgets = {
             "about_headline": forms.TextInput(attrs={"class": "form-control", "placeholder": "About headline"}),
             "about_description": forms.Textarea(attrs={"class": "form-control", "placeholder": "About description", "rows": 3}),
             "about_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
