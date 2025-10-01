@@ -85,8 +85,14 @@
             <div class="card-body d-flex flex-column">
               <h5 class="card-title fw-bold mb-2">{{ item.name }}</h5>
               <p class="card-text text-muted mb-2">{{ item.description }}</p>
-              <div class="mt-auto">
+              <div class="mt-auto d-flex align-items-center justify-content-between gap-2">
                 <span class="fw-bold fs-5 text-primary">${{ item.price }}</span>
+                <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                    <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                  </button>
+                </form>
               </div>
             </div>
           </div>
