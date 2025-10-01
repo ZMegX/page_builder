@@ -84,29 +84,34 @@
                 </div>
               {% endif %}
               <!-- Basic Info Fields -->
-              <div class="row mb-4">
-                <div class="col-md-4 text-center">
-                  <div class="ratio ratio-16x9 mb-3 rounded shadow-sm overflow-hidden bg-light d-flex align-items-center justify-content-center" style="max-width:400px; margin:auto;">
-                    <img id="logoPreview" src="{{ rp_form.instance.logo.url|default:'https://via.placeholder.com/300x200.png?text=No+Logo' }}" class="object-fit-cover w-100 h-100 logo-preview" alt="Logo preview">
-                  </div>
-                  <div class="mt-2">
+              <div class="row mb-4 g-3 align-items-end">
+                <div class="col-md-3 text-center">
+                  <div class="d-flex align-items-center justify-content-center gap-2">
                     {{ rp_form.logo|as_crispy_field }}
+                    {% if rp_form.logo.help_text %}
+                      <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="{{ rp_form.logo.help_text }}"></i>
+                    {% else %}
+                      <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip" title="Restaurant logo will update after save.
+                        120x80px+ recommended, PNG/JPG, transparent background."></i>
+                    {% endif %}
                   </div>
-                  <button type="button" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
-                    <i class="bi bi-upload me-1"></i> Upload Logo
-                  </button>
-                  <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" title="Recommended logo size: 300x200px. Supported formats: PNG, JPG. Transparent backgrounds look best."></i>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   {{ rp_form.name|as_crispy_field }}
                   {% if rp_form.name.help_text %}
                     <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.name.help_text }}"></i>
                   {% endif %}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   {{ rp_form.cuisine_type|as_crispy_field }}
                   {% if rp_form.cuisine_type.help_text %}
                     <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.cuisine_type.help_text }}"></i>
+                  {% endif %}
+                </div>
+                <div class="col-md-3">
+                  {{ rp_form.phone_number|as_crispy_field }}
+                  {% if rp_form.phone_number.help_text %}
+                    <i class="bi bi-info-circle text-primary ms-1" data-bs-toggle="tooltip" title="{{ rp_form.phone_number.help_text }}"></i>
                   {% endif %}
                 </div>
               </div>
