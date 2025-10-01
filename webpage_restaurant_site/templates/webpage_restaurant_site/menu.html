@@ -92,43 +92,118 @@
         </div>
       </div>
     </section>
-    <!-- Menu Items Section -->
-    {% for menu in menus %}
-    <div class="menu-modern-card mb-5">
-      <div class="menu-modern-section-title">{{ menu.name }}</div>
-      <div class="menu-modern-list">
-        {% for item in menu.items.all %}
-          <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2" style="border-radius: 1rem; background: #fff;">
-            <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
-              <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
-                  alt="{{ item.name }}"
-                  style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
-            </div>
-            <div class="menu-modern-item-info flex-grow-1">
-              <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
-              {% if item.ingredients %}
-                <div class="menu-modern-item-desc" style="font-style:italic; color:#888;">{{ item.ingredients }}</div>
-              {% endif %}
-            </div>
-              <div class="menu-modern-item-actions ms-3" style="display: flex; align-items: center; gap: 0.75rem;">
-                <div class="menu-modern-item-price">
-                  €{{ item.price|floatformat:2 }}
+    <!-- Desktop/tablet layout -->
+    <div class="d-none d-md-block">
+      <ul class="nav nav-tabs nav-justified mb-4" id="desktopMenuTabs" role="tablist">
+        {% for menu in menus %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link {% if forloop.first %}active{% endif %}" id="desktop-menu-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#desktop-menu-pane-{{ forloop.counter }}" type="button" role="tab" aria-controls="desktop-menu-pane-{{ forloop.counter }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ menu.name }}</button>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="tab-content" id="desktopMenuTabContent">
+        {% for menu in menus %}
+          <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="desktop-menu-pane-{{ forloop.counter }}" role="tabpanel" aria-labelledby="desktop-menu-tab-{{ forloop.counter }}">
+            <div class="menu-modern-list">
+              {% for item in menu.items.all %}
+                <div class="menu-modern-row d-flex align-items-center py-3 px-2 mb-2 menu-item-row" style="border-radius: 1rem; background: #fff; cursor:pointer;" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-price="{{ item.price|floatformat:2 }}" data-item-img="{% if item.image %}{% cloudinary_url item.image.public_id width=300 height=200 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}" data-item-ingredients="{{ item.ingredients|default:'' }}">
+                  <div class="menu-modern-item-img me-3" style="flex: 0 0 60px;">
+                    <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=60 height=60 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}"
+                        alt="{{ item.name }}"
+                        style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.7rem; box-shadow: 0 2px 8px #eee;">
+                  </div>
+                  <div class="menu-modern-item-info flex-grow-1">
+                    <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
+                  </div>
+                  <div class="menu-modern-item-actions ms-3 d-flex align-items-center gap-2">
+                    <div class="menu-modern-item-price">
+                      €{{ item.price|floatformat:2 }}
+                    </div>
+                    <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="add-to-cart-form">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                    </form>
+                  </div>
                 </div>
-                <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
-                </form>
-              </div>
+              {% empty %}
+                <div class="text-muted text-center py-4">This menu currently has no items.</div>
+              {% endfor %}
+            </div>
           </div>
-        {% empty %}
-          <div class="text-muted text-center py-4">This menu currently has no items.</div>
         {% endfor %}
       </div>
     </div>
-  {% endfor %}
+    <!-- Menu Items Section -->
+    <!-- Responsive tabs for menu sections (mobile only) -->
+    <div class="d-md-none mb-4">
+      <ul class="nav nav-tabs nav-justified" id="menuTabs" role="tablist">
+        {% for menu in menus %}
+          <li class="nav-item" role="presentation">
+            <button class="nav-link {% if forloop.first %}active{% endif %}" id="menu-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#menu-pane-{{ forloop.counter }}" type="button" role="tab" aria-controls="menu-pane-{{ forloop.counter }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ menu.name }}</button>
+          </li>
+        {% endfor %}
+      </ul>
+      <div class="tab-content pt-3" id="menuTabContent">
+        {% for menu in menus %}
+          <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="menu-pane-{{ forloop.counter }}" role="tabpanel" aria-labelledby="menu-tab-{{ forloop.counter }}">
+            <div class="row g-3">
+              {% for item in menu.items.all %}
+                <div class="col-12">
+                  <div class="card h-100 shadow-sm border-0 menu-item-row" style="cursor:pointer;" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-price="{{ item.price|floatformat:2 }}" data-item-img="{% if item.image %}{% cloudinary_url item.image.public_id width=300 height=200 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}" data-item-ingredients="{{ item.ingredients|default:'' }}">
+                    <div class="row g-0 align-items-center">
+                      <div class="col-4">
+                        <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=80 height=80 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}" alt="{{ item.name }}" class="img-fluid rounded">
+                      </div>
+                      <div class="col-5">
+                        <div class="fw-bold">{{ item.name }}</div>
+                        <div class="text-primary fw-bold">€{{ item.price|floatformat:2 }}</div>
+                      </div>
+                      <div class="col-3 text-end">
+                        <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="add-to-cart-form">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-success">Add</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="col-12 text-center text-muted">No items in this section.</div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
 </div>
 {% endblock %}
 {% block extra_js %}
+<script>
+// Enable modal logic for all devices
+  document.addEventListener('DOMContentLoaded', function() {
+    var modal = new bootstrap.Modal(document.getElementById('menuItemModal'));
+    var modalLabel = document.getElementById('menuItemModalLabel');
+    var modalImg = document.getElementById('modalItemImg');
+    var modalIngredients = document.getElementById('modalItemIngredients');
+    var modalPrice = document.getElementById('modalItemPrice');
+    var modalForm = document.getElementById('modalAddToCartForm');
+    document.querySelectorAll('.menu-item-row').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        // Prevent opening modal if Add to Cart button is clicked
+        if (e.target.closest('.add-to-cart-form')) return;
+        modalLabel.textContent = row.getAttribute('data-item-name');
+        modalImg.src = row.getAttribute('data-item-img');
+        modalImg.alt = row.getAttribute('data-item-name');
+        var ingredients = row.getAttribute('data-item-ingredients');
+        modalIngredients.textContent = ingredients ? ingredients : '';
+        modalPrice.textContent = '€' + row.getAttribute('data-item-price');
+        modalForm.action = '/menu/add-to-cart/' + row.getAttribute('data-item-id') + '/';
+        modal.show();
+      });
+    });
+  });
+
+</script>
 {% if address and map_center.lat and map_center.lng and GOOGLE_MAPS_API_KEY %}
 <script>
   function initMenuMap() {
@@ -161,4 +236,24 @@
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=initMenuMap"></script>
 {% endif %}
+<!-- Menu Item Modal (required for JS to work) -->
+<div class="modal fade" id="menuItemModal" tabindex="-1" aria-labelledby="menuItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="menuItemModalLabel">Item Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <img id="modalItemImg" src="/static/default_profile_pic.png" alt="Menu item image" class="img-fluid rounded mb-3">
+        <div class="mb-2"><strong>Ingredients:</strong> <span id="modalItemIngredients"></span></div>
+        <div class="mb-2"><strong>Price:</strong> <span id="modalItemPrice"></span></div>
+          <form id="modalAddToCartForm" method="post" action="#">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
