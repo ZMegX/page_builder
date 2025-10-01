@@ -1,11 +1,12 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Tabs, Tab, Button, Toast, ToastContainer } from 'react-bootstrap';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import MenuItemModal from './MenuItemModal';
 
 function MenuEditor({ menu }) {
   const { menuId } = useParams();
+  const navigate = useNavigate();
   // Toast state
   const [toast, setToast] = React.useState({ show: false, message: '', variant: 'success' });
   const [savingOrder, setSavingOrder] = React.useState(false);
@@ -268,6 +269,11 @@ function MenuEditor({ menu }) {
 
   return (
     <div className="container py-4" style={{ maxWidth: '900px' }}>
+      <div className="mb-3">
+        <Button variant="secondary" onClick={() => navigate('/')}>
+          &larr; Back to Menu List
+        </Button>
+      </div>
       {/* Info Banner for Action Guidance */}
       {showInfoBanner && (
         <div className="alert alert-info alert-dismissible fade show mb-3" role="alert" style={{ borderRadius: '12px', fontSize: '1.08em' }}>
