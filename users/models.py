@@ -168,9 +168,17 @@ class Review(models.Model):
     comment = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=True)  # For moderation, if needed
+    
+    # Owner reply fields
+    owner_reply = models.TextField(max_length=500, blank=True, null=True, help_text="Restaurant owner's response")
+    reply_created_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Review for {self.restaurant.name}: {self.rating} stars"
+    
+    def has_reply(self):
+        """Check if owner has replied to this review"""
+        return bool(self.owner_reply)
 
     class Meta:
         ordering = ['-created_at']
