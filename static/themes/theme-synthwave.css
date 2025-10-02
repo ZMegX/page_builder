@@ -7,12 +7,241 @@
   --synthwave2-lightviolet: #C471EB;
 }
 
-/* Scope all synthwave styles to .synthwave-theme body class */
-/* .synthwave-theme {
-  background: linear-gradient(135deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%) !important;
-  color: var(--synthwave2-magenta);
+
+.synthwave-theme {
   font-family: 'Lato', 'Arial', sans-serif;
-} */
+  font-size: 1.12rem;
+}
+
+/* Card and form controls */
+.synthwave-theme .card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
+  border: none;
+}
+
+.synthwave-theme .form-control {
+  border-radius: 0.6rem;
+  font-size: 1.08rem;
+  background: #f9f9ff;
+  border: 1.5px solid var(--synthwave2-lightviolet);
+  color: #222;
+}
+.synthwave-theme .form-control:focus {
+  border-color: var(--synthwave2-magenta);
+  box-shadow: 0 0 0 0.13rem var(--synthwave2-magenta)33;
+  background: #fff;
+  color: #222;
+}
+
+/* Placeholder styling */
+.synthwave-theme ::placeholder {
+  color: var(--synthwave2-magenta) !important;
+  opacity: 1;
+}
+
+/* Buttons */
+.synthwave-theme .btn-gradient {
+  background: linear-gradient(90deg, var(--synthwave2-purple) 0%, var(--synthwave2-blue) 100%);
+  color: #fff;
+  border: none;
+  transition: background 0.2s;
+}
+.synthwave-theme .btn-gradient:hover,
+.synthwave-theme .btn-gradient:focus {
+  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
+  color: #fff;
+}
+
+.synthwave-theme .btn-dark {
+  background: var(--synthwave2-magenta) !important;
+  color: #fff !important;
+  border: none;
+  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.synthwave-theme .btn-dark:hover,
+.synthwave-theme .btn-dark:focus {
+  background: #fff !important;
+  color: var(--synthwave2-magenta) !important;
+  border: 1.5px solid var(--synthwave2-magenta);
+}
+.synthwave-theme .btn-outline-dark {
+  color: var(--synthwave2-magenta) !important;
+  border: 1.5px solid var(--synthwave2-magenta) !important;
+  background: #fff !important;
+  transition: color .2s, background .2s;
+}
+.synthwave-theme .btn-outline-dark:hover,
+.synthwave-theme .btn-outline-dark:focus {
+  color: #fff !important;
+  background: var(--synthwave2-magenta) !important;
+  border: 1.5px solid var(--synthwave2-magenta) !important;
+}
+.synthwave-theme .btn-outline-secondary {
+  color: var(--synthwave2-blue) !important;
+  border: 1.5px solid var(--synthwave2-lightviolet) !important;
+  background: #fff !important;
+  transition: color .2s, background .2s;
+}
+.synthwave-theme .btn-outline-secondary:hover,
+.synthwave-theme .btn-outline-secondary:focus {
+  color: #fff !important;
+  background: var(--synthwave2-lightviolet) !important;
+  border: 1.5px solid var(--synthwave2-lightviolet) !important;
+}
+
+/* Logo Avatar */
+.synthwave-theme .logo-avatar {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--synthwave2-lightviolet) 0%, #fff 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--synthwave2-magenta)33;
+  margin: 0 auto 1rem auto;
+  overflow: hidden;
+}
+.synthwave-theme .logo-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Headings */
+.synthwave-theme h3,
+.synthwave-theme .fw-bold {
+  color: var(--synthwave2-magenta);
+}
+
+/* Links */
+.synthwave-theme a {
+  color: var(--synthwave2-magenta);
+  text-decoration: underline;
+}
+.synthwave-theme a:hover {
+  color: var(--synthwave2-purple);
+}
+
+/* Container */
+.synthwave-theme .container {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Card shadow for login */
+.synthwave-theme .card.shadow {
+  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
+}
+
+/* Misc */
+.synthwave-theme .rounded-4 {
+  border-radius: 1.2rem !important;
+}
+
+/* Menu card */
+.synthwave-theme .menu-modern-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
+  border: 1px solid var(--synthwave2-lightviolet);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Section title */
+.synthwave-theme .menu-modern-section-title {
+  color: var(--synthwave2-magenta);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+/* Menu list container */
+.synthwave-theme .menu-modern-list {
+  width: 100%;
+  padding: 0;
+}
+
+/* Menu row (modern flex row, not table row) */
+.synthwave-theme .menu-modern-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+  padding: 1.2rem 1rem;
+  border-radius: 0.8rem;
+  background: #fff;
+  box-shadow: 0 1px 8px var(--synthwave2-lightviolet)33;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+}
+
+.synthwave-theme .menu-modern-row:hover {
+  background: var(--synthwave2-violet);
+  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px var(--synthwave2-purple)22;
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Menu item image container */
+.synthwave-theme .menu-modern-item-img {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--synthwave2-lightviolet);
+  border-radius: 0.7rem;
+  overflow: hidden;
+}
+.synthwave-theme .menu-modern-item-img img {
+  display: block;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  box-shadow: 0 2px 8px var(--synthwave2-blue);
+}
+
+/* Menu item info */
+.synthwave-theme .menu-modern-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  color: var(--synthwave2-magenta);
+  text-align: left;
+  min-width: 0;
+}
+
+.synthwave-theme .menu-modern-item-name {
+  color: #FFA726;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.01em;
+}
+
+.synthwave-theme .menu-modern-item-desc {
+  color: var(--synthwave2-magenta);
+  font-style: italic;
+  font-size: 0.98rem;
+  margin-bottom: 0.2rem;
+  line-height: 1.5;
+}
+
+/* Menu item price */
+.synthwave-theme .menu-modern-item-price {
+  color: var(--synthwave2-magenta);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-left: auto;
+  align-self: flex-end;
+}
 
 .synthwave-theme .menu-selection-card,
 .synthwave-theme .card,
@@ -200,11 +429,17 @@
   z-index: 0;
   opacity: 0.12;
 }
-/* Optional: Add hover effect for smart interactivity */
-.synthwave-theme .menu-modern-item:hover {
-  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
-  transform: translateY(-2px) scale(1.03);
-  transition: box-shadow 0.2s, transform 0.2s;
+
+/* Synthwave highlight effect for menu row hover */
+.synthwave-theme .menu-modern-row:hover {
+  background: var(--synthwave2-violet);
+  box-shadow:
+    0 4px 24px var(--synthwave2-pink),
+    0 2px 12px var(--synthwave2-purple)22,
+    0 0 0 4px var(--synthwave2-violet); /* synthwave highlight ring */
+  outline: none;
+  transform: translateY(-2px) scale(1.01);
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
 }
 
 .synthwave-theme .menu-modern-table {
