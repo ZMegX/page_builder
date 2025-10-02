@@ -144,14 +144,17 @@ def order_confirmation(request):
             order.save()
             # send confirmation email to customer
             subject = f"Order Confirmation - {restaurant.name}"
-            item_lines = []
+            # Build a simple text table for items
+            table_header = f"{'Item':<24}{'Qty':>5}{'Price':>10}\n" + "-"*39
+            table_rows = []
             for item_data in cart.values():
-                item_lines.append(f"{item_data['name']} x{item_data['quantity']} (€{item_data['price']:.2f} each)")
-            items_str = "\n".join(item_lines)
+                row = f"{item_data['name']:<24}{item_data['quantity']:>5}{item_data['price']:>10.2f}"
+                table_rows.append(row)
+            items_table = table_header + "\n" + "\n".join(table_rows)
             message = (
                 f"Thank you for your order!\n\n"
                 f"Restaurant: {restaurant.name}\n"
-                f"Order Details:\n{items_str}\n"
+                f"Order Details:\n{items_table}\n"
                 f"Total: €{total_price:.2f}\n"
                 f"Fulfillment: {option}\n"
                 f"Payment: {pay_method}\n"
