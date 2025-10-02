@@ -5,12 +5,12 @@
 <link rel="stylesheet" href="{% static 'users/home.css' %}">
 {% endblock %}
 {% block header %}
-<section class="hero-section py-4 mb-4 text-center bg-light rounded-4 shadow-sm">
+<section class="hero-section hero-bg py-4 mb-4 text-center rounded-4 shadow-sm">
   <div class="container">
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-3">
-      <img src="{% static 'logo192.png' %}" alt="Site Logo" class="hero-logo mb-2 mb-md-0" style="width:64px;height:64px;">
+  <img src="{% static 'logo192.png' %}" alt="Site Logo" class="hero-logo mb-2 mb-md-0 home">
       <div>
-        <h1 class="fw-bold mb-1">MealFinder</h1>
+        <h1 class="fw-bold mb-1">GG</h1>
         <p class="lead mb-0">Discover great restaurants near you</p>
       </div>
     </div>
@@ -38,7 +38,7 @@
       </div>
     </div>
     <div class="col-lg-6 d-flex flex-column">
-      <div style="max-height: 480px; overflow-y: auto;">
+  <div class="home">
         {% for restaurant in restaurants %}
         <div class="card mb-4 home-restaurant-card homepage shadow-sm rounded-4">
           <div class="row g-0">

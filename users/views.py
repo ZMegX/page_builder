@@ -78,24 +78,11 @@ def home(request):
             Q(slug__icontains=q) |
             Q(addresses__formatted_address__icontains=q)
         ).distinct()
-    print("--- DEBUG: home view entered ---")
-    print(f"Search query: '{q}'")
-    print(f"Restaurant count: {restaurants_qs.count()}")
-    for r in restaurants_qs:
-        print(f"- {r.name} | Cuisine: {r.cuisine_type} | Slug: {r.slug} | Addresses: {r.addresses.count()}")
-        for addr in r.addresses.all():
-            print(f"  Formatted Address: {addr.formatted_address}")
-    print("--- DEBUG: END ---")
     key = getattr(settings, "GOOGLE_MAPS_API_KEY", "")
 
     # No pagination: get all restaurants
     restaurants = list(restaurants_qs)
 
-    print('--- DEBUG: All restaurants and their addresses ---')
-    for r in restaurants:
-        print(f'Restaurant: {r.name}')
-        for addr in r.addresses.all():
-            print(f'  Address: {addr.formatted_address}, lat={addr.latitude}, lng={addr.longitude}')
 
     # Update restaurant_reviews to work with list
     restaurant_reviews = {r.pk: r.reviews.filter(is_approved=True) for r in restaurants}
@@ -118,9 +105,7 @@ def home(request):
                 'logo': r.logo.url if getattr(r.logo, 'url', None) else '',
                 'url': restaurant_url
             })
-    print(f"Addresses for map: {addresses}")
     addresses_json = json.dumps(addresses)
-    print(f"addresses_json for JS: {addresses_json}")
 
     review_form = ReviewForm(request.POST or None)
     if request.method == "POST" and review_form.is_valid():
@@ -157,6 +142,18 @@ def register(request):
                 RestaurantProfile.objects.create(user=user)
                 group, _ = Group.objects.get_or_create(name='RestaurantOwner')
             user.groups.add(group)
+            # Send account confirmation email
+            from django.core.mail import send_mail
+            subject = "Welcome to MealFinder! Your account has been created."
+            message = (
+                f"Hello {user.username},\n\n"
+                "Thank you for registering at MealFinder. Your account has been created successfully.\n\n"
+                "You can now log in and start exploring restaurants or managing your own!\n\n"
+                "If you did not sign up for this account, please ignore this email.\n\n"
+                "Best regards,\nMealFinder Team"
+            )
+            recipient_list = [user.email]
+            send_mail(subject, message, None, recipient_list, fail_silently=True)
             return redirect('login')
     else:
         form = CustomUserCreationForm()

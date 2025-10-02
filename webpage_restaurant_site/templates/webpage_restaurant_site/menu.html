@@ -116,7 +116,7 @@
                     <div class="menu-modern-item-name" style="font-weight:700; font-size:1.1rem;">{{ item.name }}</div>
                   </div>
                   <div class="menu-modern-item-actions ms-3 d-flex align-items-center gap-2">
-                    <div class="menu-modern-item-price">
+                    <div class="menu-modern-item-price pe-4">
                       €{{ item.price|floatformat:2 }}
                     </div>
                     <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="add-to-cart-form">
@@ -154,11 +154,11 @@
                       <div class="col-4">
                         <img src="{% if item.image %}{% cloudinary_url item.image.public_id width=80 height=80 crop='fill' gravity='auto' %}{% else %}{% static 'default_profile_pic.png' %}{% endif %}" alt="{{ item.name }}" class="img-fluid rounded">
                       </div>
-                      <div class="col-5">
+                      <div class="col-5 text-center">
                         <div class="fw-bold">{{ item.name }}</div>
                         <div class="text-primary fw-bold">€{{ item.price|floatformat:2 }}</div>
                       </div>
-                      <div class="col-3 text-end">
+                      <div class="col-3 text-end pe-4">
                         <form method="post" action="{% url 'webpage_restaurant_site:add_to_cart' item.id %}" class="add-to-cart-form">
                           {% csrf_token %}
                           <button type="submit" class="btn btn-sm btn-success">Add</button>
