@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Reviews - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-chat-left-text me-2"></i>Reviews for {{ restaurant.name }}</h2>
+        <a href="{% url 'restaurant_profile' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to Profile
+        </a>
+      </div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if reviews %}
+        <div class="row">
+          {% for review in reviews %}
+            <div class="col-12 mb-4">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <!-- Review Header -->
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h5 class="mb-1">
+                        <i class="bi bi-person-circle me-2"></i>
+                        {{ review.reviewer_name|default:review.user.username|default:"Anonymous" }}
+                      </h5>
+                      <div class="mb-2">
+                        <span class="badge bg-warning text-dark fs-6">
+                          {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                              <i class="bi bi-star-fill"></i>
+                            {% else %}
+                              <i class="bi bi-star"></i>
+                            {% endif %}
+                          {% endfor %}
+                          {{ review.rating }}/5
+                        </span>
+                      </div>
+                      <small class="text-muted">
+                        <i class="bi bi-calendar me-1"></i>{{ review.created_at|date:"F d, Y" }} at {{ review.created_at|time:"g:i A" }}
+                      </small>
+                    </div>
+                    {% if not review.is_approved %}
+                      <span class="badge bg-secondary">Pending Approval</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Review Comment -->
+                  <div class="mb-3">
+                    <p class="mb-0"><strong>Review:</strong></p>
+                    <p class="text-muted">{{ review.comment }}</p>
+                  </div>
+
+                  <!-- Owner Reply Section -->
+                  {% if review.owner_reply %}
+                    <div class="border-start border-4 border-primary ps-3 py-2 bg-light rounded">
+                      <p class="mb-1"><strong><i class="bi bi-shop me-2"></i>Your Reply:</strong></p>
+                      <p class="mb-2">{{ review.owner_reply }}</p>
+                      <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>Replied on {{ review.reply_created_at|date:"F d, Y" }} at {{ review.reply_created_at|time:"g:i A" }}
+                      </small>
+                    </div>
+                  {% else %}
+                    <!-- Reply Form -->
+                    <div class="mt-3 pt-3 border-top">
+                      <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#replyForm{{ review.id }}" aria-expanded="false" aria-controls="replyForm{{ review.id }}">
+                        <i class="bi bi-reply me-1"></i>Reply to this review
+                      </button>
+                      
+                      <div class="collapse mt-3" id="replyForm{{ review.id }}">
+                        <form method="post" action="{% url 'reply_to_review' review.id %}">
+                          {% csrf_token %}
+                          <div class="mb-3">
+                            <label for="owner_reply_{{ review.id }}" class="form-label">Your Response</label>
+                            <textarea 
+                              class="form-control" 
+                              id="owner_reply_{{ review.id }}" 
+                              name="owner_reply" 
+                              rows="3" 
+                              placeholder="Thank you for your feedback! We appreciate..."
+                              maxlength="500"
+                              required
+                            ></textarea>
+                            <div class="form-text">Maximum 500 characters</div>
+                          </div>
+                          <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                              <i class="bi bi-send me-1"></i>Post Reply
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#replyForm{{ review.id }}">
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info text-center">
+          <i class="bi bi-info-circle me-2"></i>
+          No reviews yet for your restaurant.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -129,3 +129,20 @@ class ReviewForm(forms.ModelForm):
             'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your review...'}),
             'reviewer_name': forms.TextInput(attrs={'placeholder': 'Your name (optional)'}),
         }
+
+
+class ReviewReplyForm(forms.ModelForm):
+    """Form for restaurant owners to reply to reviews"""
+    class Meta:
+        model = Review
+        fields = ['owner_reply']
+        widgets = {
+            'owner_reply': forms.Textarea(attrs={
+                'rows': 3, 
+                'class': 'form-control',
+                'placeholder': 'Write your response to this review...'
+            }),
+        }
+        labels = {
+            'owner_reply': 'Your Reply'
+        }

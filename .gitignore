@@ -6,3 +6,8 @@ checklist.md
 tasklist.md
 __pycache__/
 *.pyc
+FEATURE_REVIEW_REPLIES.md
+FEATURE_SUMMARY.md
+GIT_COMMIT_GUIDE.md
+TESTING_GUIDE.md
+DOCUMENTATION_SYSTEM_SUMMARY.md

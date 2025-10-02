@@ -9,6 +9,7 @@ from .restaurant_forms import (
     SocialLinkFormSet,
     OpeningHourFormSet,
     ReviewForm,
+    ReviewReplyForm,
 )
 from locations.models import UserAddress
 from django.db.models import Q
@@ -229,3 +230,51 @@ def restaurant_order_detail(request, order_id):
         return redirect("restaurant_order_detail", order_id=order.id)
 
     return render(request, 'users/restaurant_order_detail.html', {'order': order})
+
+
+@login_required
+def reply_to_review(request, review_id):
+    """
+    View for restaurant owners to reply to a review.
+    Only the owner of the restaurant can reply.
+    """
+    from django.utils import timezone
+    from users.models import Review
+    
+    review = get_object_or_404(Review, id=review_id)
+    
+    # Check if user owns this restaurant
+    if not hasattr(request.user, 'restaurant_profile') or request.user.restaurant_profile != review.restaurant:
+        messages.error(request, "You don't have permission to reply to this review.")
+        return redirect('restaurant_profile')
+    
+    if request.method == "POST":
+        form = ReviewReplyForm(request.POST, instance=review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.reply_created_at = timezone.now()
+            review.save()
+            messages.success(request, "Your reply has been posted successfully!")
+            return redirect('manage_reviews')
+        else:
+            messages.error(request, "There was an error with your reply. Please try again.")
+    
+    return redirect('manage_reviews')
+
+
+@login_required
+def manage_reviews(request):
+    """
+    View for restaurant owners to see and manage all reviews for their restaurant
+    """
+    if not hasattr(request.user, 'restaurant_profile'):
+        messages.error(request, "You don't have a restaurant profile.")
+        return redirect('restaurant_profile')
+    
+    restaurant = request.user.restaurant_profile
+    reviews = restaurant.reviews.all().order_by('-created_at')
+    
+    return render(request, 'users/manage_reviews.html', {
+        'restaurant': restaurant,
+        'reviews': reviews,
+    })
