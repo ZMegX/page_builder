@@ -1,110 +1,248 @@
-:root {
-  --synthwave2-purple: #6A23EB;
-  --synthwave2-pink: #EB23E7;
-  --synthwave2-violet: #AB23EB;
-  --synthwave2-blue: #2923EB;
-  --synthwave2-magenta: #EB236F;
-  --synthwave2-lightviolet: #C471EB;
-}
-
-
+/* Synthwave Theme - Vibrant Retro Color Palette */
 .synthwave-theme {
+  /* Color Variables */
+  --celadon: #a9e5bb;
+  --ivory: #fefdeb;
+  --xanthous: #f7b32b;
+  --red-cmyk: #f72c25;
+  --dark-purple: #2d1e2f;
+  
+  /* Semantic Colors */
+  --primary-color: var(--xanthous);
+  --secondary-color: var(--red-cmyk);
+  --accent-color: var(--celadon);
+  --dark-color: var(--dark-purple);
+  --light-color: var(--ivory);
+  
+  /* Background Colors */
+  --bg-primary: var(--ivory);
+  --bg-secondary: var(--celadon);
+  --bg-dark: var(--dark-purple);
+  --bg-card: #ffffff;
+  
+  /* Text Colors */
+  --text-primary: var(--dark-purple);
+  --text-secondary: var(--red-cmyk);
+  --text-light: var(--ivory);
+  --text-accent: var(--xanthous);
+  
+  /* Border Colors */
+  --border-color: var(--celadon);
+  --border-accent: var(--xanthous);
+  
+  /* Typography */
   font-family: 'Lato', 'Arial', sans-serif;
   font-size: 1.12rem;
 }
 
-/* Card and form controls */
+/* ============================================
+   ANIMATIONS
+============================================ */
+
+@keyframes synthwave-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 24px 2px var(--xanthous),
+      0 0 48px 8px var(--red-cmyk),
+      0 0 8px 2px var(--celadon);
+  }
+  50% {
+    box-shadow:
+      0 0 32px 4px var(--xanthous),
+      0 0 64px 12px var(--red-cmyk),
+      0 0 12px 4px var(--celadon);
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    filter: brightness(1.0) saturate(1.0);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.15) saturate(1.2);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes retro-slide {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   CARDS & FORM CONTROLS
+============================================ */
+
 .synthwave-theme .card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 1.2rem;
-  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
-  border: none;
+  box-shadow: 0 4px 16px rgba(247, 44, 37, 0.2);
+  border: 2px solid var(--celadon);
+  transition: all 0.3s ease;
+}
+
+.synthwave-theme .card:hover {
+  border-color: var(--xanthous);
+  box-shadow: 0 8px 24px rgba(247, 179, 43, 0.3);
 }
 
 .synthwave-theme .form-control {
   border-radius: 0.6rem;
   font-size: 1.08rem;
-  background: #f9f9ff;
-  border: 1.5px solid var(--synthwave2-lightviolet);
-  color: #222;
+  background: var(--ivory);
+  border: 2px solid var(--celadon);
+  color: var(--dark-purple);
+  transition: all 0.3s ease;
 }
+
 .synthwave-theme .form-control:focus {
-  border-color: var(--synthwave2-magenta);
-  box-shadow: 0 0 0 0.13rem var(--synthwave2-magenta)33;
+  border-color: var(--red-cmyk);
+  box-shadow: 0 0 0 0.2rem rgba(247, 44, 37, 0.25);
   background: #fff;
-  color: #222;
+  color: var(--dark-purple);
 }
 
 /* Placeholder styling */
 .synthwave-theme ::placeholder {
-  color: var(--synthwave2-magenta) !important;
-  opacity: 1;
+  color: var(--red-cmyk) !important;
+  opacity: 0.7;
 }
 
-/* Buttons */
+/* ============================================
+   BUTTONS
+============================================ */
+
 .synthwave-theme .btn-gradient {
-  background: linear-gradient(90deg, var(--synthwave2-purple) 0%, var(--synthwave2-blue) 100%);
-  color: #fff;
+  background: linear-gradient(90deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  color: var(--dark-purple);
   border: none;
-  transition: background 0.2s;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.6rem 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
 }
+
 .synthwave-theme .btn-gradient:hover,
 .synthwave-theme .btn-gradient:focus {
-  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
-  color: #fff;
+  background: linear-gradient(90deg, var(--red-cmyk) 0%, var(--xanthous) 100%);
+  color: var(--ivory);
+  box-shadow: 0 6px 20px rgba(247, 44, 37, 0.4);
+  transform: translateY(-2px);
 }
 
 .synthwave-theme .btn-dark {
-  background: var(--synthwave2-magenta) !important;
-  color: #fff !important;
+  background: var(--red-cmyk) !important;
+  color: var(--ivory) !important;
   border: none;
-  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-.synthwave-theme .btn-dark:hover,
-.synthwave-theme .btn-dark:focus {
-  background: #fff !important;
-  color: var(--synthwave2-magenta) !important;
-  border: 1.5px solid var(--synthwave2-magenta);
-}
-.synthwave-theme .btn-outline-dark {
-  color: var(--synthwave2-magenta) !important;
-  border: 1.5px solid var(--synthwave2-magenta) !important;
-  background: #fff !important;
-  transition: color .2s, background .2s;
-}
-.synthwave-theme .btn-outline-dark:hover,
-.synthwave-theme .btn-outline-dark:focus {
-  color: #fff !important;
-  background: var(--synthwave2-magenta) !important;
-  border: 1.5px solid var(--synthwave2-magenta) !important;
-}
-.synthwave-theme .btn-outline-secondary {
-  color: var(--synthwave2-blue) !important;
-  border: 1.5px solid var(--synthwave2-lightviolet) !important;
-  background: #fff !important;
-  transition: color .2s, background .2s;
-}
-.synthwave-theme .btn-outline-secondary:hover,
-.synthwave-theme .btn-outline-secondary:focus {
-  color: #fff !important;
-  background: var(--synthwave2-lightviolet) !important;
-  border: 1.5px solid var(--synthwave2-lightviolet) !important;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(247, 44, 37, 0.3);
+  transition: all 0.3s ease;
 }
 
-/* Logo Avatar */
+.synthwave-theme .btn-dark:hover,
+.synthwave-theme .btn-dark:focus {
+  background: var(--ivory) !important;
+  color: var(--red-cmyk) !important;
+  border: 2px solid var(--red-cmyk);
+  transform: translateY(-2px);
+}
+
+.synthwave-theme .btn-outline-dark {
+  color: var(--red-cmyk) !important;
+  border: 2px solid var(--red-cmyk) !important;
+  background: transparent !important;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.synthwave-theme .btn-outline-dark:hover,
+.synthwave-theme .btn-outline-dark:focus {
+  color: var(--ivory) !important;
+  background: var(--red-cmyk) !important;
+  border: 2px solid var(--red-cmyk) !important;
+  transform: translateY(-2px);
+}
+
+.synthwave-theme .btn-outline-secondary {
+  color: var(--dark-purple) !important;
+  border: 2px solid var(--celadon) !important;
+  background: transparent !important;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.synthwave-theme .btn-outline-secondary:hover,
+.synthwave-theme .btn-outline-secondary:focus {
+  color: var(--dark-purple) !important;
+  background: var(--celadon) !important;
+  border: 2px solid var(--xanthous) !important;
+  transform: translateY(-2px);
+}
+
+.synthwave-theme .btn-primary {
+  background: linear-gradient(135deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  color: var(--dark-purple) !important;
+  border: none;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1.2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
+}
+
+.synthwave-theme .btn-primary:hover {
+  background: linear-gradient(135deg, var(--red-cmyk) 0%, var(--xanthous) 100%);
+  color: var(--ivory) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(247, 44, 37, 0.4);
+}
+
+.synthwave-theme .btn-success {
+  background: var(--celadon) !important;
+  color: var(--dark-purple) !important;
+  border: 2px solid var(--xanthous);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.synthwave-theme .btn-success:hover {
+  background: var(--xanthous) !important;
+  color: var(--dark-purple) !important;
+  border-color: var(--red-cmyk);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   LOGO & BRANDING
+============================================ */
+
 .synthwave-theme .logo-avatar {
   width: 100px;
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--synthwave2-lightviolet) 0%, #fff 100%);
+  background: linear-gradient(135deg, var(--celadon) 0%, var(--ivory) 100%);
   border-radius: 50%;
-  box-shadow: 0 0 12px var(--synthwave2-magenta)33;
+  border: 4px solid var(--xanthous);
+  box-shadow: 0 0 20px rgba(247, 179, 43, 0.4);
   margin: 0 auto 1rem auto;
   overflow: hidden;
+  animation: neon-pulse 2s ease-in-out infinite;
 }
+
 .synthwave-theme .logo-avatar img {
   width: 100%;
   height: 100%;
@@ -112,194 +250,283 @@
   display: block;
 }
 
-/* Headings */
-.synthwave-theme h3,
-.synthwave-theme .fw-bold {
-  color: var(--synthwave2-magenta);
+.synthwave-theme .logo-animate {
+  border: 4px solid var(--xanthous) !important;
+  transition: all 0.3s ease;
+  animation: neon-pulse 3s ease-in-out infinite;
 }
 
-/* Links */
+.synthwave-theme .logo-animate:hover {
+  border-color: var(--red-cmyk) !important;
+  box-shadow: 0 8px 24px rgba(247, 44, 37, 0.4);
+}
+
+/* ============================================
+   TYPOGRAPHY
+============================================ */
+
+.synthwave-theme h1,
+.synthwave-theme h2,
+.synthwave-theme h3,
+.synthwave-theme h4,
+.synthwave-theme h5,
+.synthwave-theme h6,
+.synthwave-theme .fw-bold {
+  color: var(--dark-purple);
+  font-weight: 700;
+}
+
+.synthwave-theme .display-6 {
+  color: var(--dark-purple) !important;
+  font-weight: 700;
+}
+
+/* ============================================
+   LINKS
+============================================ */
+
 .synthwave-theme a {
-  color: var(--synthwave2-magenta);
+  color: var(--red-cmyk);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.synthwave-theme a:hover {
+  color: var(--xanthous);
   text-decoration: underline;
 }
-.synthwave-theme a:hover {
-  color: var(--synthwave2-purple);
-}
 
-/* Container */
+/* ============================================
+   LAYOUT & STRUCTURE
+============================================ */
+
 .synthwave-theme .container {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
-/* Card shadow for login */
 .synthwave-theme .card.shadow {
-  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
+  box-shadow: 0 8px 24px rgba(247, 44, 37, 0.2);
 }
 
-/* Misc */
 .synthwave-theme .rounded-4 {
   border-radius: 1.2rem !important;
 }
 
-/* Menu card */
-.synthwave-theme .menu-modern-card {
-  background: #fff;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 8px var(--synthwave2-purple)44;
-  border: 1px solid var(--synthwave2-lightviolet);
+/* ============================================
+   MENU SELECTION CARD
+============================================ */
+
+.synthwave-theme .menu-selection-card {
+  background: linear-gradient(135deg, var(--ivory) 0%, var(--celadon) 100%);
+  border-radius: 1.5rem;
+  border: 3px solid var(--xanthous);
+  box-shadow: 
+    0 0 24px 2px rgba(247, 179, 43, 0.4),
+    0 0 48px 8px rgba(247, 44, 37, 0.2),
+    0 0 8px 2px rgba(169, 229, 187, 0.3);
+  overflow: hidden;
+  position: relative;
+  animation: synthwave-glow 3s infinite;
   padding: 2rem;
   margin-bottom: 2rem;
 }
 
-/* Section title */
-.synthwave-theme .menu-modern-section-title {
-  color: var(--synthwave2-magenta);
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  margin-top: 2rem;
+.synthwave-theme .menu-modern-card {
+  background: var(--bg-card);
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 16px rgba(247, 44, 37, 0.2);
+  border: 2px solid var(--celadon);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  transition: all 0.3s ease;
 }
 
-/* Menu list container */
+.synthwave-theme .menu-modern-card:hover {
+  border-color: var(--xanthous);
+  box-shadow: 0 8px 24px rgba(247, 179, 43, 0.3);
+}
+
+/* ============================================
+   MENU SECTION TITLES
+============================================ */
+
+.synthwave-theme .menu-modern-section-title {
+  color: var(--dark-purple);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  margin-top: 2rem;
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.synthwave-theme .menu-modern-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  border-radius: 2px;
+}
+
+/* ============================================
+   MENU LIST & ROWS
+============================================ */
+
 .synthwave-theme .menu-modern-list {
   width: 100%;
   padding: 0;
 }
 
-/* Menu row (modern flex row, not table row) */
 .synthwave-theme .menu-modern-row {
   display: flex;
   align-items: center;
   gap: 1.2rem;
   margin-bottom: 1.2rem;
   padding: 1.2rem 1rem;
-  border-radius: 0.8rem;
-  background: #fff;
-  box-shadow: 0 1px 8px var(--synthwave2-lightviolet)33;
-  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  border-radius: 1rem;
+  background: var(--bg-card) !important;
+  border: 2px solid var(--celadon);
+  box-shadow: 0 2px 8px rgba(169, 229, 187, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .synthwave-theme .menu-modern-row:hover {
-  background: var(--synthwave2-violet);
-  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px var(--synthwave2-purple)22;
-  transform: translateY(-2px) scale(1.01);
+  background: linear-gradient(135deg, var(--ivory) 0%, var(--celadon) 50%) !important;
+  border-color: var(--xanthous);
+  box-shadow: 
+    0 4px 16px rgba(247, 179, 43, 0.4),
+    0 2px 12px rgba(247, 44, 37, 0.2);
+  transform: translateY(-3px) scale(1.02);
 }
 
-/* Menu item image container */
+/* ============================================
+   MENU ITEM COMPONENTS
+============================================ */
+
 .synthwave-theme .menu-modern-item-img {
   flex: 0 0 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--synthwave2-lightviolet);
-  border-radius: 0.7rem;
+  background: linear-gradient(135deg, var(--celadon) 0%, var(--ivory) 100%);
+  border-radius: 0.75rem;
+  border: 2px solid var(--xanthous);
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(247, 179, 43, 0.3);
 }
+
 .synthwave-theme .menu-modern-item-img img {
   display: block;
   width: 60px;
   height: 60px;
   object-fit: cover;
-  border-radius: 0.7rem;
-  box-shadow: 0 2px 8px var(--synthwave2-blue);
+  border-radius: 0.75rem;
 }
 
-/* Menu item info */
 .synthwave-theme .menu-modern-item-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  color: var(--synthwave2-magenta);
+  color: var(--dark-purple);
   text-align: left;
   min-width: 0;
 }
 
 .synthwave-theme .menu-modern-item-name {
-  color: #FFA726;
+  color: var(--dark-purple);
   font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 0.2rem;
-  letter-spacing: 0.01em;
+  font-size: 1.15rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.02em;
 }
 
 .synthwave-theme .menu-modern-item-desc {
-  color: var(--synthwave2-magenta);
+  color: var(--red-cmyk);
   font-style: italic;
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   margin-bottom: 0.2rem;
   line-height: 1.5;
+  opacity: 0.85;
 }
 
-/* Menu item price */
+.synthwave-theme .menu-modern-item-desc span {
+  color: var(--red-cmyk);
+  font-style: italic;
+  opacity: 0.85;
+}
+
 .synthwave-theme .menu-modern-item-price {
-  color: var(--synthwave2-magenta);
+  color: var(--ivory);
   font-weight: 700;
   font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  box-shadow: 0 2px 8px rgba(247, 179, 43, 0.3);
   margin-left: auto;
-  align-self: flex-end;
+  align-self: center;
 }
 
-.synthwave-theme .menu-selection-card,
-.synthwave-theme .card,
-.synthwave-theme .menu-modern-card {
-  background: #fff !important;  
-  border: none;
-  border-radius: 2rem;
-  color: #000;
-  position: relative;
-  z-index: 2;
-  box-shadow:
-    0 0 24px 2px var(--synthwave2-pink),
-    0 0 48px 8px var(--synthwave2-purple),
-    0 0 8px 2px var(--synthwave2-blue);
-  animation: neon-glow 2s infinite alternate;
-}
+/* ============================================
+   NAVIGATION TABS
+============================================ */
 
-@keyframes neon-glow-item {
-  0% {
-    box-shadow:
-      0 0 3px 1px var(--synthwave2-lightviolet),
-      0 0 6px 1px var(--synthwave2-violet),
-      0 0 1px 1px var(--synthwave2-blue);
-    filter: brightness(1.01);
-  }
-  100% {
-    box-shadow:
-      0 0 6px 2px var(--synthwave2-lightviolet),
-      0 0 9px 2px var(--synthwave2-violet),
-      0 0 2px 1px var(--synthwave2-blue);
-    filter: brightness(1.06);
-  }
-}
-
-.synthwave-theme .menu-modern-section-title,
-.synthwave-theme .display-6, 
-.synthwave-theme h2, 
-.synthwave-theme h3 {
-  color: #000 !important;
-  font-size: 1.5rem;
+.synthwave-theme .nav-link[data-bs-toggle="tab"] {
+  color: var(--dark-purple);
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
   font-weight: 700;
-  text-align: center;
-  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: var(--ivory);
+  text-transform: uppercase;
   letter-spacing: 0.05em;
-  text-shadow: none;
 }
 
-@keyframes neon-text {
-  0% { text-shadow: 0 0 8px var(--synthwave2-pink), 0 0 16px var(--synthwave2-purple), 0 0 4px var(--synthwave2-blue); }
-  100% { text-shadow: 0 0 16px var(--synthwave2-pink), 0 0 32px var(--synthwave2-purple), 0 0 8px var(--synthwave2-blue); }
+.synthwave-theme .nav-link[data-bs-toggle="tab"]:hover {
+  color: var(--red-cmyk);
+  border-color: var(--xanthous);
+  background: var(--celadon);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(247, 179, 43, 0.3);
 }
+
+.synthwave-theme .nav-link[data-bs-toggle="tab"].active {
+  color: var(--ivory);
+  background: linear-gradient(135deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  border-color: var(--red-cmyk);
+  box-shadow: 0 4px 16px rgba(247, 44, 37, 0.4);
+}
+
+.synthwave-theme .nav-tabs {
+  border-bottom: 3px solid var(--xanthous);
+  margin-bottom: 2rem;
+}
+
+/* ============================================
+   MENU ITEMS (Card Style)
+============================================ */
 
 .synthwave-theme .menu-modern-item {
-  background: linear-gradient(135deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px #0003;
-  color: #fff; /* High contrast text */
-  border: none;
+  background: linear-gradient(135deg, var(--ivory) 0%, var(--celadon) 100%);
+  border-radius: 1.2rem;
+  border: 3px solid var(--xanthous);
+  box-shadow: 0 4px 16px rgba(247, 179, 43, 0.3);
+  color: var(--dark-purple);
   min-width: 260px;
   max-width: 320px;
   display: flex;
@@ -308,162 +535,116 @@
   justify-content: center;
   padding: 1.5rem 1rem;
   margin-bottom: 1.5rem;
-  text-align: center; 
-}
-
-@keyframes neon-glow-item {
-  0% {
-    box-shadow:
-      0 0 6px 1px var(--synthwave2-lightviolet),
-      0 0 12px 2px var(--synthwave2-violet),
-      0 0 3px 1px var(--synthwave2-blue);
-    filter: brightness(1.03);
-  }
-  100% {
-    box-shadow:
-      0 0 12px 2px var(--synthwave2-lightviolet),
-      0 0 18px 4px var(--synthwave2-violet),
-      0 0 6px 2px var(--synthwave2-blue);
-    filter: brightness(1.08);
-  }
-}
-
-.synthwave-theme .menu-modern-item-img {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;       /* Vertically center info */
-  align-items: center; 
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px var(--synthwave2-blue);
-  background: var(--synthwave2-violet);
-  flex-shrink: 0;
-}
-
-.synthwave-theme .menu-modern-item-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: var(--synthwave2-magenta);
   text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.synthwave-theme .menu-modern-item-name {
-  color: #FFA726;
-  font-size: 1.18rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  letter-spacing: 0.01em;
+.synthwave-theme .menu-modern-item:hover {
+  border-color: var(--red-cmyk);
+  box-shadow: 
+    0 6px 24px rgba(247, 44, 37, 0.4),
+    0 0 16px rgba(247, 179, 43, 0.3);
+  transform: translateY(-4px) scale(1.03);
+  animation: neon-pulse 1s ease-in-out;
 }
 
-.synthwave-theme .menu-modern-item-desc {
-  font-size: 1.02rem;
-  color: var(--synthwave2-magenta);
-  margin-bottom: 0.2rem;
-  line-height: 1.5;
-  font-style: italic;
-  text-align: center;
-}
-
-.synthwave-theme .menu-modern-item-price {
-  color: #fff;
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-top: 0.2rem;
-  align-self: center;;
-  background: var(--synthwave2-magenta);
-  border-radius: 0.5em;
-  padding: 0.2em 0.7em;
-  box-shadow: 0 1px 6px var(--synthwave2-magenta)44;
-}
-
-.synthwave-theme .btn-outline-secondary,
-.synthwave-theme .btn-primary,
-.synthwave-theme .btn {
-  background: linear-gradient(90deg, var(--synthwave2-purple) 0%, var(--synthwave2-blue) 100%);
-  color: var(--synthwave2-magenta) !important;
-  border: none;
-  font-weight: 700;
-  border-radius: 1em;
-  padding: 0.5em 1.2em;
-  transition: background 0.2s;
-}
-
-.synthwave-theme .btn-outline-secondary:hover,
-.synthwave-theme .btn-primary:hover,
-.synthwave-theme .btn:hover {
-  background: linear-gradient(90deg, var(--synthwave2-blue) 0%, var(--synthwave2-purple) 100%);
-  color: var(--synthwave2-magenta) !important;
-}
+/* ============================================
+   BADGES
+============================================ */
 
 .synthwave-theme .badge {
-  background: var(--synthwave2-magenta) !important;
-  color: var(--synthwave2-blue) !important;
+  background: linear-gradient(135deg, var(--xanthous) 0%, var(--red-cmyk) 100%) !important;
+  color: var(--ivory) !important;
   font-weight: 700;
-  border-radius: 0.5em;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--dark-purple);
+  box-shadow: 0 2px 8px rgba(247, 179, 43, 0.3);
 }
+
+.synthwave-theme .badge.text-bg-success {
+  background: var(--celadon) !important;
+  color: var(--dark-purple) !important;
+  border-color: var(--xanthous);
+}
+
+.synthwave-theme .badge.text-bg-secondary {
+  background: var(--dark-purple) !important;
+  color: var(--ivory) !important;
+  border-color: var(--celadon);
+}
+
+/* ============================================
+   MAP CONTAINER
+============================================ */
 
 .synthwave-theme #menu-map,
 .synthwave-theme #map {
-  height: 240px;
+  height: 320px;
   margin-top: 0.5rem;
   border-radius: 1rem;
-  box-shadow: 0 0 12px 2px var(--synthwave2-blue);
+  border: 3px solid var(--xanthous);
+  box-shadow: 
+    0 0 16px 2px rgba(247, 179, 43, 0.4),
+    0 4px 16px rgba(247, 44, 37, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.synthwave-theme a {
-  color: var(--synthwave2-magenta);
-  text-decoration: underline;
+.synthwave-theme #menu-map:hover,
+.synthwave-theme #map:hover {
+  border-color: var(--red-cmyk);
+  box-shadow: 
+    0 0 24px 4px rgba(247, 44, 37, 0.5),
+    0 6px 24px rgba(247, 179, 43, 0.3);
 }
 
-.synthwave-theme a:hover {
-  color: var(--synthwave2-purple);
-}
+/* ============================================
+   BACKGROUND OVERLAY
+============================================ */
 
 .synthwave-theme .menu-bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(254, 253, 235, 0.05) 0%, rgba(169, 229, 187, 0.03) 100%);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.12;
+  opacity: 0.5;
 }
 
-/* Synthwave highlight effect for menu row hover */
-.synthwave-theme .menu-modern-row:hover {
-  background: var(--synthwave2-violet);
-  box-shadow:
-    0 4px 24px var(--synthwave2-pink),
-    0 2px 12px var(--synthwave2-purple)22,
-    0 0 0 4px var(--synthwave2-violet); /* synthwave highlight ring */
-  outline: none;
-  transform: translateY(-2px) scale(1.01);
-  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
-}
+/* ============================================
+   TABLES
+============================================ */
 
 .synthwave-theme .menu-modern-table {
   width: 100%;
-  background: #fff !important;
+  background: var(--bg-card) !important;
   border-radius: 1.2rem;
   overflow: hidden;
-  color: #000;
-  box-shadow: 0 2px 16px #0006;
+  color: var(--dark-purple);
+  border: 2px solid var(--celadon);
+  box-shadow: 0 4px 16px rgba(247, 44, 37, 0.15);
 }
 
 .synthwave-theme .menu-modern-table th {
-  background: #fff !important;
-  color: #000;
+  background: linear-gradient(135deg, var(--ivory) 0%, var(--celadon) 100%) !important;
+  color: var(--dark-purple);
   font-weight: 700;
   font-size: 1.08rem;
   border: none;
   text-align: center;
   letter-spacing: 0.03em;
+  padding: 1rem;
+  text-transform: uppercase;
 }
 
 .synthwave-theme .menu-modern-table td {
   background: transparent;
-  color: #000;
+  color: var(--dark-purple);
   border: none;
   text-align: center;
   vertical-align: middle;
@@ -471,71 +652,132 @@
   font-size: 1.05rem;
 }
 
-.synthwave-theme .menu-modern-row {
-  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+.synthwave-theme .menu-modern-table tbody tr {
+  border-bottom: 1px solid var(--celadon);
+  transition: all 0.3s ease;
 }
 
-.synthwave-theme .menu-modern-row:hover {
-  background: var(--synthwave2-violet);
-  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
-  transform: translateY(-2px) scale(1.02);
+.synthwave-theme .menu-modern-table tbody tr:hover {
+  background: linear-gradient(135deg, rgba(254, 253, 235, 0.5) 0%, rgba(169, 229, 187, 0.3) 100%);
 }
 
-.synthwave-theme .menu-modern-item-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 0.7rem;
-  box-shadow: 0 2px 8px var(--synthwave2-blue);
-  background: #fff !important;
-  margin: 0 auto;
-  display: block;
+/* ============================================
+   MODAL
+============================================ */
+
+.synthwave-theme .modal-content {
+  border: 3px solid var(--xanthous);
+  border-radius: 1.2rem;
+  box-shadow: 
+    0 0 24px rgba(247, 179, 43, 0.4),
+    0 8px 32px rgba(247, 44, 37, 0.2);
+  background: var(--bg-card);
 }
 
-.synthwave-theme .menu-modern-item-name {
-  color: #FFA726;
+.synthwave-theme .modal-header {
+  background: linear-gradient(135deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  color: var(--ivory);
+  border-bottom: 3px solid var(--celadon);
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.5rem;
+}
+
+.synthwave-theme .modal-title {
   font-weight: 700;
-  font-size: 1.08rem;
-  letter-spacing: 0.01em;
+  color: var(--ivory);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.synthwave-theme .menu-modern-item-desc span {
-  color: var(--synthwave2-magenta);
-  font-style: italic;
-  opacity: 0.85;
+.synthwave-theme .modal-body {
+  padding: 2rem;
+  color: var(--dark-purple);
 }
 
-.synthwave-theme .menu-modern-item-price {
-  color: #fff;
+.synthwave-theme .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+/* ============================================
+   ALERTS
+============================================ */
+
+.synthwave-theme .alert-info {
+  background: linear-gradient(135deg, rgba(169, 229, 187, 0.2) 0%, rgba(254, 253, 235, 0.3) 100%);
+  border: 2px solid var(--celadon);
+  color: var(--dark-purple);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.synthwave-theme .alert-info a {
+  color: var(--red-cmyk);
   font-weight: 700;
-  background: var(--synthwave2-magenta);
-  border-radius: 0.5em;
-  padding: 0.2em 0.7em;
-  box-shadow: 0 1px 6px var(--synthwave2-magenta)44;
-  display: inline-block;
+  text-decoration: underline;
 }
 
-.synthwave-theme .menu-modern-table,
-.synthwave-theme .menu-modern-table th,
-.synthwave-theme .menu-modern-table td,
-.synthwave-theme .menu-modern-row {
-  border: none !important;
-  box-shadow: none !important;
+.synthwave-theme .alert-info a:hover {
+  color: var(--xanthous);
 }
 
-/* Optional: Add subtle row separation with background or shadow on hover only */
-.synthwave-theme .menu-modern-row {
-  transition: background 0.2s, box-shadow 0.2s;
+/* ============================================
+   TEXT UTILITIES
+============================================ */
+
+.synthwave-theme .text-primary {
+  color: var(--xanthous) !important;
 }
 
-.synthwave-theme .menu-modern-row:hover {
-  background: var(--synthwave2-violet);
-  box-shadow: 0 4px 24px var(--synthwave2-pink), 0 2px 12px #0006;
-  transform: translateY(-2px) scale(1.02);
+.synthwave-theme .text-muted {
+  color: rgba(45, 30, 47, 0.6) !important;
 }
 
-/* Add margin and padding to each menu card for spacing */
-.synthwave-theme .menu-modern-card {
-  margin-bottom: 2.5rem;
-  padding: 2rem 1.5rem;
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+============================================ */
+
+@media (max-width: 768px) {
+  .synthwave-theme .menu-selection-card {
+    border-width: 2px;
+    padding: 1.5rem;
+  }
+  
+  .synthwave-theme .nav-link[data-bs-toggle="tab"] {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .synthwave-theme .menu-modern-item {
+    min-width: 220px;
+    max-width: 280px;
+  }
+  
+  .synthwave-theme #menu-map,
+  .synthwave-theme #map {
+    height: 240px;
+  }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR
+============================================ */
+
+.synthwave-theme ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.synthwave-theme ::-webkit-scrollbar-track {
+  background: var(--ivory);
+  border-radius: 10px;
+}
+
+.synthwave-theme ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--xanthous) 0%, var(--red-cmyk) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--ivory);
+}
+
+.synthwave-theme ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--red-cmyk) 0%, var(--xanthous) 100%);
 }
