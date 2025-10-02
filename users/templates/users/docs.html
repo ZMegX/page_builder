@@ -1,91 +1,190 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Documentation | Gastro Grid{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-  <h1 class="mb-3">Project Documentation</h1>
-  <p class="lead">All resources, references, and documentation related to the development of Gastro Grid for my diploma.</p>
-</div>
+<div class="container py-4">
+  <div class="mb-5 text-center">
+    <h1 class="display-4 mb-3"><i class="bi bi-book"></i> Project Documentation</h1>
+    <p class="lead text-muted">Complete development documentation for the Gastro Grid Full-Stack Diploma Project</p>
+  </div>
 
-<section class="mb-5">
-  <h2 class="h4">📄 PDF Documents</h2>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">
-      <a href="{% static 'docs/requirements_specification.pdf' %}" target="_blank">
-        Requirements Specification (PDF)
-      </a>
-    </li>
-    <li class="list-group-item">
-      <a href="{% static 'docs/architecture_diagram.pdf' %}" target="_blank">
-        System Architecture Diagram (PDF)
-      </a>
-    </li>
-    <li class="list-group-item">
-      <a href="{% static 'docs/user_manual.pdf' %}" target="_blank">
-        User Manual (PDF)
-      </a>
-    </li>
-  </ul>
-</section>
-
-<section class="mb-5">
-  <h2 class="h4">🖼️ Screenshots & Visuals</h2>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <a href="{% static 'screenshots/login_page.png' %}" target="_blank">
-        <img src="{% static 'screenshots/login_page.png' %}" class="img-fluid rounded border" alt="Login Page Screenshot">
-        <div class="small text-center mt-1">Login Page</div>
-      </a>
-    </div>
-    <div class="col-md-4">
-      <a href="{% static 'screenshots/menu_builder.png' %}" target="_blank">
-        <img src="{% static 'screenshots/menu_builder.png' %}" class="img-fluid rounded border" alt="Menu Builder Screenshot">
-        <div class="small text-center mt-1">Menu Builder</div>
-      </a>
-    </div>
-    <div class="col-md-4">
-      <a href="{% static 'screenshots/public_menu.png' %}" target="_blank">
-        <img src="{% static 'screenshots/public_menu.png' %}" class="img-fluid rounded border" alt="Public Menu Screenshot">
-        <div class="small text-center mt-1">Public Menu</div>
-      </a>
+  {% if viewed_doc %}
+  <!-- Full-page document viewer -->
+  <div class="mb-4">
+    <a href="{% url 'documentation' %}" class="btn btn-outline-secondary mb-3">
+      <i class="bi bi-arrow-left"></i> Back to Documentation
+    </a>
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">{{ viewed_doc.title }}</h3>
+        <small><i class="bi bi-eye"></i> {{ viewed_doc.view_count }} views</small>
+      </div>
+      <div class="card-body p-0">
+        {% if viewed_doc.embed_url %}
+          <iframe src="{{ viewed_doc.embed_url }}"
+                  title="{{ viewed_doc.title }}"
+                  class="w-100 border-0"
+                  height="800"
+                  allowfullscreen="true">
+          </iframe>
+        {% elif viewed_doc.file %}
+          <div class="text-center p-5">
+            <i class="bi bi-file-earmark-pdf display-1 text-danger mb-3"></i>
+            <h4>{{ viewed_doc.title }}</h4>
+            <p class="text-muted">{{ viewed_doc.description }}</p>
+            <a href="{{ viewed_doc.file.url }}" class="btn btn-primary btn-lg" target="_blank">
+              <i class="bi bi-download"></i> Download Document
+            </a>
+          </div>
+        {% endif %}
+      </div>
     </div>
   </div>
-</section>
+  {% else %}
+  <!-- Document library view -->
+  {% if not docs_by_category %}
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading"><i class="bi bi-info-circle"></i> No Documents Yet</h4>
+    <p class="mb-0">Documentation will be added as the project progresses. Check back soon!</p>
+    {% if user.is_staff %}
+      <hr>
+      <p class="mb-0"><a href="/admin/users/document/add/" class="alert-link">Add your first document</a> in the admin panel.</p>
+    {% endif %}
+  </div>
+  {% else %}
+    {% for category, documents in docs_by_category.items %}
+    <section class="mb-5">
+      <h2 class="h3 mb-4 pb-2 border-bottom">
+        {% if category == "Requirements &amp; Analysis" %}
+          <i class="bi bi-clipboard-data text-primary"></i>
+        {% elif category == "Design &amp; Architecture" %}
+          <i class="bi bi-diagram-3 text-success"></i>
+        {% elif category == "Implementation" %}
+          <i class="bi bi-code-square text-info"></i>
+        {% elif category == "Testing &amp; Quality Assurance" %}
+          <i class="bi bi-check2-circle text-warning"></i>
+        {% elif category == "User Guide &amp; Documentation" %}
+          <i class="bi bi-book text-secondary"></i>
+        {% elif category == "Presentations" %}
+          <i class="bi bi-easel text-danger"></i>
+        {% else %}
+          <i class="bi bi-folder text-muted"></i>
+        {% endif %}
+        {{ category }}
+      </h2>
 
-<section class="mb-5">
-  <h2 class="h4">🔗 References & Useful Links</h2>
-  <ul>
-    <li>
-      <a href="https://github.com/yourusername/gastro-grid" target="_blank" rel="noopener">
-        Project Source Code (GitHub)
-      </a>
-    </li>
-    <li>
-      <a href="https://docs.djangoproject.com/en/4.2/" target="_blank" rel="noopener">
-        Django Documentation
-      </a>
-    </li>
-    <li>
-      <a href="https://getbootstrap.com/docs/5.3/" target="_blank" rel="noopener">
-        Bootstrap 5 Documentation
-      </a>
-    </li>
-  </ul>
-</section>
+      <div class="row g-4">
+        {% for doc in documents %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm hover-shadow transition">
+            <div class="card-body">
+              <div class="d-flex align-items-start mb-3">
+                <div class="flex-shrink-0">
+                  {% if doc.doc_type == "pdf" %}
+                    <i class="bi bi-file-earmark-pdf fs-1 text-danger"></i>
+                  {% elif doc.doc_type == "google_doc" %}
+                    <i class="bi bi-file-earmark-text fs-1 text-primary"></i>
+                  {% elif doc.doc_type == "google_slides" %}
+                    <i class="bi bi-file-earmark-slides fs-1 text-warning"></i>
+                  {% elif doc.doc_type == "google_sheets" %}
+                    <i class="bi bi-file-earmark-spreadsheet fs-1 text-success"></i>
+                  {% elif doc.doc_type == "image" %}
+                    <i class="bi bi-file-earmark-image fs-1 text-info"></i>
+                  {% else %}
+                    <i class="bi bi-file-earmark fs-1 text-secondary"></i>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h5 class="card-title mb-1">{{ doc.title }}</h5>
+                  <small class="text-muted">
+                    <i class="bi bi-eye"></i> {{ doc.view_count }} views
+                  </small>
+                </div>
+              </div>
 
-<section>
-  <h2 class="h4">📁 Other Files</h2>
-  <ul>
-    <li>
-      <a href="{% static 'docs/database_schema.sql' %}" target="_blank">
-        Database Schema (SQL)
-      </a>
-    </li>
-    <li>
-      <a href="{% static 'docs/test_plan.pdf' %}" target="_blank">
-        Test Plan (PDF)
-      </a>
-    </li>
-  </ul>
-</section>
+              {% if doc.description %}
+                <p class="card-text text-muted small">{{ doc.description|truncatewords:20 }}</p>
+              {% endif %}
+
+              <div class="d-grid gap-2">
+                {% if doc.embed_url %}
+                  <a href="?view={{ doc.id }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye"></i> View Document
+                  </a>
+                  <a href="{{ doc.google_doc_url }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                    <i class="bi bi-box-arrow-up-right"></i> Open in Google
+                  </a>
+                {% elif doc.file %}
+                  <a href="{{ doc.file.url }}" class="btn btn-primary btn-sm" target="_blank">
+                    <i class="bi bi-download"></i> Download
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card-footer bg-light text-muted small">
+              <i class="bi bi-calendar3"></i> Updated {{ doc.updated_at|date:"M d, Y" }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  {% endif %}
+  {% endif %}
+
+  <!-- Additional Resources Section -->
+  <section class="mt-5 pt-4 border-top">
+    <h2 class="h4 mb-4"><i class="bi bi-link-45deg"></i> Additional Resources</h2>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <div class="card border-0 bg-light h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-github"></i> Source Code</h5>
+            <p class="card-text small">View the complete project source code and commit history.</p>
+            <a href="https://github.com/ZMegX/page_builder" class="btn btn-sm btn-outline-dark" target="_blank">
+              Visit Repository <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-0 bg-light h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-file-code"></i> Technologies Used</h5>
+            <p class="card-text small">Django, Bootstrap, PostgreSQL, Cloudinary, and more.</p>
+            <a href="{% url 'why_choose_us' %}" class="btn btn-sm btn-outline-dark">
+              Learn More <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-0 bg-light h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-question-circle"></i> Support</h5>
+            <p class="card-text small">Questions or feedback about the project?</p>
+            <a href="mailto:your.email@example.com" class="btn btn-sm btn-outline-dark">
+              Contact Me <i class="bi bi-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+.hover-shadow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-5px);
+}
+.transition {
+  transition: all 0.3s ease;
+}
+</style>
 {% endblock %}

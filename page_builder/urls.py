@@ -8,8 +8,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('menus/', include('menus.urls', namespace='menus')),    path("", include("menus.public_urls")),
-
+    
+    # Documentation page - must be before catch-all patterns
+    path('documentation/', user_views.documentation, name='documentation'),
+    
+    # Menus
+    path('menus/', include('menus.urls', namespace='menus')),
+    
     # React catch-all route for menu-editor (must be before slug catch-alls)
     path('menu-editor/', TemplateView.as_view(template_name='users/index.html'), name='react_menu_editor'),
     path('menu-editor/<path:path>/', TemplateView.as_view(template_name='users/index.html')),
@@ -21,9 +26,11 @@ urlpatterns = [
     # Django's built-in authentication URLs (login, logout, password management)
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('users.urls')),
-    path('', include('webpage_restaurant_site.urls')),
     path('locations/', include('locations.urls')),
-    path('docs/', user_views.documentation, name='docs'),
+    
+    # Restaurant public pages and catch-all patterns - must be last
+    path('', include('webpage_restaurant_site.urls')),
+    path("", include("menus.public_urls")),
 ]
 
 if settings.DEBUG:

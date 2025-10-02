@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
-from .models import Order
+from .models import Order, Document
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.conf import settings
@@ -60,8 +60,33 @@ def is_restaurant_owner(user):
 def is_customer(user):
     return user.is_authenticated and user.groups.filter(name='Customer').exists()
 
-def documentation(request):
-    return render(request, 'users/docs.html')
+def documentation(request):    
+    # Get all published documents grouped by category
+    documents = Document.objects.filter(is_published=True).order_by('category', 'order', 'title')
+    
+    # Group documents by category
+    docs_by_category = {}
+    for doc in documents:
+        category_name = doc.get_category_display()
+        if category_name not in docs_by_category:
+            docs_by_category[category_name] = []
+        docs_by_category[category_name].append(doc)
+    
+    # Track view if viewing a specific document
+    doc_id = request.GET.get('view')
+    viewed_doc = None
+    if doc_id:
+        try:
+            viewed_doc = Document.objects.get(id=doc_id, is_published=True)
+            viewed_doc.increment_view_count()
+        except Document.DoesNotExist:
+            pass
+    
+    context = {
+        'docs_by_category': docs_by_category,
+        'viewed_doc': viewed_doc,
+    }
+    return render(request, 'users/docs.html', context)
 
 def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')

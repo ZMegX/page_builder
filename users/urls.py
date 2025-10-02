@@ -40,7 +40,6 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('why-choose-us/', views.why_choose_us, name='why_choose_us'),
     path('restaurants/', browse_restaurants, name='browse_restaurants'),
-    path('docs/', views.documentation, name='docs'),
     path('review/<int:restaurant_pk>/', leave_review, name='leave_review'),
     # users/urls.py
     path('restaurant/<int:restaurant_pk>/reviews/', restaurant_reviews, name='restaurant_reviews'),

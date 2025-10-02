@@ -174,3 +174,90 @@ class Review(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Document(models.Model):
+    """
+    Model for storing project documentation (PDFs, Google Docs, etc.)
+    Supports both file uploads and embedded Google Doc links
+    """
+    CATEGORY_CHOICES = [
+        ('requirements', 'Requirements & Analysis'),
+        ('design', 'Design & Architecture'),
+        ('implementation', 'Implementation'),
+        ('testing', 'Testing & Quality Assurance'),
+        ('user_guide', 'User Guide & Documentation'),
+        ('presentation', 'Presentations'),
+        ('other', 'Other'),
+    ]
+    
+    DOC_TYPE_CHOICES = [
+        ('pdf', 'PDF Document'),
+        ('google_doc', 'Google Doc'),
+        ('google_slides', 'Google Slides'),
+        ('google_sheets', 'Google Sheets'),
+        ('image', 'Image/Screenshot'),
+        ('other', 'Other'),
+    ]
+    
+    title = models.CharField(max_length=200, help_text="Document title")
+    description = models.TextField(blank=True, help_text="Brief description of the document")
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
+    doc_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES, default='pdf')
+    
+    # For file uploads (PDFs, images, etc.)
+    file = CloudinaryField('document', blank=True, null=True, 
+                          help_text="Upload a PDF or image file")
+    
+    # For Google Docs/Slides/Sheets
+    google_doc_url = models.URLField(blank=True, null=True, 
+                                     help_text="Full URL to Google Doc, Slides, or Sheets")
+    embed_url = models.URLField(blank=True, null=True, 
+                               help_text="Embed URL (auto-generated from Google Doc URL)")
+    
+    # Metadata
+    order = models.PositiveIntegerField(default=0, help_text="Display order within category")
+    is_published = models.BooleanField(default=True, help_text="Show on documentation page")
+    view_count = models.PositiveIntegerField(default=0, help_text="Number of views")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['category', 'order', 'title']
+        verbose_name = 'Document'
+        verbose_name_plural = 'Documents'
+    
+    def __str__(self):
+        return f"{self.get_category_display()} - {self.title}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-generate embed URL from Google Doc URL
+        if self.google_doc_url and not self.embed_url:
+            self.embed_url = self.generate_embed_url()
+        super().save(*args, **kwargs)
+    
+    def generate_embed_url(self):
+        """Convert Google Doc sharing URL to embed URL"""
+        url = self.google_doc_url
+        
+        # Google Docs
+        if '/document/d/' in url:
+            doc_id = url.split('/document/d/')[1].split('/')[0]
+            return f"https://docs.google.com/document/d/{doc_id}/preview"
+        
+        # Google Slides
+        elif '/presentation/d/' in url:
+            doc_id = url.split('/presentation/d/')[1].split('/')[0]
+            return f"https://docs.google.com/presentation/d/{doc_id}/embed"
+        
+        # Google Sheets
+        elif '/spreadsheets/d/' in url:
+            doc_id = url.split('/spreadsheets/d/')[1].split('/')[0]
+            return f"https://docs.google.com/spreadsheets/d/{doc_id}/preview"
+        
+        return url
+    
+    def increment_view_count(self):
+        """Increment the view counter"""
+        self.view_count += 1
+        self.save(update_fields=['view_count'])
