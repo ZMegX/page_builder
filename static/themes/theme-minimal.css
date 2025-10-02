@@ -1,38 +1,63 @@
 :root {
-  --minimal-dark: #252626;
-  --minimal-black: #0D0D0C;
-  --minimal-gray: #A6A6A6;
-  --minimal-light: #F2F2F2;
-  --minimal-mid: #BFBFBF;
+  /* CSS HEX - New Color Palette */
+  --gunmetal: #202c39;
+  --gunmetal-2: #283845;
+  --sage: #b8b08d;
+  --peach-yellow: #f2d492;
+  --atomic-tangerine: #f29559;
+  --border-orange: #F25918;
 }
 
 /* Scope all minimal styles to .minimal-theme body class */
 .minimal-theme {
-  background: var(--minimal-light) !important;
-  color: var(--minimal-black);
+  background: var(--peach-yellow) !important;
+  color: var(--gunmetal);
   font-family: 'Inter', 'Arial', sans-serif;
 }
 
 /* Card and menu selection */
-.minimal-theme .menu-selection-card,
+.minimal-theme .menu-selection-card {
+  background: #ffffff;
+  border: 1px solid var(--border-orange);
+  border-radius: 1.2rem;
+  color: var(--gunmetal);
+  box-shadow: 0 2px 8px var(--border-orange);
+}
+
 .minimal-theme .card,
 .minimal-theme .menu-modern-card {
-  background: var(--minimal-light);
-  border: 1px solid var(--minimal-mid);
+  background: var(--peach-yellow);
+  border: 1px solid var(--border-orange);
   border-radius: 1.2rem;
-  color: var(--minimal-black);
-  box-shadow: 0 2px 8px var(--minimal-mid);
+  color: var(--gunmetal);
+  box-shadow: 0 2px 8px var(--border-orange);
 }
 
 /* Section titles */
 .minimal-theme .menu-modern-section-title,
 .minimal-theme .display-6,
-.minimal-theme h1, 
-.minimal-theme h2, 
+.minimal-theme h1,
+.minimal-theme h2,
 .minimal-theme h3 {
-  color: var(--minimal-dark);
+  color: var(--gunmetal-2);
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+/* Keyframe for border animation */
+@keyframes borderPulse {
+  0% {
+    border-color: var(--border-orange);
+    box-shadow: 0 1px 4px var(--border-orange);
+  }
+  50% {
+    border-color: var(--atomic-tangerine);
+    box-shadow: 0 0 12px var(--atomic-tangerine);
+  }
+  100% {
+    border-color: var(--atomic-tangerine);
+    box-shadow: 0 0 8px var(--atomic-tangerine);
+  }
 }
 
 /* Menu item styling */
@@ -42,10 +67,17 @@
   gap: 1.2rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--minimal-mid);
-  background: var(--minimal-light);
+  border: 4px solid var(--border-orange);
+  background: var(--peach-yellow);
   border-radius: 0.8rem;
-  box-shadow: 0 1px 4px var(--minimal-mid);
+  box-shadow: 0 1px 4px var(--border-orange);
+  transition: all 0.3s ease;
+}
+
+.minimal-theme .menu-modern-item:hover {
+  animation: borderPulse 0.6s ease-in-out forwards;
+  transform: translateY(-2px);
+  cursor: pointer;
 }
 
 .minimal-theme .menu-modern-item-img {
@@ -53,7 +85,7 @@
   height: 70px;
   object-fit: cover;
   border-radius: 0.8rem;
-  background: var(--minimal-gray);
+  background: var(--sage);
   flex-shrink: 0;
 }
 
@@ -62,20 +94,20 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: var(--minimal-black);
+  color: var(--gunmetal);
 }
 
 .minimal-theme .menu-modern-item-name {
   font-size: 1.08rem;
   font-weight: 700;
   margin-bottom: 0.2rem;
-  color: var(--minimal-dark);
+  color: var(--gunmetal-2);
   letter-spacing: 0.01em;
 }
 
 .minimal-theme .menu-modern-item-desc {
   font-size: 0.98rem;
-  color: var(--minimal-gray);
+  color: var(--gunmetal);
   margin-bottom: 0.2rem;
   line-height: 1.5;
 }
@@ -83,17 +115,66 @@
 .minimal-theme .menu-modern-item-price {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--minimal-dark);
+  color: var(--atomic-tangerine);
   margin-top: 0.2rem;
   align-self: flex-end;
+}
+
+/* Tab Navigation Buttons - Only for menu tabs with data-bs-toggle */
+.minimal-theme .nav-link[data-bs-toggle="tab"] {
+  background: transparent;
+  color: var(--gunmetal) !important;
+  border: 2px solid var(--border-orange);
+  font-weight: 600;
+  border-radius: 0.8em;
+  padding: 0.6em 1.2em;
+  margin: 0.3em;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.minimal-theme .nav-link[data-bs-toggle="tab"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--atomic-tangerine), transparent);
+  transition: left 0.5s ease;
+}
+
+.minimal-theme .nav-link[data-bs-toggle="tab"]:hover::before {
+  left: 100%;
+}
+
+.minimal-theme .nav-link[data-bs-toggle="tab"]:hover {
+  background: var(--sage);
+  color: var(--gunmetal-2) !important;
+  border-color: var(--atomic-tangerine);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(242, 149, 89, 0.3);
+}
+
+.minimal-theme .nav-link[data-bs-toggle="tab"].active {
+  background: var(--atomic-tangerine);
+  color: var(--gunmetal) !important;
+  border-color: var(--atomic-tangerine);
+  box-shadow: 0 4px 12px rgba(242, 149, 89, 0.4);
+}
+
+.minimal-theme .nav-link[data-bs-toggle="tab"].active:hover {
+  background: var(--atomic-tangerine);
+  transform: scale(1.05);
 }
 
 /* Buttons and badges */
 .minimal-theme .btn-outline-secondary,
 .minimal-theme .btn-primary,
 .minimal-theme .btn {
-  background: var(--minimal-dark);
-  color: var(--minimal-light) !important;
+  background: var(--atomic-tangerine);
+  color: var(--gunmetal) !important;
   border: none;
   font-weight: 600;
   border-radius: 0.6em;
@@ -104,13 +185,13 @@
 .minimal-theme .btn-outline-secondary:hover,
 .minimal-theme .btn-primary:hover,
 .minimal-theme .btn:hover {
-  background: var(--minimal-black);
-  color: var(--minimal-light) !important;
+  background: var(--gunmetal);
+  color: var(--peach-yellow) !important;
 }
 
 .minimal-theme .badge {
-  background: var(--minimal-gray) !important;
-  color: var(--minimal-black) !important;
+  background: var(--sage) !important;
+  color: var(--gunmetal) !important;
   font-weight: 600;
   border-radius: 0.4em;
 }
@@ -121,17 +202,17 @@
   height: 240px;
   margin-top: 0.5rem;
   border-radius: 1rem;
-  box-shadow: 0 0 8px 1px var(--minimal-mid);
+  box-shadow: 0 0 8px 1px var(--border-orange);
 }
 
 /* Links */
 .minimal-theme a {
-  color: var(--minimal-dark);
+  color: var(--gunmetal-2);
   text-decoration: underline;
 }
 
 .minimal-theme a:hover {
-  color: var(--minimal-black);
+  color: var(--atomic-tangerine);
 }
 
 /* Overlay */

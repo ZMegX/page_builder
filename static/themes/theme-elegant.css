@@ -1,0 +1,442 @@
+/* Theme Elegant - Sophisticated color palette with deep blues and crimson accents */
+
+.elegant-theme {
+  /* Color Variables */
+  --crimson: #d7263d;
+  --oxford-blue: #02182b;
+  --dodger-blue: #0197f6;
+  --blue-munsell: #448fa3;
+  --sky-blue: #68c5db;
+  
+  /* Semantic Colors */
+  --primary-color: var(--dodger-blue);
+  --secondary-color: var(--crimson);
+  --accent-color: var(--sky-blue);
+  --dark-color: var(--oxford-blue);
+  --light-color: var(--blue-munsell);
+  
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-dark: var(--oxford-blue);
+  --bg-card: #ffffff;
+  
+  /* Text Colors */
+  --text-primary: var(--oxford-blue);
+  --text-secondary: var(--blue-munsell);
+  --text-light: #ffffff;
+  --text-muted: #6c757d;
+  
+  /* Border Colors */
+  --border-color: var(--sky-blue);
+  --border-accent: var(--dodger-blue);
+  
+  /* Shadow */
+  --shadow-sm: 0 2px 4px rgba(2, 24, 43, 0.1);
+  --shadow-md: 0 4px 12px rgba(2, 24, 43, 0.15);
+  --shadow-lg: 0 8px 24px rgba(2, 24, 43, 0.2);
+}
+
+/* ============================================
+   ANIMATIONS
+============================================ */
+
+@keyframes elegantPulse {
+  0%, 100% {
+    border-color: var(--sky-blue);
+    box-shadow: 0 0 0 0 rgba(104, 197, 219, 0.4);
+  }
+  50% {
+    border-color: var(--dodger-blue);
+    box-shadow: 0 0 0 8px rgba(1, 151, 246, 0);
+  }
+}
+
+@keyframes elegantShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes elegantFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ============================================
+   MENU SELECTION CARD
+============================================ */
+
+.elegant-theme .menu-selection-card {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-radius: 1rem;
+  border: 3px solid var(--sky-blue);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+.elegant-theme .menu-selection-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--dodger-blue), transparent);
+  animation: elegantShine 3s infinite;
+}
+
+/* ============================================
+   CARDS
+============================================ */
+
+.elegant-theme .card,
+.elegant-theme .menu-modern-card {
+  background: var(--bg-card);
+  border: 2px solid var(--sky-blue);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.elegant-theme .card:hover,
+.elegant-theme .menu-modern-card:hover {
+  border-color: var(--dodger-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   MENU ITEMS
+============================================ */
+
+.elegant-theme .menu-modern-item {
+  border: 3px solid var(--sky-blue);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  background: var(--bg-card);
+}
+
+.elegant-theme .menu-modern-item:hover {
+  border-color: var(--dodger-blue);
+  animation: elegantPulse 1.5s ease-in-out;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.elegant-theme .menu-modern-row {
+  background: var(--bg-card) !important;
+  border: 2px solid var(--sky-blue);
+  transition: all 0.3s ease;
+}
+
+.elegant-theme .menu-modern-row:hover {
+  border-color: var(--dodger-blue);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.elegant-theme .menu-modern-item-name {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.elegant-theme .menu-modern-item-price {
+  color: var(--crimson);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   NAVIGATION TABS
+============================================ */
+
+.elegant-theme .nav-link[data-bs-toggle="tab"] {
+  color: var(--text-primary);
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.elegant-theme .nav-link[data-bs-toggle="tab"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(1, 151, 246, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.elegant-theme .nav-link[data-bs-toggle="tab"]:hover::before {
+  left: 100%;
+}
+
+.elegant-theme .nav-link[data-bs-toggle="tab"]:hover {
+  color: var(--dodger-blue);
+  border-color: var(--sky-blue);
+  background: var(--bg-card);
+  transform: translateY(-2px);
+}
+
+.elegant-theme .nav-link[data-bs-toggle="tab"].active {
+  color: var(--text-light);
+  background: linear-gradient(135deg, var(--dodger-blue) 0%, var(--blue-munsell) 100%);
+  border-color: var(--dodger-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.elegant-theme .nav-tabs {
+  border-bottom: 3px solid var(--sky-blue);
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
+
+.elegant-theme .btn-primary {
+  background: linear-gradient(135deg, var(--dodger-blue) 0%, var(--blue-munsell) 100%);
+  border: 2px solid var(--dodger-blue);
+  color: var(--text-light);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.elegant-theme .btn-primary:hover {
+  background: linear-gradient(135deg, var(--blue-munsell) 0%, var(--dodger-blue) 100%);
+  border-color: var(--sky-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.elegant-theme .btn-success {
+  background: linear-gradient(135deg, var(--blue-munsell) 0%, var(--sky-blue) 100%);
+  border: 2px solid var(--blue-munsell);
+  color: var(--text-light);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.elegant-theme .btn-success:hover {
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--blue-munsell) 100%);
+  border-color: var(--dodger-blue);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.elegant-theme .btn-outline-secondary {
+  color: var(--oxford-blue);
+  border: 2px solid var(--sky-blue);
+  background: transparent;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.elegant-theme .btn-outline-secondary:hover {
+  background: var(--sky-blue);
+  border-color: var(--dodger-blue);
+  color: var(--text-light);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   BADGES
+============================================ */
+
+.elegant-theme .badge.text-bg-success {
+  background: linear-gradient(135deg, var(--blue-munsell) 0%, var(--sky-blue) 100%) !important;
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border: 2px solid var(--sky-blue);
+}
+
+.elegant-theme .badge.text-bg-secondary {
+  background: var(--blue-munsell) !important;
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border: 2px solid var(--oxford-blue);
+}
+
+/* ============================================
+   LOGO ANIMATION
+============================================ */
+
+.elegant-theme .logo-animate {
+  border: 4px solid var(--sky-blue) !important;
+  transition: all 0.3s ease;
+  animation: elegantFloat 3s ease-in-out infinite;
+}
+
+.elegant-theme .logo-animate:hover {
+  border-color: var(--dodger-blue) !important;
+  box-shadow: 0 8px 16px rgba(1, 151, 246, 0.3);
+}
+
+/* ============================================
+   MAP CONTAINER
+============================================ */
+
+.elegant-theme #menu-map,
+.elegant-theme #map {
+  border: 3px solid var(--sky-blue);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.elegant-theme #menu-map:hover,
+.elegant-theme #map:hover {
+  border-color: var(--dodger-blue);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   MODAL
+============================================ */
+
+.elegant-theme .modal-content {
+  border: 3px solid var(--sky-blue);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-lg);
+  background: var(--bg-card);
+}
+
+.elegant-theme .modal-header {
+  background: linear-gradient(135deg, var(--dodger-blue) 0%, var(--blue-munsell) 100%);
+  color: var(--text-light);
+  border-bottom: 3px solid var(--sky-blue);
+  border-radius: 1rem 1rem 0 0;
+}
+
+.elegant-theme .modal-title {
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.elegant-theme .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* ============================================
+   ALERTS
+============================================ */
+
+.elegant-theme .alert-info {
+  background: linear-gradient(135deg, rgba(1, 151, 246, 0.1) 0%, rgba(104, 197, 219, 0.1) 100%);
+  border: 2px solid var(--sky-blue);
+  color: var(--oxford-blue);
+  border-radius: 0.75rem;
+}
+
+.elegant-theme .alert-info a {
+  color: var(--dodger-blue);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.elegant-theme .alert-info a:hover {
+  color: var(--crimson);
+  text-decoration: underline;
+}
+
+/* ============================================
+   LINKS
+============================================ */
+
+.elegant-theme a {
+  color: var(--dodger-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.elegant-theme a:hover {
+  color: var(--crimson);
+}
+
+/* ============================================
+   TEXT UTILITIES
+============================================ */
+
+.elegant-theme .text-primary {
+  color: var(--dodger-blue) !important;
+}
+
+.elegant-theme .text-muted {
+  color: var(--blue-munsell) !important;
+}
+
+/* ============================================
+   BACKGROUND OVERLAY (Optional)
+============================================ */
+
+.elegant-theme .menu-bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(104, 197, 219, 0.03) 0%, rgba(1, 151, 246, 0.05) 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+============================================ */
+
+@media (max-width: 768px) {
+  .elegant-theme .menu-selection-card {
+    border-width: 2px;
+  }
+  
+  .elegant-theme .nav-link[data-bs-toggle="tab"] {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .elegant-theme .menu-modern-item {
+    border-width: 2px;
+  }
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR
+============================================ */
+
+.elegant-theme ::-webkit-scrollbar {
+  width: 12px;
+}
+
+.elegant-theme ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.elegant-theme ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--dodger-blue) 0%, var(--sky-blue) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--bg-secondary);
+}
+
+.elegant-theme ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--crimson) 0%, var(--dodger-blue) 100%);
+}
