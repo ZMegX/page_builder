@@ -7,7 +7,8 @@
 {% block hero %}
 <section class="hero-section position-relative text-white landing-restaurant-page"
   data-bg="{% if profile.hero_image %}{{ profile.hero_image.url }}{% else %}{% static 'img/hero-default.jpg' %}{% endif %}">
-  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center landing-restaurant-page hero-bg-trans">
+  <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 landing-restaurant-page" style="pointer-events:none;"></div>
+  <div class="container h-100 d-flex flex-column justify-content-center align-items-center text-center landing-restaurant-page">
   <h1 class="display-4 fw-bold mb-3 landing-restaurant-page">{{ profile.hero_headline|default:"Welcome to " }}{{ profile.name }}</h1>
   <p class="lead mb-4 landing-restaurant-page">
       {{ profile.hero_description|default:"Enjoy authentic cuisine, friendly service, and a cozy atmosphere. Order online, view our menu, or book a table today!" }}
@@ -26,7 +27,6 @@
         <i class="bi bi-chat-left-text me-2"></i>Reviews
       </button>
     </div>
-    <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 landing-restaurant-page" style="pointer-events:none;"></div>
   </div>
 </section>
 {% endblock %}
