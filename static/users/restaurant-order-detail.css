@@ -1,37 +1,427 @@
+/* Modern Black & White Theme with Hover Effects */
 .restaurant-order-detail.order-detail-card {
     border-radius: 18px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     background: #fff;
     padding: 2rem;
     margin-bottom: 2rem;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
 }
+
+.restaurant-order-detail.order-detail-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
 .restaurant-order-detail.order-status {
     font-weight: 600;
     border-radius: 8px;
     padding: 0.35em 0.8em;
     font-size: 0.98rem;
     display: inline-block;
+    transition: all 0.3s ease;
 }
-.restaurant-order-detail.order-status.pending { background: #ffe082; color: #7c6f00; }
-.restaurant-order-detail.order-status.completed { background: #c8e6c9; color: #256029; }
-.restaurant-order-detail.order-status.cancelled { background: #ffcdd2; color: #b71c1c; }
-.restaurant-order-detail.order-status.in_progress { background: #bbdefb; color: #0d47a1; }
-.restaurant-order-detail.order-items-table th, .restaurant-order-detail.order-items-table td {
+
+.restaurant-order-detail.order-status:hover {
+    transform: scale(1.05);
+}
+
+.restaurant-order-detail.order-status.pending { 
+    background: #f5f5f5; 
+    color: #333;
+    border: 2px solid #666;
+}
+
+.restaurant-order-detail.order-status.completed { 
+    background: #000; 
+    color: #fff;
+    border: 2px solid #000;
+}
+
+.restaurant-order-detail.order-status.cancelled { 
+    background: #fff; 
+    color: #000;
+    border: 2px solid #000;
+}
+
+.restaurant-order-detail.order-status.in_progress { 
+    background: #333; 
+    color: #fff;
+    border: 2px solid #333;
+}
+
+.restaurant-order-detail.order-items-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.restaurant-order-detail.order-items-table th, 
+.restaurant-order-detail.order-items-table td {
     vertical-align: middle;
     padding: 0.75rem 0.5rem;
     font-size: 1.05rem;
 }
+
 .restaurant-order-detail.order-items-table th {
-    background: #f5f5f5;
+    background: #000;
     font-weight: 600;
-    color: #222;
-    border-bottom: 2px solid #eee;
+    color: #fff;
+    border-bottom: 2px solid #000;
 }
+
+.restaurant-order-detail.order-items-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e0e0e0;
+}
+
 .restaurant-order-detail.order-items-table tbody tr:hover {
-    background: #f8f9fa;
+    background: #f5f5f5;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+/* Form Controls & Buttons */
+.form-select {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.form-select:hover {
+    border-color: #333;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    border-color: #000;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+    outline: none;
+}
+
+.btn-outline-secondary {
+    border: 2px solid #000;
+    color: #000;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.375rem 1rem;
+}
+
+.btn-outline-secondary:hover {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #000;
+    border: 2px solid #000;
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+}
+
+.btn-primary:hover {
+    background: #333;
+    border-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-secondary {
+    background: #666;
+    border: 2px solid #666;
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    background: #333;
+    border-color: #333;
+}
+
+/* ============================================
+   ENHANCED HEADER SECTION
+============================================ */
+
+.order-detail-header {
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    color: #fff;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+/* Header Left Section */
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.order-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+}
+
+.order-badge:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+}
+
+.order-badge i {
+    font-size: 1.5rem;
+}
+
+.order-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.order-meta {
+    display: flex;
+    gap: 1.5rem;
+    padding-left: 0.5rem;
+}
+
+.order-date,
+.order-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Header Center Section - Status Control */
+.header-center {
+    flex: 1;
+    max-width: 400px;
+}
+
+#statusForm {
+    margin: 0;
+}
+
+.status-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.status-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.status-label i {
+    font-size: 0.75rem;
+}
+
+.status-input-group {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.status-select {
+    flex: 1;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.95);
+    color: #000;
+    border-radius: 8px;
+    padding: 0.625rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.status-select:hover {
+    background: #fff;
+    border-color: rgba(255,255,255,0.5);
+}
+
+.status-select:focus {
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+    outline: none;
+}
+
+.btn-update {
+    background: #fff;
+    color: #000;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-update:hover {
+    background: #f5f5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+}
+
+.btn-update i {
+    font-size: 1.1rem;
+}
+
+/* Header Right Section - Actions */
+.header-right {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    border: 2px solid transparent;
+}
+
+.btn-print {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border-color: rgba(255,255,255,0.3);
+}
+
+.btn-print:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+}
+
+.btn-back {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255,255,255,0.3);
+}
+
+.btn-back:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
+}
+
+.btn-action i {
+    font-size: 1.1rem;
+}
+
+/* Responsive Header */
+@media (max-width: 992px) {
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+
+    .header-center {
+        max-width: 100%;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-action {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .order-detail-header {
+        padding: 1rem 0;
+    }
+
+    .order-badge {
+        padding: 0.5rem 1rem;
+    }
+
+    .order-number {
+        font-size: 1.1rem;
+    }
+
+    .order-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .status-input-group {
+        flex-direction: column;
+    }
+
+    .btn-update {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-right {
+        flex-direction: column;
+    }
+}
+
 @media print {
   body * { visibility: hidden !important; }
   #print-area, #print-area * { visibility: visible !important; }
   #print-area { position: absolute; left: 0; top: 0; width: 100vw; background: #fff; z-index: 9999; }
+  
+  /* Hide form controls when printing */
+  #statusForm, .btn-primary, .modal { display: none !important; }
 }
