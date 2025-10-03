@@ -6,6 +6,12 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 
+# Custom error handlers
+handler400 = 'users.views.handler400'
+handler403 = 'users.views.handler403'
+handler404 = 'users.views.handler404'
+handler500 = 'users.views.handler500'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     

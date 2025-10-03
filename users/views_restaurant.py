@@ -225,9 +225,6 @@ def restaurant_orders_list(request):
     completed_count = orders.filter(status='completed').count()
     cancelled_count = orders.filter(status='cancelled').count()
     
-    # Debug: Print counts to console
-    print(f"DEBUG - Status counts: Pending={pending_count}, InProgress={in_progress_count}, Completed={completed_count}, Cancelled={cancelled_count}")
-    
     return render(request, 'users/restaurant_orders_list.html', {
         'orders': orders,
         'pending_count': pending_count,

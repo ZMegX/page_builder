@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}400 - Bad Request{% endblock %}
+
+{% block body_class %}error-page{% endblock %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+  <div class="text-center">
+    <!-- Error Icon -->
+    <div class="error-icon mb-4">
+      <i class="bi bi-x-octagon-fill text-warning" style="font-size: 8rem;"></i>
+    </div>
+
+    <!-- Error Code -->
+    <h1 class="display-1 fw-bold text-dark mb-3">400</h1>
+
+    <!-- Error Message -->
+    <h2 class="h3 fw-semibold mb-3">Bad Request</h2>
+    <p class="lead text-muted mb-4">
+      Your browser sent a request that this server could not understand.
+    </p>
+
+    <!-- Detailed Information -->
+    <div class="alert alert-warning d-inline-block text-start mx-auto mb-4" style="max-width: 550px;">
+      <h5 class="alert-heading">
+        <i class="bi bi-lightbulb-fill me-2"></i>Common Causes
+      </h5>
+      <ul class="mb-0 small">
+        <li>Invalid or malformed URL</li>
+        <li>Corrupted cookies or cache</li>
+        <li>Invalid form data submission</li>
+        <li>File upload size exceeded</li>
+      </ul>
+    </div>
+
+    <!-- Troubleshooting Tips -->
+    <div class="card border-0 shadow-sm d-inline-block text-start mx-auto mb-4" style="max-width: 550px;">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-tools me-2 text-primary"></i>Try These Steps:
+        </h5>
+        <ol class="mb-0 small">
+          <li class="mb-2">Clear your browser cache and cookies</li>
+          <li class="mb-2">Check the URL for typos or errors</li>
+          <li class="mb-2">Try refreshing the page</li>
+          <li class="mb-0">Use the back button and try again</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center mb-4">
+      <a href="{% url 'home' %}" class="btn btn-dark btn-lg px-5">
+        <i class="bi bi-house-fill me-2"></i>
+        Go to Homepage
+      </a>
+      <button type="button" onclick="window.history.back()" class="btn btn-outline-dark btn-lg px-5">
+        <i class="bi bi-arrow-left me-2"></i>
+        Go Back
+      </button>
+      <button type="button" onclick="window.location.reload()" class="btn btn-outline-secondary btn-lg px-5">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Support Links -->
+    <div class="mt-4">
+      <p class="text-muted mb-2">Still having issues?</p>
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{% url 'contact_us' %}" class="text-decoration-none">
+          <i class="bi bi-chat-dots me-1"></i>Contact Support
+        </a>
+        <a href="{% url 'webpage_restaurant_site:browse_restaurants' %}" class="text-decoration-none">
+          <i class="bi bi-shop me-1"></i>Browse Restaurants
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="text-decoration-none">
+            <i class="bi bi-person me-1"></i>My Account
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="text-decoration-none">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-page {
+    background: linear-gradient(135deg, #fffbf0 0%, #fff4e0 100%);
+  }
+  
+  .error-icon {
+    animation: wiggle 1.5s infinite;
+  }
+  
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-5deg);
+    }
+    75% {
+      transform: rotate(5deg);
+    }
+  }
+  
+  .btn {
+    transition: all 0.3s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}

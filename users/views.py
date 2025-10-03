@@ -323,3 +323,32 @@ def restaurant_profile_manage(request):
         'GOOGLE_MAPS_API_KEY': getattr(settings, "GOOGLE_MAPS_API_KEY", ""),
     }
     return render(request, 'users/restaurant_profile.html', context)
+
+
+# Custom Error Handlers
+def handler400(request, exception):
+    """
+    Custom 400 Bad Request error handler
+    """
+    return render(request, 'error_pages/400.html', status=400)
+
+
+def handler403(request, exception):
+    """
+    Custom 403 Forbidden error handler
+    """
+    return render(request, 'error_pages/403.html', status=403)
+
+
+def handler404(request, exception):
+    """
+    Custom 404 Not Found error handler
+    """
+    return render(request, 'error_pages/404.html', status=404)
+
+
+def handler500(request):
+    """
+    Custom 500 Internal Server Error handler
+    """
+    return render(request, 'error_pages/500.html', status=500)

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}403 - Access Forbidden{% endblock %}
+
+{% block body_class %}error-page{% endblock %}
+
+{% block content %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+  <div class="text-center">
+    <!-- Error Icon -->
+    <div class="error-icon mb-4">
+      <i class="bi bi-shield-exclamation text-danger" style="font-size: 8rem;"></i>
+    </div>
+
+    <!-- Error Code -->
+    <h1 class="display-1 fw-bold text-dark mb-3">403</h1>
+
+    <!-- Error Message -->
+    <h2 class="h3 fw-semibold mb-3">Access Forbidden</h2>
+    <p class="lead text-muted mb-4">
+      You don't have permission to access this resource.
+    </p>
+
+    <!-- Detailed Information -->
+    <div class="alert alert-danger d-inline-block text-start mx-auto mb-4" style="max-width: 500px;">
+      <h5 class="alert-heading">
+        <i class="bi bi-info-circle-fill me-2"></i>Why am I seeing this?
+      </h5>
+      <ul class="mb-0 small">
+        <li>You may not have the required permissions</li>
+        <li>This content might be restricted to certain user types</li>
+        <li>Your account may need additional verification</li>
+      </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center mb-4">
+      <a href="{% url 'home' %}" class="btn btn-dark btn-lg px-5">
+        <i class="bi bi-house-fill me-2"></i>
+        Go to Homepage
+      </a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="btn btn-outline-dark btn-lg px-5">
+          <i class="bi bi-person-fill me-2"></i>
+          My Profile
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-dark btn-lg px-5">
+          <i class="bi bi-box-arrow-in-right me-2"></i>
+          Login to Continue
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Helpful Information -->
+    <div class="mt-5">
+      <p class="text-muted mb-2">Need help?</p>
+      <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{% url 'contact_us' %}" class="text-decoration-none">
+          <i class="bi bi-envelope me-1"></i>Contact Support
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'webpage_restaurant_site:browse_restaurants' %}" class="text-decoration-none">
+            <i class="bi bi-shop me-1"></i>Browse Restaurants
+          </a>
+        {% else %}
+          <a href="{% url 'register' %}" class="text-decoration-none">
+            <i class="bi bi-person-plus me-1"></i>Create Account
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-page {
+    background: linear-gradient(135deg, #fff0f0 0%, #ffe0e0 100%);
+  }
+  
+  .error-icon {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+  }
+  
+  .btn {
+    transition: all 0.3s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .alert {
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+  }
+</style>
+{% endblock %}
