@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Contact Us - Gastro Grid{% endblock %}
+{% block extra_css %}
+<style>
+/* Contact Us Page Styles */
+.contact-hero {
+    background: linear-gradient(135deg, #000 0%, #333 100%);
+    color: #fff;
+    padding: 4rem 0 3rem 0;
+    margin-bottom: 3rem;
+}
+
+.contact-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.contact-hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.contact-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+}
+
+.contact-info-section {
+    background: #f8f9fa;
+    padding: 2.5rem;
+    border-right: 1px solid #e0e0e0;
+}
+
+.contact-form-section {
+    padding: 2.5rem;
+}
+
+.contact-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: #fff;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.contact-info-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    background: #000;
+    color: #fff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.contact-info-content h6 {
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.contact-info-content p {
+    color: #555;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.contact-info-content a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.contact-info-content a:hover {
+    color: #666;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e0e0e0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #000;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+}
+
+.btn-submit {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+    padding: 0.875rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-submit:hover {
+    background: #fff;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.social-link {
+    width: 45px;
+    height: 45px;
+    background: #000;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    transform: translateY(-4px);
+}
+
+.section-heading {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.section-heading::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: #000;
+}
+
+@media (max-width: 768px) {
+    .contact-hero h1 {
+        font-size: 2rem;
+    }
+
+    .contact-info-section {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .contact-info-section,
+    .contact-form-section {
+        padding: 1.5rem;
+    }
+
+    .contact-info-item {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="contact-hero">
+    <div class="container text-center">
+        <h1><i class="bi bi-envelope-heart me-3"></i>Get In Touch</h1>
+        <p>Have a question or need support? We're here to help! Reach out to us and we'll get back to you as soon as possible.</p>
+    </div>
+</div>
+<!-- Contact Section -->
+<div class="contact-container px-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="contact-card">
+                <div class="row g-0">
+                    <!-- Contact Information -->
+                    <div class="col-lg-5">
+                        <div class="contact-info-section">
+                            <h2 class="section-heading">Contact Information</h2>
+                            <p class="mb-4 text-muted">Fill out the form and our team will get back to you within 24 hours.</p>
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <div class="contact-info-content">
+                                    <h6>Email Us</h6>
+                                    <p>
+                                        <a href="mailto:infogastrogrid@gmail.com">infogastrogrid@gmail.com</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="contact-info-content">
+                                    <h6>Business Hours</h6>
+                                    <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                                    <p class="mb-0">Saturday - Sunday: Closed</p>
+                                </div>
+                            </div>
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="bi bi-globe"></i>
+                                </div>
+                                <div class="contact-info-content">
+                                    <h6>Website</h6>
+                                    <p>
+                                        <a href="{% url 'home' %}">www.gastrogrid.com</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Social Links -->
+                            <div>
+                                <h6 class="fw-bold mb-3">Follow Us</h6>
+                                <div class="social-links">
+                                    <a href="#" class="social-link" aria-label="Facebook">
+                                        <i class="bi bi-facebook"></i>
+                                    </a>
+                                    <a href="#" class="social-link" aria-label="Twitter">
+                                        <i class="bi bi-twitter"></i>
+                                    </a>
+                                    <a href="#" class="social-link" aria-label="Instagram">
+                                        <i class="bi bi-instagram"></i>
+                                    </a>
+                                    <a href="#" class="social-link" aria-label="LinkedIn">
+                                        <i class="bi bi-linkedin"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Contact Form -->
+                    <div class="col-lg-7">
+                        <div class="contact-form-section">
+                            <h2 class="section-heading">Send Us a Message</h2>
+                            <form method="post" action="mailto:infogastrogrid@gmail.com">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="firstName" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="lastName" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject *</label>
+                                    <select class="form-select" id="subject" name="subject" required>
+                                        <option value="" selected disabled>Select a subject...</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="support">Technical Support</option>
+                                        <option value="restaurant">Restaurant Partnership</option>
+                                        <option value="feedback">Feedback</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="message" class="form-label">Message *</label>
+                                    <textarea class="form-control" id="message" name="message" rows="6" required placeholder="Tell us more about your inquiry..."></textarea>
+                                </div>
+                                <div class="alert alert-info" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Note:</strong> This form will open your default email client. Alternatively, you can email us directly at <a href="mailto:infogastrogrid@gmail.com" class="alert-link">infogastrogrid@gmail.com</a>
+                                </div>
+                                <button type="submit" class="btn btn-submit w-100">
+                                    <i class="bi bi-send-fill me-2"></i>Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FAQ Section -->
+<div class="container mb-5">
+    <div class="text-center mb-4">
+        <h2 class="section-heading d-inline-block">Frequently Asked Questions</h2>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            How do I register as a restaurant owner?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Simply click on "Register" in the navigation menu and fill out the registration form. You'll be able to set up your restaurant profile and start creating menus right away.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            What is your response time for support inquiries?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We aim to respond to all inquiries within 24 hours during business days (Monday-Friday). For urgent matters, please mark your email as "Urgent" in the subject line.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Can I schedule a demo of the platform?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Absolutely! Send us an email at infogastrogrid@gmail.com with "Demo Request" in the subject line, and we'll schedule a personalized walkthrough of the platform.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
