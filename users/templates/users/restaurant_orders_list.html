@@ -53,7 +53,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Pending</div>
-        <div class="stat-value">{{ pending_count }}</div>
+        <div class="stat-value" data-count="{{ pending_count }}">{{ pending_count }}</div>
       </div>
     </div>
     <div class="stat-card in-progress">
@@ -62,7 +62,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">In Progress</div>
-        <div class="stat-value">{{ in_progress_count }}</div>
+        <div class="stat-value" data-count="{{ in_progress_count }}">{{ in_progress_count }}</div>
       </div>
     </div>
     <div class="stat-card completed">
@@ -71,7 +71,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Completed</div>
-        <div class="stat-value">{{ completed_count }}</div>
+        <div class="stat-value" data-count="{{ completed_count }}">{{ completed_count }}</div>
       </div>
     </div>
     <div class="stat-card cancelled">
@@ -80,7 +80,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Cancelled</div>
-        <div class="stat-value">{{ cancelled_count }}</div>
+        <div class="stat-value" data-count="{{ cancelled_count }}">{{ cancelled_count }}</div>
       </div>
     </div>
   </div>
@@ -188,9 +188,9 @@
                     </span>
                     
                     <!-- Status Update Dropdown -->
-                    <form method="post" action="{% url 'restaurant_orders_list' %}" class="m-0">
+                    <form method="post" action="{% url 'restaurant_orders_list' %}" class="status-update-form m-0" data-order-id="{{ order.id }}">
                       {% csrf_token %}
-                      <select name="status" class="form-select form-select-sm order-status-dropdown" onchange="this.form.submit()">
+                      <select name="status" class="form-select form-select-sm order-status-dropdown" data-original-status="{{ order.status }}">
                         {% for key, value in order.STATUS_CHOICES %}
                           <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ value }}</option>
                         {% endfor %}
@@ -280,8 +280,8 @@
 
 {% block extra_js %}
 <script>
-  // Auto-hide alerts after 5 seconds
   document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide alerts after 5 seconds
     setTimeout(function() {
       var alerts = document.querySelectorAll('.alert');
       alerts.forEach(function(alert) {
@@ -289,17 +289,40 @@
         bsAlert.close();
       });
     }, 5000);
-  });
 
-  // Search functionality (frontend filter)
-  document.querySelector('.form-control[placeholder*="Search"]').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('.restaurant-order-list tbody tr');
-    
-    rows.forEach(function(row) {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    // Status update handling - Submit form on change and reload page
+    document.querySelectorAll('.order-status-dropdown').forEach(function(dropdown) {
+      dropdown.addEventListener('change', function(e) {
+        const form = this.closest('.status-update-form');
+        const originalStatus = this.dataset.originalStatus;
+        const newStatus = this.value;
+        
+        // Only submit if status actually changed
+        if (newStatus !== originalStatus) {
+          console.log('Submitting status change:', originalStatus, '→', newStatus);
+          // Submit the form which will reload the page and update stats
+          form.submit();
+          // Force page reload to ensure stats update
+          setTimeout(function() {
+            window.location.reload(true);
+          }, 100);
+        }
+      });
     });
+
+    // Search functionality (frontend filter)
+    const searchInput = document.querySelector('.form-control[placeholder*="Search"]');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.restaurant-order-list tbody tr');
+        
+        rows.forEach(function(row) {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+      });
+    }
   });
 </script>
 {% endblock %}

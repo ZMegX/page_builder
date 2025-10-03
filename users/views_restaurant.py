@@ -219,11 +219,14 @@ def restaurant_orders_list(request):
 
     orders = Order.objects.filter(restaurant=rp).order_by('-created_at')
     
-    # Calculate counts by status
+    # Calculate counts by status (fresh from database)
     pending_count = orders.filter(status='pending').count()
     in_progress_count = orders.filter(status='in_progress').count()
     completed_count = orders.filter(status='completed').count()
     cancelled_count = orders.filter(status='cancelled').count()
+    
+    # Debug: Print counts to console
+    print(f"DEBUG - Status counts: Pending={pending_count}, InProgress={in_progress_count}, Completed={completed_count}, Cancelled={cancelled_count}")
     
     return render(request, 'users/restaurant_orders_list.html', {
         'orders': orders,
