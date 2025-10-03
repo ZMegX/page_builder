@@ -46,7 +46,7 @@ urlpatterns = [
     path('restaurant/<int:restaurant_pk>/reviews/', restaurant_reviews, name='restaurant_reviews'),
     path('orders/<int:order_id>/', order_detail, name='order_detail'),
     path('orders/', order_list, name='order_list'),  # for order history
-    path('restaurant/orders/', views.restaurant_orders_list, name='restaurant_orders_list'),
+    path('restaurant/orders/', views_restaurant.restaurant_orders_list, name='restaurant_orders_list'),
     path('restaurant/orders/<int:order_id>/', views_restaurant.restaurant_order_detail, name='restaurant_order_detail'),
     # review management
     path('restaurant/reviews/', views_restaurant.manage_reviews, name='manage_reviews'),
