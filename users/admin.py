@@ -16,9 +16,25 @@ admin.site.register(RestaurantProfile, RestaurantProfileAdmin)
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('restaurant', 'reviewer_name', 'rating', 'is_approved', 'created_at')
-    list_filter = ('restaurant', 'is_approved', 'rating')
-    search_fields = ('reviewer_name', 'comment')
+    list_display = ('restaurant', 'reviewer_name', 'rating', 'has_owner_reply', 'is_approved', 'created_at')
+    list_filter = ('restaurant', 'is_approved', 'rating', 'reply_created_at')
+    search_fields = ('reviewer_name', 'comment', 'owner_reply')
+    readonly_fields = ('created_at', 'reply_created_at')
+    
+    fieldsets = (
+        ('Review Information', {
+            'fields': ('restaurant', 'user', 'reviewer_name', 'rating', 'comment', 'created_at', 'is_approved')
+        }),
+        ('Owner Reply', {
+            'fields': ('owner_reply', 'reply_created_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    def has_owner_reply(self, obj):
+        return obj.has_reply()
+    has_owner_reply.boolean = True
+    has_owner_reply.short_description = 'Has Reply'
 
 
 @admin.register(Document)

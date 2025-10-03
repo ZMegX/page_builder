@@ -7,6 +7,18 @@
 {% endblock %}
 {% block content %}
 <div class="container py-4">
+  <!-- Quick Actions -->
+  <div class="mb-4">
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{% url 'manage_reviews' %}" class="btn btn-outline-primary">
+        <i class="bi bi-chat-left-text me-2"></i>Manage Reviews
+      </a>
+      <a href="{% url 'restaurant_orders_list' %}" class="btn btn-outline-success">
+        <i class="bi bi-receipt me-2"></i>View Orders
+      </a>
+    </div>
+  </div>
+
   <!-- Live Preview Card -->
   <div class="mb-4">
     <div class="card shadow-sm border-0 rounded-4 w-100">

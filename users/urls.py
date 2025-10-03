@@ -47,6 +47,10 @@ urlpatterns = [
     path('orders/', order_list, name='order_list'),  # for order history
     path('restaurant/orders/', views.restaurant_orders_list, name='restaurant_orders_list'),
     path('restaurant/orders/<int:order_id>/', views_restaurant.restaurant_order_detail, name='restaurant_order_detail'),
+    
+    # Review management
+    path('restaurant/reviews/', views_restaurant.manage_reviews, name='manage_reviews'),
+    path('review/<int:review_id>/reply/', views_restaurant.reply_to_review, name='reply_to_review'),
 
     # API endpoints
     path('api/orders/', CustomerOrderListView.as_view(), name='api_customer_orders'),
