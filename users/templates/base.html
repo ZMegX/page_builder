@@ -50,9 +50,8 @@
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
                   <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
-                  <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                 </ul>
               </li>
             {% endif %}
@@ -80,6 +79,9 @@
                   <li><a class="dropdown-item text-center" href="{% url 'profile' %}">Account Settings</a></li>
                   {% if user.restaurant_profile %}
                     <li><a class="dropdown-item text-center" href="{% url 'restaurant_orders_list' %}">Recent Orders</a></li>
+                    {% if user.restaurant_profile.slug %}
+                      <li><a class="dropdown-item text-center" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
+                    {% endif %}
                   {% endif %}
                   {% if is_customer %}
                     <li><a class="dropdown-item text-center" href="{% url 'order_list' %}">My Orders</a></li>
@@ -124,7 +126,6 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li><a class="dropdown-item" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
-                  <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                 </ul>
@@ -146,6 +147,9 @@
                   <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'profile' %}">Account Settings</a></li>
                   {% if user.restaurant_profile %}
                     <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'restaurant_orders_list' %}">Recent Orders</a></li>
+                    {% if user.restaurant_profile.slug %}
+                      <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
+                    {% endif %}
                   {% endif %}
                   {% if is_customer %}
                     <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'order_list' %}">My Orders</a></li>

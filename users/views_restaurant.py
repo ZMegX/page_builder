@@ -194,7 +194,13 @@ def leave_review(request, restaurant_pk):
 @login_required
 def restaurant_orders_list(request):
     if not hasattr(request.user, 'restaurant_profile') or not request.user.restaurant_profile:
-        return render(request, 'users/restaurant_orders_list.html', {'orders': []})
+        return render(request, 'users/restaurant_orders_list.html', {
+            'orders': [],
+            'pending_count': 0,
+            'in_progress_count': 0,
+            'completed_count': 0,
+            'cancelled_count': 0,
+        })
 
     rp = request.user.restaurant_profile
 
@@ -212,7 +218,20 @@ def restaurant_orders_list(request):
         return redirect("restaurant_orders_list")
 
     orders = Order.objects.filter(restaurant=rp).order_by('-created_at')
-    return render(request, 'users/restaurant_orders_list.html', {'orders': orders})
+    
+    # Calculate counts by status
+    pending_count = orders.filter(status='pending').count()
+    in_progress_count = orders.filter(status='in_progress').count()
+    completed_count = orders.filter(status='completed').count()
+    cancelled_count = orders.filter(status='cancelled').count()
+    
+    return render(request, 'users/restaurant_orders_list.html', {
+        'orders': orders,
+        'pending_count': pending_count,
+        'in_progress_count': in_progress_count,
+        'completed_count': completed_count,
+        'cancelled_count': cancelled_count,
+    })
 
 @login_required
 def restaurant_order_detail(request, order_id):
