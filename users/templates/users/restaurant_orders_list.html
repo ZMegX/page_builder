@@ -44,7 +44,6 @@
     </div>
   </div>
 </div>
-
 <!-- Stats Cards -->
 <div class="container-fluid px-4">
   <div class="orders-stats">
@@ -54,7 +53,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Pending</div>
-        <div class="stat-value">{{ orders|default_if_none:"0"|length|add:"0" }}</div>
+        <div class="stat-value">{{ pending_count }}</div>
       </div>
     </div>
     <div class="stat-card in-progress">
@@ -63,7 +62,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">In Progress</div>
-        <div class="stat-value">0</div>
+        <div class="stat-value">{{ in_progress_count }}</div>
       </div>
     </div>
     <div class="stat-card completed">
@@ -72,7 +71,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Completed</div>
-        <div class="stat-value">0</div>
+        <div class="stat-value">{{ completed_count }}</div>
       </div>
     </div>
     <div class="stat-card cancelled">
@@ -81,7 +80,7 @@
       </div>
       <div class="stat-content">
         <div class="stat-label">Cancelled</div>
-        <div class="stat-value">0</div>
+        <div class="stat-value">{{ cancelled_count }}</div>
       </div>
     </div>
   </div>
@@ -89,7 +88,6 @@
 {% endblock %}
 {% block content %}
 <div class="container-fluid px-4 py-4">
- 
   <!-- Main Orders Container -->
   <div class="restaurant-orders-container">
     <!-- Filter Bar -->
