@@ -3,8 +3,6 @@
 {% load cloudinary %}
 
 {% block title %}My Menus - {{ restaurant.name }}{% endblock %}
-
-
 {% block extra_css %}
 <style>
   .minimal-card {
@@ -15,14 +13,18 @@
   }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="container py-4">
   <div class="row mb-4 align-items-center">
-    <div class="col-md-8 col-12">
+    <div class="col-md-6 col-12">
       <input type="text" class="form-control" placeholder="Search menus...">
     </div>
-    <div class="col-md-4 col-12 text-md-end mt-2 mt-md-0">
+    <div class="col-md-6 col-12 text-md-end mt-2 mt-md-0 d-flex gap-2 justify-content-md-end">
+      {% if restaurant.slug %}
+        <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" target="_blank" rel="noopener" class="btn btn-outline-success">
+          <i class="bi bi-eye me-1"></i> View Website
+        </a>
+      {% endif %}
       <a href="/menu-editor/create" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Create Menu
       </a>

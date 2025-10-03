@@ -306,6 +306,92 @@ body {
   border-top-color: #333;
 }
 
+/* Enhanced Custom Tooltip Styling */
+.custom-tooltip {
+  --bs-tooltip-max-width: 280px;
+  --bs-tooltip-opacity: 0.95;
+}
+
+.custom-tooltip .tooltip-inner {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  color: #f7fafc;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border-radius: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+  max-width: 280px;
+  word-wrap: break-word;
+}
+
+/* Arrow color matching for all positions */
+.custom-tooltip.bs-tooltip-top .tooltip-arrow::before,
+.custom-tooltip.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+  border-top-color: #2d3748;
+}
+
+.custom-tooltip.bs-tooltip-end .tooltip-arrow::before,
+.custom-tooltip.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+  border-right-color: #2d3748;
+}
+
+.custom-tooltip.bs-tooltip-bottom .tooltip-arrow::before,
+.custom-tooltip.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+  border-bottom-color: #2d3748;
+}
+
+.custom-tooltip.bs-tooltip-start .tooltip-arrow::before,
+.custom-tooltip.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+  border-left-color: #2d3748;
+}
+
+/* Smooth appearance animation */
+.custom-tooltip {
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* List styling within tooltips */
+.custom-tooltip .tooltip-inner ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.2rem;
+  list-style-type: disc;
+}
+
+.custom-tooltip .tooltip-inner li {
+  margin-bottom: 0.25rem;
+}
+
+/* Strong text in tooltips */
+.custom-tooltip .tooltip-inner strong {
+  color: #90cdf4;
+  font-weight: 600;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .custom-tooltip {
+    --bs-tooltip-max-width: 240px;
+  }
+  
+  .custom-tooltip .tooltip-inner {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
 
 /* Alerts */
 .alert-stack {

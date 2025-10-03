@@ -1,8 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize tooltips
+    // Initialize tooltips with mobile-friendly options
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-        new bootstrap.Tooltip(tooltipTriggerEl);
+        // Enable tooltips to work on mobile with touch events
+        new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover focus click', // Added click for mobile devices
+            placement: 'auto', // Auto adjust placement on small screens
+            html: true, // Allow HTML content in tooltips
+            animation: true, // Enable smooth animations
+            delay: { show: 300, hide: 100 }, // Add delays for better UX
+            customClass: 'custom-tooltip', // Add custom class for styling
+            boundary: 'window' // Keep tooltip within window bounds
+        });
     });
 
     // Toggle password visibility

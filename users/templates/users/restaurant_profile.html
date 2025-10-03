@@ -9,13 +9,22 @@
 <div class="container py-4">
   <!-- Quick Actions -->
   <div class="mb-4">
-    <div class="d-flex gap-2 flex-wrap">
-      <a href="{% url 'manage_reviews' %}" class="btn btn-outline-primary">
-        <i class="bi bi-chat-left-text me-2"></i>Manage Reviews
-      </a>
-      <a href="{% url 'restaurant_orders_list' %}" class="btn btn-outline-success">
-        <i class="bi bi-receipt me-2"></i>View Orders
-      </a>
+    <div class="d-flex gap-2 flex-wrap justify-content-between align-items-center">
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'restaurant_orders_list' %}" class="btn btn-outline-success">
+          <i class="bi bi-receipt me-2"></i>View Orders
+        </a>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'manage_reviews' %}" class="btn btn-outline-primary">
+          <i class="bi bi-chat-left-text me-2"></i>Manage Reviews
+        </a>
+        {% if user.restaurant_profile.slug %}
+        <a href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener" class="btn btn-outline-info">
+          <i class="bi bi-eye me-2"></i>Preview Page
+        </a>
+        {% endif %}
+      </div>
     </div>
   </div>
 
@@ -130,7 +139,7 @@
               <!-- Theme Choice Card -->
               <div class="card text-center mb-3">
                 <div class="card-header bg-black text-white">
-                  <h6 class="mb-0"><i class="bi bi-palette me-2"></i> Theme</h6>
+                  <h6 class="mb-0"><i class="bi bi-palette me-2"></i> Choose your theme</h6>
                 </div>
                 <div class="card-body">
                   <div class="row g-3 justify-content-around">

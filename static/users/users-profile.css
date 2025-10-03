@@ -23,8 +23,38 @@
     opacity: 1;
     transform: translateY(0);
 }
+
+/* Black & White Theme for Header */
+.profile-header-bw {
+    background: #fff !important;
+    border: 1.5px solid #e5e7eb !important;
+    box-shadow: 0 2px 8px rgba(34, 34, 34, 0.08) !important;
+}
+
+.profile-header-bw h2 {
+    color: #222 !important;
+    letter-spacing: 0.5px;
+}
+
+.profile-header-bw .text-muted {
+    color: #666 !important;
+}
+
+.profile-header-bw .bi-person-circle {
+    color: #222 !important;
+}
+
 .profile-header-action {
     min-width: 120px;
+    border-width: 1.5px !important;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    transition: all 0.18s ease;
+}
+
+.profile-header-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 34, 34, 0.15);
 }
 @media (max-width: 576px) {
     .profile-header-animated {

@@ -181,6 +181,9 @@ class MenuListView(LoginRequiredMixin, ListView):
         avg_price_result = MenuItem.objects.filter(menu__owner=user).aggregate(avg_price=Avg('price'))
         context['average_price'] = avg_price_result['avg_price'] or 0
         context['is_paginated'] = False
+        # Add restaurant profile to context
+        if hasattr(user, 'restaurant_profile'):
+            context['restaurant'] = user.restaurant_profile
         return context
     
 class MenuDeleteView(LoginRequiredMixin, DeleteView):

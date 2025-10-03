@@ -16,7 +16,7 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'home' %}">Gastro Grid</a>
         <div class="d-flex align-items-center d-lg-none" style="gap:0.5rem;">
-          <button class="nav-link cart-btn btn btn-link p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar" aria-label="View cart">
+          <button class="nav-link cart-btn btn btn-link p-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar" aria-label="View cart">
             <i class="bi bi-cart3" style="font-size:1.5rem;"></i>
             {% if cart and cart|length > 0 %}
               <span class="badge bg-danger ms-1">{{ cart|length }}</span>
@@ -50,21 +50,19 @@
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
                   <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                 </ul>
               </li>
             {% endif %}
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                  <a class="nav-link cart-btn" href="#" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar">
+                  <a class="nav-link cart-btn p-2" href="#" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar" aria-controls="cartSidebar">
                     <i class="bi bi-cart3"></i> Cart
                     {% if cart and cart|length > 0 %}
                       <span class="badge bg-danger ms-1">{{ cart|length }}</span>
                     {% endif %}
                   </a>
                 </li>
-                <li class="nav-item dropdown ms-auto">
+                <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex justify-content-center align-items-center text-center w-100" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <span class="position-relative">
                     {% if user.profile.image %}
@@ -80,7 +78,7 @@
                   {% if user.restaurant_profile %}
                     <li><a class="dropdown-item text-center" href="{% url 'restaurant_orders_list' %}">Recent Orders</a></li>
                     {% if user.restaurant_profile.slug %}
-                      <li><a class="dropdown-item text-center" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
+                      <li><a class="dropdown-item text-center" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Preview page</a></li>
                     {% endif %}
                   {% endif %}
                   {% if is_customer %}
@@ -126,14 +124,13 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-dark">
                   <li><a class="dropdown-item" href="{% url 'menus:menu_list' %}">View/Create menu</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
+                  <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
                 </ul>
               </li>
             {% endif %}
             {% if user.is_authenticated %}
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <span class="position-relative">
                     {% if user.profile.image %}
                       <img src="{{ user.profile.image.url }}" class="rounded-circle" style="width:32px; height:32px; object-fit:cover; margin-right:8px;" alt="Profile">
@@ -143,22 +140,23 @@
                   </span>
                   <span>{{ user.username }}</span>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end w-100 justify-content-center">
-                  <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'profile' %}">Account Settings</a></li>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item text-center" href="{% url 'profile' %}">Account Settings</a></li>
                   {% if user.restaurant_profile %}
-                    <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'restaurant_orders_list' %}">Recent Orders</a></li>
+                    <li><a class="dropdown-item text-center" href="{% url 'restaurant_orders_list' %}">View your orders</a></li>
+                    <li><a class="dropdown-item text-center" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
                     {% if user.restaurant_profile.slug %}
-                      <li><a class="dropdown-item" href="{% url 'restaurant_profile' %}">Restaurant Settings</a></li>
+                      <li><a class="dropdown-item text-center" href="{% url 'webpage_restaurant_site:landing' slug=user.restaurant_profile.slug %}" target="_blank" rel="noopener">Public Page Preview</a></li>
                     {% endif %}
                   {% endif %}
                   {% if is_customer %}
-                    <li><a class="dropdown-item d-flex justify-content-center align-items-center text-center w-100" href="{% url 'order_list' %}">My Orders</a></li>
+                    <li><a class="dropdown-item text-center" href="{% url 'order_list' %}">My Orders</a></li>
                   {% endif %}
                   <li><hr class="dropdown-divider"></li>
                   <li>
-                    <form method="post" action="{% url 'logout' %}">
+                    <form method="post" action="{% url 'logout' %}" class="w-100">
                       {% csrf_token %}
-                      <button type="submit" class="dropdown-item text-danger d-flex justify-content-center align-items-center text-center w-100">Logout</button>
+                      <button type="submit" class="dropdown-item text-danger text-center w-100">Logout</button>
                     </form>
                   </li>
                 </ul>
