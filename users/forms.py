@@ -25,10 +25,10 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email']
 
-# Profile Update Form (same as ProfileForm, can be omitted if not differing)
+# profile update form (same as ProfileForm, can be omitted if not differing)
 ProfileUpdateForm = ProfileForm
 
-# Address Create/Edit Form
+# address create/delete Form
 class AddressForm(forms.ModelForm):
     class Meta:
         model = UserAddress
@@ -43,10 +43,10 @@ class RestaurantDetailsForm(forms.ModelForm):
             'cuisine_type',
             'registration_number',
             'phone_number',
-            'logo',
-            
+            'logo',          
         ]
-# User Registration Form (extend as needed)
+
+# user registration form (extend as needed)
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     ROLE_CHOICES = [
@@ -59,7 +59,7 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = UserCreationForm.Meta.fields + ("email", "role")
 
-# Custom Set Password Form (for password reset/change flows)
+# custom set password form (for password reset/change flows)
 class CustomSetPasswordForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

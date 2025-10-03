@@ -210,29 +210,52 @@
     {% endif %}
   </div>
 </div>
-    <footer class="bg-light border-top mt-5 py-4">
+    <footer class="site-footer">
       <div class="container">
         <div class="row">
-          <!-- Left -->
-          <div class="col-md-6 mb-3 mb-md-0">
-            <a href="{% url 'home' %}" class="fw-semibold text-decoration-none text-dark">Gastro Grid</a>
-            <p class="text-muted small mb-0">© {{ now|date:"Y" }} Gastro Grid. All rights reserved.</p>
+          <!-- Brand Section -->
+          <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+            <div class="footer-brand">
+              <a href="{% url 'home' %}" class="footer-logo">Gastro Grid</a>
+              <p class="footer-tagline">Your gateway to culinary excellence</p>
+              <p class="footer-copyright">© {{ now|date:"Y" }} Gastro Grid. All rights reserved.</p>
+            </div>
           </div>
-          <!-- Right -->
-          <div class="col-md-6">
-            <ul class="nav justify-content-md-end justify-content-center">
-              <li class="nav-item"><a class="nav-link px-2" href="{% url 'home' %}">Home</a></li>
-              {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link px-2" href="{% url 'menus:menu_list' %}">Menus</a></li>
-                <li class="nav-item"><a class="nav-link px-2" href="{% url 'menus:my_menu' %}">Dishes</a></li>
-                <li class="nav-item"><a class="nav-link px-2" href="{% url 'profile' %}">Account</a></li>
-              {% else %}
-                <li class="nav-item"><a class="nav-link px-2" href="{% url 'login' %}">Login</a></li>
-                <li class="nav-item"><a class="nav-link px-2" href="{% url 'register' %}">Register</a></li>
-              {% endif %}
-              <li class="nav-item"><a class="nav-link px-2" href="{% url 'documentation' %}">Docs</a></li>
-              <li class="nav-item"><a class="nav-link px-2" href="{% url 'why_choose_us' %}"><i class="bi bi-star me-1"></i>Why Choose Us</a></li>
+
+          <!-- Quick Links -->
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <h6 class="footer-heading">Quick Links</h6>
+            <ul class="footer-links">
+              <li><a href="{% url 'home' %}">Home</a></li>
               <li><a href="{% url 'webpage_restaurant_site:browse_restaurants' %}">Browse Restaurants</a></li>
+              <li><a href="{% url 'why_choose_us' %}"><i class="bi bi-star me-1"></i>Why Choose Us</a></li>
+              <li><a href="{% url 'documentation' %}">Documentation</a></li>
+            </ul>
+          </div>
+
+          <!-- Account Section -->
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <h6 class="footer-heading">Account</h6>
+            <ul class="footer-links">
+              {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">My Account</a></li>
+                <li><a href="{% url 'menus:menu_list' %}">My Menus</a></li>
+                <li><a href="{% url 'menus:my_menu' %}">My Dishes</a></li>
+              {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Support Section -->
+          <div class="col-lg-2 col-md-6">
+            <h6 class="footer-heading">Support</h6>
+            <ul class="footer-links">
+              <li><a href="#">Help Center</a></li>
+              <li><a href="{% url 'contact_us' %}">Contact Us</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Privacy Policy</a></li>
             </ul>
           </div>
         </div>

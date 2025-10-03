@@ -13,8 +13,7 @@ DAYS_OF_WEEK = [
     ("Sunday", "Sunday"),
 ]
 
-
-# Main Details Form
+# restaurant details form
 class RestaurantProfileForm(forms.ModelForm):
     class Meta:
         model = RestaurantProfile
@@ -35,7 +34,7 @@ class RestaurantProfileForm(forms.ModelForm):
             "theme_choice": forms.Select(attrs={"class": "form-select"}),
         }
 
-# Hero Section Form
+# hero section form
 class HeroForm(forms.ModelForm):
     class Meta:
         model = RestaurantProfile
@@ -50,7 +49,7 @@ class HeroForm(forms.ModelForm):
             "hero_image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
         }
 
-# About Section Form
+# about section form
 class AboutForm(forms.ModelForm):
     class Meta:
         model = RestaurantProfile
@@ -129,7 +128,6 @@ class ReviewForm(forms.ModelForm):
             'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your review...'}),
             'reviewer_name': forms.TextInput(attrs={'placeholder': 'Your name (optional)'}),
         }
-
 
 class ReviewReplyForm(forms.ModelForm):
     """Form for restaurant owners to reply to reviews"""

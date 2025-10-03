@@ -19,7 +19,7 @@ from users.api_views import (
 urlpatterns = [
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
-    path("accounts/", include("django.contrib.auth.urls")),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('profile/', views.profile_manage, name='profile'),
     path('restaurant/profile/', views_restaurant.restaurant_profile, name='restaurant_profile'),
 
@@ -39,6 +39,7 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('why-choose-us/', views.why_choose_us, name='why_choose_us'),
+    path('contact/', views.contact_us, name='contact_us'),
     path('restaurants/', browse_restaurants, name='browse_restaurants'),
     path('review/<int:restaurant_pk>/', leave_review, name='leave_review'),
     # users/urls.py
@@ -47,8 +48,7 @@ urlpatterns = [
     path('orders/', order_list, name='order_list'),  # for order history
     path('restaurant/orders/', views.restaurant_orders_list, name='restaurant_orders_list'),
     path('restaurant/orders/<int:order_id>/', views_restaurant.restaurant_order_detail, name='restaurant_order_detail'),
-    
-    # Review management
+    # review management
     path('restaurant/reviews/', views_restaurant.manage_reviews, name='manage_reviews'),
     path('review/<int:review_id>/reply/', views_restaurant.reply_to_review, name='reply_to_review'),
 

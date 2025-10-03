@@ -124,18 +124,18 @@ def restaurant_profile(request):
             if hours_fs.is_valid():
                 hours_fs.save()
                 hours_saved = True
-        # If any form was saved, reload the page to show updated data and clear POST
+        # if any form was saved, reload the page to show updated data and clear POST
         if rp_saved or social_saved or hours_saved or logo_saved or about_saved or hero_saved:
             return redirect("restaurant_profile")
     else:
-        # On a GET request, create unbound instances of the forms.
+        # on a GET request, create unbound instances of the forms.
         rp_form = RestaurantProfileForm(instance=rp)
         hero_form = HeroForm(instance=rp)
         about_form = AboutForm(instance=rp)
         social_fs = SocialLinkFormSet(instance=rp, prefix="social")
         hours_fs = OpeningHourFormSet(instance=rp, prefix="hours")
 
-    # Fetch the saved addresses for display in the template.
+    # fetch the saved addresses for display in the template.
     saved_addresses = UserAddress.objects.filter(restaurant_profile=rp)
 
     context = {

@@ -91,6 +91,9 @@ def documentation(request):
 def why_choose_us(request):
     return render(request, 'users/why_choose_us.html')
 
+def contact_us(request):
+    return render(request, 'contact-us.html')
+
 def home(request):
     q = request.GET.get('q', '')
     restaurants_qs = RestaurantProfile.objects.prefetch_related('addresses')
