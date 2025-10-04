@@ -14,7 +14,6 @@
   }
   .browse-restaurant-card:hover {
     box-shadow: 0 8px 32px rgba(0,0,0,0.14);
-    background: #f8f9fa;
   }
   .browse-restaurant-logo {
     height: 120px;
@@ -56,18 +55,21 @@
     border-radius: 8px;
     transition: box-shadow 0.2s;
   }
-  .browse-action-buttons .btn-outline-primary {
-    border-color: #00c896;
-    color: #00c896;
-  }
-  .browse-action-buttons .btn-outline-primary:hover {
-    background: #00c896;
+  /* Modern Black & White Theme */
+  .browse-action-buttons .btn-modern-black {
+    background: #111;
     color: #fff;
-    box-shadow: 0 2px 8px rgba(0,200,150,0.08);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
   }
-  .browse-action-buttons .btn-outline-primary.btn-sm {
-    font-size: 0.95rem;
-    padding: 0.45em 0.8em;
+  .browse-action-buttons .btn-modern-black:hover,
+  .browse-action-buttons .btn-modern-black:focus {
+    background: #222;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   }
 </style>
 {% endblock %}
@@ -118,8 +120,8 @@
               </div>
               <div class="browse-action-buttons mt-auto">
                 {% if restaurant.slug %}
-                  <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" class="btn btn-outline-primary btn-sm w-100">
-                    View Page
+                  <a href="{% url 'webpage_restaurant_site:landing' slug=restaurant.slug %}" class="btn btn-modern-black btn-sm w-100">
+                    <i class="bi bi-eye me-1"></i> View Page
                   </a>
                 {% else %}
                   <span class="text-muted small">No public page</span>
