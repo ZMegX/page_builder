@@ -2,7 +2,14 @@
 Generate a new Django SECRET_KEY
 Run this script to generate a new secret key for your .env file
 """
-from django.core.management.utils import get_random_secret_key
+import secrets
+
+def get_random_secret_key():
+    """
+    Return a 50 character random string usable as a SECRET_KEY setting value.
+    """
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    return ''.join(secrets.choice(chars) for i in range(50))
 
 if __name__ == "__main__":
     new_key = get_random_secret_key()
