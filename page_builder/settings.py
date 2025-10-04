@@ -23,7 +23,11 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET')
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'SECURE': True,
+    'RESOURCE_TYPE': 'auto',
+    'TYPE': 'upload',
+    'ACCESS_MODE': 'public',  # Make files publicly accessible
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -34,10 +38,10 @@ MEDIA_URL = '/media/'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p(zi^f2^ue!+@t8wf4$4gr=j+12wt2$ej4)@!zg2d61-213t#4'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['page-builder-g94b.onrender.com', 'localhost', '127.0.0.1']
 
