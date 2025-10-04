@@ -215,6 +215,8 @@ class Document(models.Model):
     
     # For file uploads (PDFs, images, etc.)
     file = CloudinaryField('document', blank=True, null=True, 
+                          resource_type='auto',
+                          type='upload',
                           help_text="Upload a PDF or image file")
     
     # For Google Docs/Slides/Sheets
